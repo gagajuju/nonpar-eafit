@@ -1,0 +1,19 @@
+
+# Density estimation {#dens}
+
+## Review on histograms
+	
+## Kernel density estimation
+
+## Asymptotic properties
+
+## Confidence intervals
+
+## Multivariate extension
+
+## Bandwidth selection
+
+## Local likelihood
+
+## Exercises
+	

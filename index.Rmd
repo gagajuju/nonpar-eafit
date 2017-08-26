@@ -1,0 +1,44 @@
+--- 
+title: "Short course on nonparametric density and regression estimation"
+subtitle: "MSc in Applied Mathematics at EAFIT University (Colombia)"
+author: "Eduardo García Portugués"
+date: "`r Sys.Date()`, v0.1"
+knit: "bookdown::render_book"
+documentclass: book
+bibliography: nonpar-eafit.bib
+biblio-style: apalike
+link-citations: yes
+site: bookdown::bookdown_site
+---
+
+# Introduction {#intro}
+
+<!--
+(Move up once decided what options)
+cover-image: no
+description: "A 12-hour module within the subject \"Robust and nonparametric statistical techniques\" of the MSc in Applied Mathematics at EAFIT University (Colombia)."
+github-repo: egarpor/nonpar-eafit
+apple-touch-icon: "touch-icon.png"
+apple-touch-icon-size: 120
+favicon: "favicon.ico"
+-->
+
+## Course objectives
+
+## Software employed
+
+## Review on useful probabilistic results
+
+## Review on Landau notation
+
+## Main references and credits
+
+The following great reference books have been used extensively for preparing these notes:
+
+- @James2013 (linear regression, logistic regression, PCA, clustering),
+- @Pena2002 (linear regression, logistic regression, PCA, clustering),
+- @Bartholomew2008 (PCA).
+
+The icons used in the notes were designed by [madebyoliver](http://www.flaticon.com/authors/madebyoliver), [freepik](http://www.flaticon.com/authors/freepik), and [roundicons](http://www.flaticon.com/authors/roundicons) from [Flaticon](http://www.flaticon.com/).
+
+
