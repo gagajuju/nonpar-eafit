@@ -1,6 +1,6 @@
 bookdown::gitbook:
   css: css/style.css
-  split_by: section
+  split_by: chapter
   includes:
     in_header: analytics/script.html
   config:

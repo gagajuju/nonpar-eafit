@@ -5,4 +5,5 @@ _book
 _bookdown_files
 rsconnect
 TODO
+INFO
 datasets/~*.xlsx
