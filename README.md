@@ -1,6 +1,6 @@
 # Short course on nonparametric curve estimation
 
-[![Travis-CI Build Status](https://travis-ci.org/egarpor/nonpar-eafit.svg?branch=master)](https://travis-ci.org/egarpor/nonpar-eafit) [![License](https://img.shields.io/badge/license-MIT%20License-brightgreen.svg)](https://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/badge/license-CC_BY--NC--SA_4.0-blue.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 ![KDE animation](https://raw.githubusercontent.com/egarpor/project-kde/master/images/kde.gif)
 
