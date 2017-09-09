@@ -21,3 +21,7 @@ Here is a broad view of the syllabus:
 ## Contributions
 
 Contributions, reporting of typos, and feedback on the notes are very welcome. Either send an email to <edgarcia@est-econ.uc3m.es> or (preferably) fork the repository, make your changes and open a pull request. Give me a reason for listing your name below!
+
+## License
+
+All material in this repository is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).

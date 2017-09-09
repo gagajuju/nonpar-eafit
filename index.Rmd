@@ -23,22 +23,471 @@ apple-touch-icon-size: 120
 favicon: "favicon.ico"
 -->
 
-## Course objectives
+## Course objectives and logistics {#intro-course}
 
-## Software employed
+This course is intended to provide an introduction to **nonparametric estimation** of the **density and regression functions** from, mostly, the perspective of kernel smoothing. The emphasis will be placed in building intuition behind the methods, gaining insights into their asymptotic properties, and showing their application through the use of statistical software.
 
-## Review on useful probabilistic results
+The **software** employed in the course is *the* statistical language [`R`](https://cran.r-project.org/) and its most common IDE (Integrated Development Environment) nowadays, [`RStudio`](https://www.rstudio.com/products/rstudio/download/). A basic prior knowledge of both is assumed^[Among others: basic programming in `R`, ability to work with objects and data structures, ability to produce graphics, knowledge of the main statistical functions, ability to run scripts in `RStudio`.]. The Appendix presents basic introductions to `RStudio` and `R` for those students lacking basic expertise on them. 
 
-## Review on Landau notation
+The notes contain a substantial amount of snippets of code that are fully self-contained. Students are encouraged to bring their own laptops at the lessons to practice with the code. 
 
-## Main references and credits
+The required packages for the course are:
+```{r, echo = TRUE, cache = TRUE, warning = FALSE, message = FALSE, eval = FALSE}
+# Install packages
+install.packages(c("ks", "nor1mix", "KernSmooth", "sm", "rgl"))
+```
 
-The following great reference books have been used extensively for preparing these notes:
+The codes in the notes assume the packages have been loaded:
+```{r, echo = TRUE, cache = TRUE, warning = FALSE, message = FALSE}
+# Load packages
+library(ks)
+library(nor1mix)
+library(KernSmooth)
+library(sm)
+library(rgl)
+```
+The **Shiny interactive apps** on the notes can be downloaded and run locally. This allows in particular to examine their codes. Check [this GitHub repository](https://github.com/egarpor/ShinyServer) for the sources.
 
-- @James2013 (linear regression, logistic regression, PCA, clustering),
-- @Pena2002 (linear regression, logistic regression, PCA, clustering),
-- @Bartholomew2008 (PCA).
+Each topic of this contains a mix of theoretical and practical exercises for **grading**. Each student must choose *three exercises* in total (at least one theoretical and other practical) from Sections \@ref(dens-exercises) and \@ref(reg-exercises) and turn them in order to be graded. The grade is according to the difficulty of the solved exercises, which is given by the number of stars: easy ($\star$), medium ($\star\star$), and hard ($\star\star\star$). The final grade ($0-10$) is $\frac{1}{3}\sum_{i=1}^n\frac{\mathrm{Score}_i}{10}(5.5+1.5\star_i)$, where $\mathrm{Score}_i$ is the score ($0-10$) for the $i$-th exercise and $\star_i$ represents its number of stars ($1-3$).
 
-The icons used in the notes were designed by [madebyoliver](http://www.flaticon.com/authors/madebyoliver), [freepik](http://www.flaticon.com/authors/freepik), and [roundicons](http://www.flaticon.com/authors/roundicons) from [Flaticon](http://www.flaticon.com/).
+## Background and notation {#intro-nota}
 
+We begin by reviewing some elementary results that we will employ during the course, which will also serve to introduce notation and acronyms.
 
+### Basic probability review {#intro-prob}
+
+A tripe $(\Omega,\mathcal{A},\mathbb{P})$ is called a *probability space*. $\Omega$ represents the *sample space*, the set of all possible individual outcomes of a random experiment. $\mathcal{A}$ is a *$\sigma$-field*, a class of subsets of $\Omega$ that is closed under complementation and infinite unions, and such that $\Omega\in\mathcal{A}$. $\mathcal{A}$ represents the collection of possible *events* (combinations of individual outcomes) that are assigned a probability by the *probability measure* $\mathbb{P}$. A *random variable* is a map $X:\Omega\longrightarrow\mathbb{R}$ such that $\{\omega\in\Omega:X(\omega)\leq x\}\in\mathcal{A}$ (the set is *measurable*).
+
+The *cumulative distribution function* (cdf) of a random variable $X$ is $F(x):=\mathbb{P}[X\leq x]$. When an *independent and identically distributed* (iid) sample $X_1,\ldots,X_n$ is given, the cdf can be estimated by the *empirical distribution function* (ecdf)
+\begin{align}
+F_n(x)=\frac{1}{n}\sum_{i=1}^n\mathbb{1}_{\{X_i\leq x\}}, (\#eq:ecdf)
+\end{align}
+where $1_{\{x\in A\}}=1_A(x)=\begin{cases}1,\text{ if }x\in A,\\0,\text{ if }x\notin A\end{cases}$ is an *indicator function*. Continuous random variables are either characterized by the cdf $F$ or the *probability distribution function* (pdf) $f:=F'$, which represents the *infinitesimal relative probability* of $X$ per unit of length. We write $X\sim F$ (or $X\sim f$) to denote that $X$ has a a cdf $F$ (or a pdf $f$). If two random variables $X$ and $Y$ have the same distribution, we write $X\stackrel{d}{=}Y$.
+
+The *expectation* operator is constructed using the Lebesgue-Stieljes "$\mathrm{d}F(x)$" integral. Hence, for $X\sim F$, the expectation of $g(X)$ is
+$$
+\mathbb{E}[g(X)]:=\int g(x)\mathrm{d}F(x)=\begin{cases}\int g(x)f(x)\mathrm{d}x,&\text{if $X$ continuous,}\\\sum_{i} g(x_i)\mathbb{P}[X=x_i],&\text{if $X$ discrete.}\end{cases}
+$$
+Unless otherwise stated, the integration limits of any integral are $\mathbb{R}$ or $\mathbb{R}^p$. The variance operator is defined as $\mathbb{V}\mathrm{ar}[X]:=\mathbb{E}[(X-\mathbb{E}[X])^2]$.
+
+We employ bold faces to denote vectors and matrices. A $p$-*random vector* is a map $\mathbf{X}:\Omega\longrightarrow\mathbb{R}^p$, $\mathbf{X}(\omega):=(X_1(\omega),\ldots,X_p(\omega))$, such that each $X_i$ is a random variable. The (joint) cdf of $\mathbf{X}$ is $F(\mathbf{x}):=\mathbb{P}[\mathbf{X}\leq \mathbf{x}]:=\mathbb{P}[X_1\leq x_1,\ldots,X_p\leq x_p]$ and, if $\mathbf{X}$ is continuous, its (joint) pdf is $f:=\frac{\partial^p}{\partial x_1\cdots\partial x_p}F$. The *marginals* of $F$ and $f$ are the cdf and pdf of $X_i$, $i=1,\ldots,p$, respectively. They are defined as:
+\begin{align*}
+F_{X_i}(x_i)&:=\mathbb{P}[X_i\leq x]=\int_{\mathbb{R}^{p-1}} F(\mathbf{x})\mathrm{d}x_1\cdots\mathrm{d}\check{x_i}\cdots\mathrm{d}x_p,\\
+f_{X_i}(x_i)&:=\frac{\partial}{\partial x_i}F_{X_i}(x_i)=\int_{\mathbb{R}^{p-1}} f(\mathbf{x})\mathrm{d}x_1\cdots\mathrm{d}\check{x_i}\cdots\mathrm{d}x_p,
+\end{align*} 
+where $\check{x_i}$ means that $x_i$ is omitted. The definitions can be extended analogously to the marginals of the cdf and pdf of different subsets of $\mathbf{X}$.
+
+The *conditional* cdf and pdf of $X_1\vert(X_2,\ldots,X_p)$ are defined, respectively, as
+\begin{align*}
+F_{X_1\vert X_2=x_2,\ldots,X_p=x_p}(x_1)&:=\mathbb{P}[X_1\leq x_1\vert X_2=x_2,\ldots,X_p=x_p],\\
+f_{X_1\vert X_2=x_2,\ldots,X_p=x_p}(x_1)&:=\frac{f(\mathbf{x})}{f_{2,\ldots,p}(x_2,\ldots,x_p)}.
+\end{align*}
+The *conditional expectation* of $Y\vert X$ is the following random variable^[Recall that the $X$-part is random!]
+$$
+\mathbb{E}[Y\vert X]:=\int y \mathrm{d}F_{Y\vert X}(y\vert X). 
+$$
+The *conditional variance* of $Y|X$ is defined as $\mathbb{V}\mathrm{ar}[Y\vert X]:=\mathbb{E}[(Y-\mathbb{E}[Y\vert X])^2\vert X]=\mathbb{E}[Y^2\vert X]-\mathbb{E}[Y\vert X]^2$.
+
+```{proposition, name = "Laws of total expectation and variance"}
+Let $X$ and $Y$ be two random variables. 
+
+- **Total expectation**. If $\mathbb{E}[|Y|]<\infty$, then $\mathbb{E}[Y]=\mathbb{E}[\mathbb{E}[Y\vert X]]$.
+- **Total variance**. If $\mathbb{E}[Y^2]<\infty$, then $\mathbb{V}\mathrm{ar}[Y]=\mathbb{E}[\mathbb{V}\mathrm{ar}[Y\vert X]]+\mathbb{V}\mathrm{ar}[\mathbb{E}[Y\vert X]]$.
+
+```
+
+```{exercise}
+Prove the law of total variance from the law of total expectation.
+```
+
+We conclude with some useful inequalities.
+
+```{proposition, name = "Markov's inequality"}
+Let $X$ be a non-negative random variable with $\mathbb{E}[X]<\infty$. Then 
+$$
+\mathbb{P}[X>t]\leq\frac{\mathbb{E}[X]}{t}, \quad\forall t>0.
+$$
+```
+
+```{proposition, name = "Chebyshev's inequality"}
+Let $\mu=\mathbb{E}[X]$ and $\sigma^2=\mathbb{V}\mathrm{ar}[X]$. Then 
+$$
+\mathbb{P}[|X-\mu|\geq t]\leq\frac{\sigma^2}{t^2},\quad \forall t>0.
+$$
+```
+
+```{exercise}
+Prove Markov's inequality using $X=X1_{X>t}+X1_{X\leq t}$. Then prove Chebyshev's inequality using Markov's. *Hint*: use the random variable $(X-\mathbb{E}[X])^2$.
+```
+
+```{proposition, name = "Cauchy-Schwartz inequality"}
+Let $X$ and $Y$ such that $\mathbb{E}[X^2]<\infty$ and $\mathbb{E}[Y^2]<\infty$. Then $\mathbb{E}[|XY|]\leq\sqrt{\mathbb{E}[X^2]\mathbb{E}[Y^2]}$.
+```
+
+```{proposition, name = "Jensen's inequality"}
+If $g$ is a convex function, then $g(\mathbb{E}[X])\leq\mathbb{E}[g(X)]$.
+```
+
+```{example}
+Jensen's inequality has interesting derivarions. For example:
+
+- Take $h=-g$. Then $h$ is a concave function and we have that $h(\mathbb{E}[X])\geq\mathbb{E}[h(X)]$.
+- Take $g(x)=x^r$ for $r\geq 1$. Then $\mathbb{E}[X]^r\leq \mathbb{E}[X^r]$. If $0<r<1$, then $\mathbb{E}[X]^r\geq \mathbb{E}[X^r]$.
+- Consider $0\leq r\leq s$. Then $g(x)=x^\frac{r}{s}$ is convex and $g(\mathbb{E}[|X|^s])\leq \mathbb{E}[g(|X|^s)]<\mathbb{E}[|X|^r]$. As a consequence $\mathbb{E}[|X|^r]<\infty\implies\mathbb{E}[|X|^s]<\infty$ for $0\leq r\leq s$.
+
+```
+
+### Some facts about distributions {#intro-distr}
+
+We will make use of several parametric distributions. Some notation and facts are introduced as follows:
+
+- $\mathcal{N}(\mu,\sigma^2)$ stands for the *normal distribution* with mean $\mu$ and variance $\sigma^2$. Its pdf is $\phi_\sigma(x-\mu):=\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x-\mu)^2}{2\sigma^2}}$, $x\in\mathbb{R}$, and satisfies that $\phi_\sigma(x-\mu)=\frac{1}{\sigma}\phi_1\left(\frac{x-\mu}{\sigma}\right)$. Its cdf is denoted as $\Phi_\sigma(x-\mu)$. $z_\alpha$ denotes the upper $\alpha$-quantile of a $\mathcal{N}(0,1)$, *i.e.*, $z_\alpha=\Phi_1^{-1}(1-\alpha)$. Some uncentered moments of $X\sim\mathcal{N}(\mu,\sigma^2)$ are
+$$
+\mathbb{E}[X]=\mu,\;\mathbb{E}[X^2]=\mu^2+\sigma^2,\; \mathbb{E}[X^3]=\mu^3+3\mu\sigma^2,\; \mathbb{E}[X^4]=\mu^4+6\mu^2\sigma^2+3\sigma^4.
+$$
+- The *exponential distribution* is denoted as $\mathrm{Exp}(\lambda)$ and has pdf $f(x;\lambda)=\lambda e^{-\lambda x}$, $\lambda,x>0$.
+- The *gamma distribution* is denoted as $\Gamma(a,p)$ and has pdf $f(x;a,p)=\frac{a^p}{\Gamma(p)} x^{p-1}e^{-a x}$, $a,p,x>0$, where $\Gamma(p)=\int_0^\infty x^{p-1}e^{-ax}\mathrm{d}x$. It is known that
+$$
+\mathbb{E}[\Gamma(a,p)]=\frac{p}{a},\;\mathbb{V}\mathrm{ar}[\Gamma(a,p)]=\frac{p}{a^2}.
+$$
+- The *inverse gamma distribution*, $\mathrm{IG}(a,p)\stackrel{d}{=}\Gamma(a,p)^{-1}$, has pdf
+$f(x;a,p)=\frac{a^p}{\Gamma(p)} x^{-p-1}e^{-\frac{a}{x}}$, $a,p,x>0$. It is known that
+$$
+\mathbb{E}[\mathrm{IG}(a,p)]=\frac{a}{p-1},\;\mathbb{V}\mathrm{ar}[\mathrm{IG}(a,p)]=\frac{a^2}{(p-1)^2(p-2)}.
+$$
+- The *binomial distribution* is denoted as $\mathrm{B}(n,p)$. Recall that $\mathbb{E}[\mathrm{B}(n,p)]=np$ and $\mathbb{V}\mathrm{ar}[\mathrm{B}(n,p)]=np(1-p)$.
+- The *beta distribution* is denoted as $\beta(a,b)$ and its pdf is $f(x;a,b)=\frac{1}{\beta(a,b)}x^{a-1}(1-x)^{1-b}$, where $\beta(a,b)=\frac{\Gamma(a)\Gamma(b)}{\Gamma(a+b)}$. When $a=b=1$, the *uniform distribution* $\mathcal{U}(0,1)$ arises.
+
+### Basic stochastic convergence review {#intro-stoch}
+
+Let $X_n$ be a sequence of random variables defined in a common probability space $(\Omega,\mathcal{A},\mathbb{P})$. The four most common types of convergence of $X_n$ to a random variable in $(\Omega,\mathcal{A},\mathbb{P})$ are the following.
+
+```{definition, name = "Convergence in distribution", label = "dist"}
+$X_n$ *converges in distribution* to $X$, written $X_n\stackrel{d}{\longrightarrow}X$, if $\lim_{n\to\infty}F_n(x)=F(x)$ for all $x$ for which $F$ is continuous, where $X_n\sim F_n$ and $X\sim F$.
+```
+
+```{definition, name = "Convergence in probability", label = "prob"}
+$X_n$ *converges in probability* to $X$, written $X_n\stackrel{\mathbb{P}}{\longrightarrow}X$, if $\lim_{n\to\infty}\mathbb{P}[|X_n-X|>\varepsilon]=0$, $\forall \varepsilon>0$.
+```
+
+```{definition, name = "Convergence almost surely", label = "as"}
+$X_n$ *converges almost surely* (as) to $X$, written $X_n\stackrel{\mathrm{as}}{\longrightarrow}X$, if $\mathbb{P}[\{\omega\in\Omega:\lim_{n\to\infty}X_n(s)=X(s)\}]=1$.
+```
+
+```{definition, name = "Convergence in $r$-mean", label = "rmean"}
+$X_n$ *converges in $r$-mean* to $X$, written $X_n\stackrel{r}{\longrightarrow}X$, if $\lim_{n\to\infty}\mathbb{E}[|X_n-X|^r]=0$.
+```
+
+```{remark}
+The previous definitions can be extended to a sequence of $p$-random vectors $\mathbf{X}_n$. For Definitions \@ref(def:prob) and \@ref(def:rmean), replace $|\cdot|$ by the Euclidean norm $||\cdot||$. Alternatively, Definition \@ref(def:prob) can be extended *marginally*: $\mathbf{X_n}\stackrel{\mathbb{P}}{\longrightarrow}\mathbf{X}:\iff X_{j,n}\stackrel{\mathbb{P}}{\longrightarrow}X_j$, $\forall j=1,\ldots,p$. For Definition \@ref(def:dist), replace $F_n$ and $F$ by the joint cdfs of $\mathbf{X}_n$ and $\mathbf{X}$, respectively. Definition \@ref(def:as) extends marginally as well.
+```
+
+The $2$-mean convergence plays a remarkable role in defining a consistent estimator $\hat\theta_n=T(X_1,\ldots,X_n)$ of a parameter $\theta$. We say that the *estimator is consistent* if its Mean Squared Error (MSE),
+$$
+\mathrm{MSE}[\hat\theta_n]:=\mathbb{E}[(\hat\theta_n-\theta)^2]=(\mathbb{E}[\hat\theta_n]-\theta)^2+\mathbb{V}\mathrm{ar}[\hat\theta_n]=:\mathrm{Bias}[\hat\theta_n]^2+\mathbb{V}\mathrm{ar}[\hat\theta_n],
+$$
+goes to zero as $n\to\infty$. Equivalently, if $\hat\theta_n\stackrel{2}{\longrightarrow}\theta$.
+
+If $X$ is a *degenerate* random variable such that $\mathbb{P}[X=c]=1$, $c\in\mathbb{R}$, then we write $X_n\stackrel{d,\mathbb{P},r,\mathrm{as}}{\longrightarrow} c$ (the notation applies to the four types of convergences).
+
+The relations between the types of convergences are conveniently summarized in the next proposition.
+
+```{proposition}
+Let $X_n$ be a sequence of random variables and $X$ a random variable. Then the following implication diagram is satisfied:
+\begin{align*}
+\begin{array}{rcl}
+X_n\stackrel{r}{\longrightarrow}X \quad\implies & X_n\stackrel{\mathbb{P}}{\longrightarrow}X & \impliedby\quad X_n\stackrel{\mathrm{as}}{\longrightarrow}X\\
+& \Downarrow & \\
+& X_n\stackrel{d}{\longrightarrow}X &
+\end{array}
+\end{align*}
+None of the converses hold in general. However, there are some notable exceptions:
+
+i. If $X_n\stackrel{d}{\longrightarrow}c$, then $X_n\stackrel{\mathbb{P}}{\longrightarrow}c$.
+ii. If $\forall\varepsilon>0$, $\lim_{n\to\infty}\sum_n\mathbb{P}[|X_n-X|>\varepsilon]<\infty$ (implies^[Intuitively: if convergence in probability is fast enought, then we have almost surely convergence.] $X_n\stackrel{\mathbb{P}}{\longrightarrow}X$), then $X_n\stackrel{\mathrm{as}}{\longrightarrow}X$.
+iii. If $X_n\stackrel{\mathbb{P}}{\longrightarrow}X$ and $\mathbb{P}[|X_n|\leq M]=1$, $\forall n\in\mathbb{N}$ and $M>0$, then $X_n\stackrel{r}{\longrightarrow}X$ for $r\geq1$.
+iv. If $S_n=\sum_{i=1}^nX_i$ with $X_1,\ldots,X_n$ iid, then $S_n\stackrel{r}{\longrightarrow}S\iff S_n\stackrel{\mathrm{as}}{\longrightarrow}S$.
+
+Also, if $s>r\geq 1$, then $X_n\stackrel{s}{\longrightarrow}X\implies X_n\stackrel{r}{\longrightarrow}X$.
+```
+
+*The* corner stone limit result in probability is the central limit theorem (CLT). In its simpler version, it entails that:
+
+```{theorem, name = "CLT", label = "clt"}
+Let $X_n$ be a sequence of iid random variables with $\mathbb{E}[X_n]=\mu$ and $\mathbb{V}\mathrm{ar}[X_n]=\sigma^2<\infty$, $i\in\mathbb{N}$. Then:
+$$
+\frac{\sqrt{n}(\bar{X}-\mu)}{\sigma}\stackrel{d}{\longrightarrow}\mathcal{N}(0,1).
+$$
+```
+
+We will use later the following CLT for random variables that are independent but *not* identically distributed due to its easy-to-check moment conditions.
+
+```{theorem, name = "Lyapunov's CLT", label = "lya"}
+Let $X_n$ be a sequence of independent random variables with $\mathbb{E}[X_i]=\mu_i$ and $\mathbb{V}\mathrm{ar}[X_i]=\sigma_i^2<\infty$, $i\in\mathbb{N}$, and such that for some $\delta>0$
+$$
+\frac{1}{s_n^{2+\delta}}\sum_{i=1}^n\mathbb{E}\left[|X_i-\mu_i|^{2+\delta}\right]\longrightarrow0\text{ as }n\to\infty,
+$$
+with $s_n^2=\sum_{i=1}^n\sigma^2_i$. Then:
+$$
+\frac{1}{s_n}\sum_{i=1}^n(X_i-\mu_i)\stackrel{d}{\longrightarrow}\mathcal{N}(0,1).
+$$
+```
+
+Finally, the next results will be of usefulness.
+
+```{theorem, name = "Cramér-Wold device"}
+Let $\mathbf{X}_n$ be a sequence of $p$-dimensional random vectors. Then:
+$$
+\mathbf{X}_n\stackrel{d}{\longrightarrow}\mathbf{X}\iff \mathbf{c}'\mathbf{X}_n\stackrel{d}{\longrightarrow}\mathbf{c}'\mathbf{X},\quad \forall \mathbf{c}\in\mathbb{R}^p.
+$$
+```
+
+```{theorem, name = "Continuous mapping theorem", label = "cmt"}
+If $\mathbf{X}_n\stackrel{d,\,\mathbb{P},\,\mathrm{as}}{\longrightarrow}\mathbf{X}$, then $g(\mathbf{X}_n)\stackrel{d,\,\mathbb{P},\,\mathrm{as}}{\longrightarrow}g(\mathbf{X})$ for any continuous function $g$.
+```
+
+```{theorem, name = "Slutsky's theorem"}
+Let $X_n$ and $Y_n$ be sequences of random variables.
+
+i. If $X_n\stackrel{d}{\longrightarrow}X$ and $Y_n\stackrel{\mathbb{P}}{\longrightarrow} c$, then $X_nY_n\stackrel{d}{\longrightarrow}cX$.
+ii. If $X_n\stackrel{d}{\longrightarrow}X$ and $Y_n\stackrel{\mathbb{P}}{\longrightarrow} c$, $c\neq0$, then $\frac{X_n}{Y_n}\stackrel{d}{\longrightarrow}\frac{X}{c}$.
+iii. If $X_n\stackrel{d}{\longrightarrow}X$ and $Y_n\stackrel{\mathbb{P}}{\longrightarrow} c$, then $X_n+Y_n\stackrel{d}{\longrightarrow}X+c$.
+
+```
+
+```{theorem, name = "Limit algebra for $(\\mathbb{P},\\,r,\\,\\mathrm{as})$-convergence"}
+Let $X_n$ and $Y_n$ be sequences of random variables and $a_n\to a$ and $b_n\to b$ two sequences. Denote $X_n\stackrel{\mathbb{P},\,r,\,\mathrm{as}}{\longrightarrow}X$ to "$X_n$ converges in probability (respectively almost surely, respectively in $r$-mean)".
+
+i. If $X_n\stackrel{\mathbb{P},\,r,\,\mathrm{as}}{\longrightarrow}X$ and $Y_n\stackrel{\mathbb{P},\,r,\,\mathrm{as}}{\longrightarrow}X$, then $a_nX_n+b_nY_n\stackrel{\mathbb{P},\,r,\,\mathrm{as}}{\longrightarrow}aX+bY$.
+ii. If $X_n\stackrel{\mathbb{P},\,\mathrm{as}}{\longrightarrow}X$ and $Y_n\stackrel{\mathbb{P},\,\mathrm{as}}{\longrightarrow}X$, then $X_nY_n\stackrel{\mathbb{P},\,\mathrm{as}}{\longrightarrow}XY$.
+
+```
+
+```{remark}
+Recall the abscense of results for convergence in distribution. They do not hold. Particularly: $X_n\stackrel{d}{\longrightarrow}X$ and $Y_n\stackrel{d}{\longrightarrow}X$ $\,\,\,\not\!\!\!\!\implies X_n+Y_n\stackrel{d}{\longrightarrow}X+Y$.
+```
+
+```{theorem, name = "Delta method", label = "delta"}
+If $\sqrt{n}(X_n-\mu)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma^2)$, then $\sqrt{n}(g(X_n)-g(\mu))\stackrel{d}{\longrightarrow}\mathcal{N}\left(0,(g'(\mu))^2\sigma^2\right)$ for any function such that $g$ is differentiable at $\mu$ and $g'(\mu)\neq0$.
+```
+
+```{example, label = "ml"}
+It is well known that, given a parametric density $f_\theta$, with parameter $\theta\in\Theta$, and iid $X_1,\ldots,X_n\sim f_\theta$, then the *maximum likelihood* estimator $\hat\theta_{\mathrm{ML}}:=\arg\max_{\theta\in\Theta}\sum_{i=1}^n\log f_\theta(X_i)$ converges to a normal under certain regularity conditions:
+$$
+\sqrt{n}(\hat\theta_{\mathrm{ML}}-\theta)\stackrel{d}{\longrightarrow}\mathcal{N}\left(0,I(\theta)^{-1}\right),
+$$
+where $I(\theta):=-\mathbb{E}_\theta\left[\frac{\partial^2\log f_\theta(x)}{\partial\theta^2}\right]$. Then, it is satisfied that:
+$$
+\sqrt{n}(g(\hat\theta_{\mathrm{ML}})-g(\theta))\stackrel{d}{\longrightarrow}\mathcal{N}\left(0,(g'(\theta))^2I(\theta)^{-1}\right).
+$$
+```
+
+```{theorem, name = "Weak and strong laws of large numbers"}
+Let $X_n$ be a iid sequence with $\mathbb{E}[X_i]=\mu$, $i\geq1$. Then: $\frac{1}{n}\sum_{i=1}^nX_i\stackrel{\mathbb{P},\,\mathrm{as}}{\longrightarrow}\mu$.
+```
+
+### Review on $O_\mathbb{P}$ and $o_\mathbb{P}$ notation {#intro-ohs}
+
+In computer science the $O$ notation used to measure the complexity of algorithms. For example, when an algorithm is $O(n^2)$, it is said that it is *quadratic* in time and we know that is going to take *on the order of* $n^2$ operations to process an input of size $n$. We do not care about the specific amount of computations, but focus on the *big picture* by looking for an upper bound for the sequence of computation times in terms of $n$. This upper bound disregards constants. For example, the dot product between two vectors of size $n$ is an $O(n)$ operation, albeit it takes $n$ multiplications and $n-1$ sums, hence $2n-1$ operations.
+
+In mathematical analysis, $O$-related notation is mostly used with the aim of bounding sequences that *shrink to zero*. The technicalities are however the same.
+
+```{definition, name = "Big $O$"}
+Given two strictly positive sequences $a_n$ and $b_n$,
+$$
+a_n=O(b_n):\iff \lim_{n\to\infty}\frac{a_n}{b_n}\leq C,\text{ for a }C>0.
+$$
+If $a_n=O(b_n)$, then we say that *$a_n$ is big-$O$ of $b_n$*. To indicate that $a_n$ is bounded, we write $a_n=O(1)$.
+```
+
+```{definition, name = "Little $o$"}
+Given two strictly positive sequences $a_n$ and $b_n$,
+$$
+a_n=o(b_n):\iff \lim_{n\to\infty}\frac{a_n}{b_n}=0.
+$$
+If $a_n=o(b_n)$, then we say that *$a_n$ is little-$o$ of $b_n$*. To indicate that $a_n\to0$, we write $a_n=o(1)$.
+```
+
+The interpretation of these two definitions is simple:
+
+- $a_n=O(b_n)$ means that $a_n$ **"not larger than"** $b_n$ asymptotically. If $a_n,b_n\to0$, then it means that $a_n$ **"does not decrease slower"** than $b_n$.
+- $a_n=o(b_n)$ means that $a_n$ is **"smaller than"** $b_n$ asymptotically. If $a_n,b_n\to0$, then it means that $a_n$ **"decrease faster"** than $b_n$.
+
+Obviously, **little-$o$ implies big-$O$**. Playing with limits we can get a list of useful facts:
+
+```{proposition, label = "ohs"}
+Consider three sequences $a_n,b_n,c_n\to0$. The following properties hold:
+
+i. $O(ka_n)=O(a_n)$, $o(ka_n)=o(a_n)$, $k\in\mathbb{R}$.
+ii. $o(a_n)+o(b_n)=o(a_n+b_n)$, $O(a_n)+O(b_n)=O(a_n+b_n)$.
+iii. $o(a_n)+O(b_n)=O(a_n+b_n)$, $o(a_n)o(b_n)=o(a_nb_n)$.
+iv. $O(a_n)O(b_n)=O(a_nb_n)$, $o(a_n)O(b_n)=o(a_nb_n)$.
+v. $o(1)O(a_n)=o(a_n)$.
+vi. $a_n^r=o(a_n^s)$, for $r>s\geq 0$.
+vii. $a_nb_n=o(a_n^2+b_n^2)$.
+viii. $a_nb_n=o(a_n+b_n)$.
+ix. $(a_n+b_n)^k=O(a_n^k+b_n^k)$.
+
+```
+
+The last result is a consequence of a useful inequality:
+
+```{lemma, name = "$C_p$ inequality"}
+Given $a,b\in\mathbb{R}$ and $p>0$, 
+$$
+|a+b|^p\leq C_p(|a|^p+|b|^p), \quad C_p=\begin{cases}1,&0<p\leq1,\\2^{p-1},&p>1.\end{cases}
+$$
+```
+
+The previous notation is purely deterministic. Let's add some stochastic flavor by establishing the stochastic analogous of little-$o$.
+
+```{definition, name = "Little $o_\\mathbb{P}$"}
+Given a strictly positive sequence $a_n$ and a sequence of random variables $X_n$,
+\begin{align*}
+X_n=o_\mathbb{P}(a_n):\iff& \frac{|X_n|}{a_n}\stackrel{\mathbb{P}}{\longrightarrow}0 \\
+\iff& \lim_{n\to\infty}\mathbb{P}\left[\frac{|X_n|}{a_n}>\varepsilon\right]=0,\quad\forall\varepsilon>0.
+\end{align*}
+If $X_n=o_\mathbb{P}(a_n)$, then we say that *$X_n$ is little-$o_\mathbb{P}$ of $a_n$*.
+```
+
+Therefore, little-$o_\mathbb{P}$ allows to quantify easily the speed at which a sequence of random variables converges to zero in probability.
+
+```{example}
+Let $Y_n=o_\mathbb{P}\left(n^{-\frac{1}{2}}\right)$ and $Z_n=o_\mathbb{P}\left(n^{-1}\right)$. Then $Z_n$ converges faster to zero in probability than $Y_n$. To visualize this, recall that the little-$o_\mathbb{P}$ and limit definitions entail that
+$$
+\forall\varepsilon,\delta>0,\,\exists \,n_0=n_0(\varepsilon,\delta):\forall n\geq n_0,\, \mathbb{P}\left[|X_n|>a_n\varepsilon\right]<\delta.
+$$
+Therefore, for fixed $\varepsilon,\delta>0$, and a fixed $n\geq\max(n_{0,Y},n_{0,Z})$, then  $\mathbb{P}\left[Y_n\in\left(-n^{-\frac{1}{2}}\varepsilon,n^{-\frac{1}{2}}\varepsilon\right)\right]<1-\delta$ and
+$\mathbb{P}\left[Z_n\in(-n^{-1}\varepsilon,n^{-1}\varepsilon)\right]<1-\delta$, but the latter interval is much shorter, hence $Z_n$ is more tighly concentrated around $0$.
+```
+
+```{definition, name = "Big $O_\\mathbb{P}$"}
+Given a strictly positive sequence $a_n$ and a sequence of random variables $X_n$,
+\begin{align*}
+X_n=O_\mathbb{P}(a_n):\iff&\forall\varepsilon>0,\,\exists\,C=C(\varepsilon)>0,\,n_0=n_0(\varepsilon):\forall n\geq n_0,\, \mathbb{P}\left[\frac{|X_n|}{a_n}>C_\varepsilon\right]<\varepsilon\\
+\iff& \lim_{C\to\infty}\lim_{n\to\infty}\mathbb{P}\left[\frac{|X_n|}{a_n}>C\right]=0.
+\end{align*}
+If $X_n=O_\mathbb{P}(a_n)$, then we say that *$X_n$ is big-$O_\mathbb{P}$ of $a_n$*.
+```
+
+```{example}
+Chebyshev inequality entails that $\mathbb{P}[|X-\mathbb{E}[X]|\geq t]\leq \frac{\mathbb{V}\mathrm{ar}[X]}{t^2}$, $\forall t>0$. Setting $\varepsilon:=\frac{\mathbb{V}\mathrm{ar}[X]}{t^2}$ and $C_\varepsilon:=\frac{1}{\sqrt{\varepsilon}}$, then $\mathbb{P}\left[|X-\mathbb{E}[X]|\geq \sqrt{\mathbb{V}\mathrm{ar}[X]}C_\varepsilon\right]\leq \varepsilon$. Therefore, 
+$$
+X-\mathbb{E}[X]=O_\mathbb{P}\left(\sqrt{\mathbb{V}\mathrm{ar}[X_n]}\right).
+$$
+```
+
+```{exercise}
+Prove that if $X_n\stackrel{d}{\longrightarrow}X$, then $X_n=O_\mathbb{P}(1)$. *Hint*: use the double-limit definition and note that $X=O_\mathbb{P}(1)$.
+```
+
+```{example, label = "das"}
+(Example 1.18 in @DasGupta2008) Suppose that $a_n(X_n-c_n)\stackrel{d}{\longrightarrow}X$ for deterministic sequences $a_n$ and $c_n$ such that $c_n\to c$. Then, if $a_n\to\infty$, $X_n-c=o_\mathbb{P}(1)$. The argument is simple:
+$$
+X_n-c=X_n-c_n+c_n-c=\frac{1}{a_n}a_n(X_n-c_n)+o(1)=\frac{1}{a_n}O_\mathbb{P}(1)+o(1).
+$$
+```
+
+```{exercise}
+Using the previous example, derive the weak law of large numbers as a consequence of the CLT, both for id and non-id independent random variables.
+```
+
+```{proposition, label = "ohps"}
+Consider two strictly positive sequences $a_n,b_n\to 0$. The following properties hold:
+
+i. $o_\mathbb{P}(a_n)=O_\mathbb{P}(a_n)$ (little-$o_\mathbb{P}$ implies big-$O_\mathbb{P}$).
+ii. $o(1)=o_\mathbb{P}(1)$, $O(1)=O_\mathbb{P}(1)$ (deterministic implies probabilistic).
+iii. $kO_\mathbb{P}(a_n)=O_\mathbb{P}(a_n)$, $ko_\mathbb{P}(a_n)=o_\mathbb{P}(a_n)$, $k\in\mathbb{R}$.
+iv. $o_\mathbb{P}(a_n)+o_\mathbb{P}(b_n)=o_\mathbb{P}(a_n+b_n)$, $O_\mathbb{P}(a_n)+O_\mathbb{P}(b_n)=O_\mathbb{P}(a_n+b_n)$.
+v. $o_\mathbb{P}(a_n)+O_\mathbb{P}(b_n)=O_\mathbb{P}(a_n+b_n)$, $o_\mathbb{P}(a_n)o_\mathbb{P}(b_n)=o_\mathbb{P}(a_nb_n)$.
+vi. $O_\mathbb{P}(a_n)O_\mathbb{P}(b_n)=O_\mathbb{P}(a_nb_n)$, $o_\mathbb{P}(a_n)O_\mathbb{P}(b_n)=o_\mathbb{P}(a_nb_n)$.
+vii. $o_\mathbb{P}(1)O_\mathbb{P}(a_n)=o_\mathbb{P}(a_n)$.
+vii. $(1+o_\mathbb{P}(1))^{-1}=O_\mathbb{P}(1)$.
+
+```
+
+### Basic analytical tools {#intro-analytic}
+
+We will make use of the following well-known analytical results.
+
+```{theorem, name = "Integral mean value theorem"}
+Let $f:[a,b]\longrightarrow\mathbb{R}$ be a continuous function over $(a,b)$. Then there exists $c\in(a,b)$ such that
+$\int_a^b f(x)\mathrm{d}x=f(c)(b-a)$.
+```
+
+```{theorem, name = "Taylor's theorem", label = "tay"}
+Let $f:\mathbb{R}\longrightarrow\mathbb{R}$ and $x\in\mathbb{R}$. Assume that $f$ has $p$ continuous derivatives in an interval $(x-\delta,x+\delta)$ for some $\delta>0$. Then for any $0<h<\delta$,
+$$
+f(x+h)=\sum_{j=0}^p\frac{f^{(j)}(x)}{j!}h^j+R_n,\quad R_n=o(h^p).
+$$
+```
+
+```{remark}
+The remaider $R_n$ *depends on* $x\in\mathbb{R}$. Explicit control of $R_n$ is possible if $f$ is further assumed to be $(p+1)$ differentiable in $(x-\delta,x+\delta)$. In this case, $R_n=\frac{f^{(p+1)}(\xi_x)}{(p+1)!}h^{p+1}=o(h^p)$, for some $\xi_x\in(x-\delta,x+\delta)$. Then, if $f^{(p+1)}$ is bounded in $(x-\delta,x+\delta)$, $\sup_{y\in(x-\delta,x+\delta)}\frac{R_n}{h^p}\to0$, *i.e.*, the remainder is $o(h^p)$ uniformly in $(x-\delta,x+\delta)$.
+```
+
+```{theorem, name = "Dominated convergence theorem", label = "dct"}
+Let $\{f_n:S\subset\mathbb{R}\longrightarrow\mathbb{R}\}$ be a sequence of Lebesgue measurable functions such that $\lim_{n\to\infty}f_n(x)=f(x)$ and $|f_n(x)|\leq g(x)$, $\forall x\in S$ and $\forall n\in\mathbb{N}$, where $\int_S |g(x)|\mathrm{d}x<\infty$. Then
+$$
+\lim_{n\to\infty}\int_S f_n(x)\mathrm{d}x=\int_S f(x)\mathrm{d}x<\infty.
+$$
+```
+
+```{remark}
+Note that if $S$ is bounded and $|f_n(x)|\leq M$, $\forall x\in S$ and $\forall n\in\mathbb{N}$, then limit interchangeability with integral is always possible.
+```
+
+## Nonparametric inference {#intro-nonpar}
+
+The aim of statistical inference is to use data to *infer* an unknown quantity. In the game of inference, there is usually a trade-off between *efficiency* and *generality*, and this trade-off is controlled by the strength of assumptions that are made on the data generating process.
+
+Parametric inference opts for favoring **efficiency**. Given a model (a strong assumption on the data generating process), it provides a set of inferential methods (point estimation, confidence intervals, hypothesis testing, etc). All of them are the most efficient inferential procedures *if* the model matches the reality, in other words, if the data generating process truly satisfies the assumptions. Otherwise the methods may be inconsistent.
+
+On the other hand, nonparametric inference opts for favoring **generality**. Given a set of *minimal and weak* assumptions (e.g. certain smoothness of a density), it provides inferential methods that are consistent for broad situations, in exchange of losing efficiency for small or moderate sample sizes.
+
+Hence, for any specific data generation process there is a parametric method that dominates in efficiency its nonparametric counterpart. But knowledge of the data generation process is rarely the case in practice. That is the appealing of a nonparametric method: it will **perform adequately no matter what the data generation process is**. For that reason, nonparametric methods are useful\ldots
+
+- \ldots when we have no clue on what could be a good parametric model.
+- \ldots for creating goodness-of-fit tests employed for validating parametric models.
+
+```{example}
+Assume we have a sample $X_1,\ldots,X_n$ from a random variable $X$ and we want to estimate its distribution function $F$. Without any assumption, we know that the ecdf in \@ref(eq:ecdf) is an estimate for $F(x)=\mathbb{P}[X\leq x]$. It is indeed a *nonparametric estimate* for $F$. Its expectation and variance are
+$$
+\mathbb{E}[F_n(x)]=F(x),\quad \mathbb{V}\mathrm{ar}[F_n(x)]=\frac{F(x)(1-F(x))}{n}.
+$$
+From the squared bias and variance, we can get the Mean Squared Error (MSE):
+$$
+\mathrm{MSE}[F_n(x)]=(\mathbb{E}[F_n(x)]-F(x))^2+\mathbb{V}\mathrm{ar}[F_n(x)]=\frac{F(x)(1-F(x))}{n}.
+$$
+Assume now that $X\sim\mathrm{Exp}(\lambda)$. By maximum likelihood, it is possible to estimate $\lambda$ as $\hat \lambda_\mathrm{ML}={\bar X}^{-1}$. Then, we have the following estimate for $F(x)$:
+\begin{align}
+F(x;\hat\lambda_\mathrm{ML})=1-e^{-\hat\lambda_\mathrm{ML} x}. (\#eq:expdistest)
+\end{align}
+Is not so simple to obtain the exact MSE for \@ref(eq:expdistest), even if it is easy to prove that $\hat\lambda_\mathrm{ML}\sim \mathrm{IG}(\lambda^{-1},n)$. Approximations are possible using Exercise \@ref(exm:ml). However, the MSE can be easily approximated by Monte Carlo.
+
+What does it happen when the data is generated from an $\mathrm{Exp}(\lambda)$? Then \@ref(eq:expdistest) uniformly dominates \@ref(eq:ecdf) in performance. But, even for small deviations from $\mathrm{Exp}(\lambda)$ given by $\Gamma(\lambda, p)$, $p=1+\delta$, \@ref(eq:expdistest) shows major problems in terms of bias, while \@ref(eq:ecdf) remains with the same performance. The animation in Figure \@ref(fig:mse) illustrates precisely this behaviour.
+```
+
+```{r, mse, echo = FALSE, fig.cap = 'A simplified example of parametric and nonparametric estimation. The objective is to estimate the distribution function $F$ of a random variable. The data is generated from a $\\Gamma(\\lambda,p)$. The parametric method assumes that $p=1$, that is, that the data comes from a $\\mathrm{Exp}(\\lambda)$. The nonparametric method does not assume anything on the data generation process. The left plot shows the true distribution function and ten estimates of each method from samples of size $n$. The right plot shows the MSE of each method on estimationg $F(x)$.', screenshot.opts = list(delay = 15), dev = 'png', cache = TRUE, out.width = '90%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/dist-mse/', height = '550px')
+```
+
+## Credits {#intro-credits}
+
+Several great reference books have been used for preparing these notes. The following list details the sections in which each of them has been consulted:
+
+- @Bowman1997 (Sections )
+- @Fan1996 (Sections )
+- @DasGupta2008 (Sections \@ref(intro-prob), \@ref(intro-stoch), \@ref(intro-ohs))
+- @Scott2015 (Sections \@ref(dens-hist), \@ref(dens-bwd), \@ref(dens-kde)--\@ref(dens-bwd)))
+- @Silverman1986 (Sections \@ref(dens-kde), \@ref(dens-bwd))
+- @Vaart1998 (Sections \@ref(intro-stoch), \@ref(intro-ohs))
+- @Wand1995 (Sections \@ref(dens-kde), \@ref(dens-bwd), \@ref(dens-kde)--\@ref(dens-bwd)))
+- @Wasserman2004 (Sections \@ref(intro-stoch))
+- @Wasserman2006 (Sections \@ref(intro-prob), \@ref(dens-loclik), \@ref(reg-pen), \@ref(dens-ci))
+- @Wood2006 (Sections )
+
+In addition, these notes are possible due to the existence of the 
+@R-bookdown, @R-knitr, @R-rmarkdown, and @R-base.
+
+All material in these notes is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
