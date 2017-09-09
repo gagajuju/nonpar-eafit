@@ -1,4 +1,4 @@
-# Short course on nonparametric curve estimation
+# A short course on nonparametric curve estimation
 
 [![License](https://img.shields.io/badge/license-CC_BY--NC--SA_4.0-blue.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 

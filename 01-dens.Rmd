@@ -1,19 +1,778 @@
-
 # Density estimation {#dens}
 
-## Review on histograms
+A random variable $X$ is completely characterized by its cdf. Hence, an estimation of the cdf yields as a side-product estimates for different characteristics of $X$ by plugging-in $F_n$ in the $F$. For example, the mean $\mu=\mathbb{E}[X]=\int x \mathrm{d}F(x)$ can be estimated by $\int x \mathrm{d}F_n(x)=\frac{1}{n}\sum_{i=1}^n X_i=\bar X$. Despite its usefulness, cdfs are hard to visualize and interpret.
+
+**Densities**, on the other hand, are easy to visualize and interpret, making them **ideal tools for data exploration**. They provide immediate graphical information about the most likely areas, modes, and spread of $X$. A *continuous* random variable is also completely characterized by its pdf $f=F'$. Density estimation does not follow trivially from the ecdf $F_n$, since this is not differentiable (not even continuous), hence the need of the specific procedures we will see in this chapter.
+
+## Histograms {#dens-hist}
 	
-## Kernel density estimation
+The simplest method to estimate a density $f$ form an iid sample $X_1,\ldots,X_n$ is the **histogram**. From an analytical point of view, the idea is to aggregate the data in intervals of the form $[x_0,x_0+h)$ and then use their relative frequency to approximate the density at $x\in[x_0,x_0+h)$, $f(x)$, by the estimate of
+$$
+f(x_0)=F'(x_0)=\lim_{h\to0^+}\frac{F(x_0+h)-F(x_0)}{h}=\lim_{h\to0^+}\frac{\mathbb{P}[x_0<X< x_0+h]}{h}.
+$$
 
-## Asymptotic properties
+More precisely, given an origin $t_0$ and a *bandwidth* $h>0$, the histogram builds a piecewise constant function in the intervals $\{B_k:=[t_{k},t_{k+1}):t_k=t_0+hk,k\in\mathbb{Z}\}$ by counting the number of sample points inside each of them. These constant-length intervals are also denoted *bins*. The fact that they are of constant length $h$ is important, since it allows to standardize by $h$ in order to have relative frequencies in the bins. The histogram at a point $x$ is defined as
+\begin{align}
+\hat f_H(x;t_0,h):=\frac{1}{nh}\sum_{i=1}^n1_{\{X_i\in B_k:x\in B_k\}}. (\#eq:hist)
+\end{align}
+Equivalently, if we denote the number of points in $B_k$ as $v_k$, then the histogram is $\hat f_H(x;t_0,h)=\frac{v_k}{nh}$ if $x\in B_k$ for a $k\in\mathbb{Z}$.
 
-## Confidence intervals
+The analysis of $\hat f_H(x;t_0,h)$ as a random variable is simple, once it is recognized that the bin counts $v_k$ are distributed as $\mathrm{B}(n,p_k)$, with $p_k=\mathbb{P}[X\in B_k]=\int_{B_k} f(t)\mathrm{d}t$^[Note that it is key that the $\{B_k\}$ are *deterministic* (and not sample-dependent) for this result to hold.]. If $f$ is continuous, then by the mean value theorem, $p_k=hf(\xi_{k,h})$ for a $\xi_{k,h}\in(t_k,t_{k+1})$. Therefore:
+\begin{align*}
+\mathbb{E}[\hat f_H(x;t_0,h)]&=\frac{1}{nh}np_k=f(\xi_{k,h}),\\
+\mathbb{V}\mathrm{ar}[\hat f_H(x;t_0,h)]&=\frac{1}{n^2h^2}np_k(1-p_k)=\frac{f(\xi_{k,h})(1-hf(\xi_{k,h}))}{nh}.
+\end{align*}
+The above results show interesting insights: 
 
-## Multivariate extension
+1. If $h\to0$, then $\xi_{h,k}\to x$, resulting in $f(\xi_{k,h})\to f(x)$, and thus \@ref(eq:hist) becoming an *asymptotically* unbiased estimator of $f(x)$.
+2. But if $h\to0$, the variance increases. For decreasing the variance, $nh\to\infty$ is required. 
+3. The variance is directly dependent on $f(x)(1-hf(x))\approx f(x)$, hence the more variability at regions with higher density. 
 
-## Bandwidth selection
+A more detailed analysis of the histogram can be seen in @Scott2015[page 54]. We skip it here since we the detailed asymptotic analysis for the more general kernel density estimator is given in Section \@ref(dens-kde).
 
-## Local likelihood
+Implementation of histograms is very simple in `R`. As an example, we consider the old-but-gold dataset `faithful`. This dataset contains the duration of the eruption and the waiting time between eruptions for the Old Faithful geyser in Yellowstone National Park (USA).
 
-## Exercises
-	
+```{r, echo = TRUE, collapse = TRUE, cache = TRUE}
+# The faithful dataset is included in R
+head(faithful)
+
+# Duration of eruption
+faithE <- faithful$eruptions
+
+# Default histogram: automatically chosen bins and absolute frequencies!
+histo <- hist(faithE)
+
+# List that contains several objects
+str(histo)
+
+# With relative frequencies
+hist(faithE, probability = TRUE)
+
+# Choosing the breaks
+# t0 = min(faithE), h = 0.25
+Bk <- seq(min(faithE), max(faithE), by = 0.25)
+hist(faithE, probability = TRUE, breaks = Bk)
+rug(faithE) # Plotting the sample
+```
+
+The shape of the histogram depends on:
+
+- $t_0$, since the separation between bins happens at $t_0k$, $k\in\mathbb{Z}$;
+- $h$, which controls the bin size and the effective number of bins for aggregating the sample. 
+
+We focus first on exploring the dependence on $t_0$, as it serves for motivating the next density estimator.
+```{r, echo = TRUE, collapse = TRUE, cache = TRUE}
+# Uniform sample
+set.seed(1234567)
+u <- runif(n = 100)
+
+# t0 = 0, h = 0.2
+Bk1 <- seq(0, 1, by = 0.2)
+
+# t0 = -0.1, h = 0.2
+Bk2 <- seq(-0.1, 1.1, by = 0.2)
+
+# Comparison
+par(mfrow = c(1, 2))
+hist(u, probability = TRUE, breaks = Bk1, ylim = c(0, 1.5),
+     main = "t0 = 0, h = 0.2")
+rug(u)
+abline(h = 1, col = 2)
+hist(u, probability = TRUE, breaks = Bk2, ylim = c(0, 1.5),
+     main = "t0 = -0.1, h = 0.2")
+rug(u)
+abline(h = 1, col = 2)
+```
+
+High dependence on $t_0$ also happens when estimating densities that are not compactly supported. The next snippet of code points towards it.
+```{r, echo = TRUE, eval = FALSE, collapse = TRUE, cache = TRUE}
+# Sample 100 points from a N(0, 1) and 50 from a N(3, 0.25)
+set.seed(1234567)
+samp <- c(rnorm(n = 100, mean = 0, sd = 1), 
+          rnorm(n = 50, mean = 3.25, sd = sqrt(0.5)))
+
+# min and max for choosing Bk1 and Bk2
+range(samp)
+
+# Comparison
+Bk1 <- seq(-2.5, 5, by = 0.5)
+Bk2 <- seq(-2.25, 5.25, by = 0.5)
+par(mfrow = c(1, 2))
+hist(samp, probability = TRUE, breaks = Bk1, ylim = c(0, 0.5), 
+     main = "t0 = -2.5, h = 0.5")
+rug(samp)
+hist(samp, probability = TRUE, breaks = Bk2, ylim = c(0, 0.5),
+     main = "t0 = -2.25, h = 0.5")
+rug(samp)
+```
+
+An alternative to avoid the dependence on $t_0$ is the **moving histogram** or **naive density estimator**. The idea is to aggregate the sample $X_1,\ldots,X_n$ in intervals of the form $(x-h, x+h)$ and then use its relative frequency in $(x-h,x+h)$ to approximate the density at $x$: 
+$$
+f(x)=F'(x)=\lim_{h\to0^+}\frac{F(x+h)-F(x-h)}{2h}=\lim_{h\to0^+}\frac{\mathbb{P}[x-h<X<x+h]}{2h}.
+$$
+Recall the differences with the histogram: the intervals depend on the evaluation point $x$ and are centered around it. That allows to directly estimate $f(x)$ (without the proxy $f(x_0)$) by an estimate of the symmetric derivative. 
+
+More precisely, given a bandwidth $h>0$, the naive density estimator builds a piecewise constant function by considering the relative frequency of$X_1,\ldots,X_n$ inside $(x-h,x+h)$:
+\begin{align}
+\hat f_N(x;h):=\frac{1}{2nh}\sum_{i=1}^n1_{\{x-h<X_i<x+h\}}. (\#eq:movhist)
+\end{align}
+The function has $2n$ discontinuities that are located at $X_i\pm h$. 
+
+Similarly to the histogram, the analysis of $\hat f_N(x;h)$ as a random variable follows from realizing that $\sum_{i=1}^n1_{\{x-h<X_i<x+h\}}\sim \mathrm{B}(n,p_{x,h})$, $p_{x,h}=\mathbb{P}[x-h<X<x+h]=F(x+h)-F(x-h)$. Then:
+\begin{align*}
+\mathbb{E}[\hat f_N(x;h)]&=\frac{F(x+h)-F(x-h)}{2h},\\
+\mathbb{V}\mathrm{ar}[\hat f_N(x;h)]&=\frac{F(x+h)-F(x-h)}{4nh^2}-\frac{(F(x+h)-F(x-h))^2}{4nh^2}.
+\end{align*}
+These two results provide interesting insights on the effect of $h$:
+
+1. If $h\to0$, then $\mathbb{E}[\hat f_N(x;h)]\to f(x)$ and \@ref(eq:movhist) is an asymptotically unbiased estimator of $f(x)$. But also $\mathbb{V}\mathrm{ar}[\hat f_N(x;h)]\approx \frac{f(x)}{2nh}-\frac{f(x)^2}{n}\to\infty$.
+2. If $h\to\infty$, then $\mathbb{E}[\hat f_N(x;h)]\to \infty$ and $\mathbb{V}\mathrm{ar}[\hat f_N(x;h)]\to0$.
+3. The variance shrinks to zero if $nh\to\infty$ (or, in other words, if $h^{-1}=o(n)$). So both the bias and the variance can be shrink to zero reduced if $n\to\infty$, $h\to0$ and $nh\to\infty$.
+4. The variance is (almost) proportional to $f(x)$.
+
+The animation in Figure \@ref(fig:movinghist) illustrates the previous points and gives insight on how the performance of \@ref(eq:movhist) varies smoothly with $h$.
+
+```{r, movinghist, echo = FALSE, fig.cap = 'Bias and variance for the moving histogram. The animation shows how for small bandwidths the bias of $\\hat f_N(x;h)$ on estimating $f(x)$ is small, but the variance is high, and how for large bandwidths the bias is large and the variance is small. The variance is represented by the asymptotic $95\\%$ confidence intervals for $\\hat f_N(x;h)$.', screenshot.opts = list(delay = 15), dev = 'png', cache = TRUE, out.width = '90%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/bias-var-movhist/', height = '550px')
+```
+
+Estimator \@ref(eq:movhist) raises an important question: **Why giving the same weight to all $X_1,\ldots,X_n$ in $(x-h, x+h)$?** After all, we are estimating $f(x)=F'(x)$ by estimating $\frac{F(x+h)-F(x-h)}{2h}$ through the relative frequency of $X_1,\ldots,X_n$ in $(x-h,x+h)$. Should not be the data points closer to $x$ more important than the ones further away? The answer to this question shows that \@ref(eq:movhist) is indeed a particular case of a wider class of density estimators. 
+
+## Kernel density estimation {#dens-kde}
+
+The moving histogram \@ref(eq:movhist) can be equivalently written as
+\begin{align*}
+\hat f_N(x;h)=\frac{1}{nh}\sum_{i=1}^n\frac{1}{2}1_{\{-h<x-X_i<h\}}=\frac{1}{nh}\sum_{i=1}^nK\left(\frac{x-X_i}{h}\right), (\#eq:movhist2)
+\end{align*}
+with $K(z)=\frac{1}{2}1_{\{-1<z<1\}}$. Interestingly, $K$ is a uniform *density* in $(-1,1)$. This means that, when approximating
+\begin{align*}
+\mathbb{P}[x-h<X<x+h]=\mathbb{P}\left[-1<\frac{x-X}{h}<1\right]
+\end{align*}
+by \@ref(eq:movhist2), we give equal weight to all the . The generalization of \@ref(eq:movhist2) is now obvious: replace $K$ by an arbitrary density. Then $K$ is known as a *kernel*, a density that is typically symmetric and unimodal at $0$. This generalization provides the definition of **kernel density estimator** (kde):
+\begin{align}
+\hat f(x;h):=\frac{1}{nh}\sum_{i=1}^nK\left(\frac{x-X_i}{h}\right). (\#eq:kde)
+\end{align}
+A common notation is $K_h(z):=\frac{1}{h}K\left(\frac{z}{h}\right)$, so $\hat f(x;h)=\frac{1}{n}\sum_{i=1}^nK_h(x-X_i)$.
+
+Several types of kernels are possible. The most popular is the *Gaussian kernel* $K(z)=\phi(z)$, although the *Epanechnikov kernel*, $K(z)=\frac{3}{4}(1-z^2)1_{|z|<1}$, is slightly more efficient, as we will see later. The *rectangular kernel* $K(z)=\frac{1}{2}1_{\{|z|<1\}}$ yields the moving histogram as a particular case. The kde inherits the smoothness properties of the kernel. That means, for example, \@ref(eq:kde) with a Gaussian kernel is infinitely differentiable. But with an Epanechnikov kernel, \@ref(eq:kde) is only first differentiable, and with a rectangular kernel is not even continuous. However, if a certain smoothness is guaranteed (continuity at least), the *choice of the kernel has little importance in practise* (at least compared with the choice of $h$). Figure \@ref(fig:kdeconst) illustrates the construction of the kde and the bandwidth and kernel effects.
+
+```{r, kdeconst, echo = FALSE, fig.cap = 'Construction of the kernel density estimator. The animation shows how the bandwidth and kernel affect the density estimate, and how the kernels are rescaled densities with modes at the data points.', screenshot.opts = list(delay = 15), dev = 'png', cache = TRUE, out.width = '90%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/', height = '550px')
+```
+
+Implementation of kde in `R` is built-in through the `density` function. The function automatically chooses the bandwidth $h$ using a *bandwith selector* which will be studied in detail in Section \@ref(dens-bwd).
+
+```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
+# Sample 100 points from a N(0, 1)
+set.seed(1234567)
+samp <- rnorm(n = 100, mean = 0, sd = 1)
+
+# Quickly compute a kde and plot the density object
+# Automatically chooses bandwidth and uses Gaussian kernel
+plot(density(x = samp))
+
+# Select a particular bandwidth (0.5) and kernel (Epanechnivok)
+lines(density(x = samp, bw = 0.5, kernel = "epanechnikov"), col = 2)
+
+# density automatically chooses the interval for plotting the kde
+# (observe that the black line goes to roughly between -3 and 3)
+# This can be tuned using "from" and "to"
+plot(density(x = samp, from = -4, to = 4), xlim = c(-5, 5))
+
+# The density object is a list
+kde <- density(x = samp, from = -5, to = 5, n = 1024)
+str(kde)
+# Note that the evaluation grid "x"" is not directly controlled, only through 
+# "from, "to", and "n" (better use powers of 2)
+plot(kde$x, kde$y, type = "l")
+curve(dnorm(x), col = 2, add = TRUE) # True density
+rug(samp)
+```
+
+```{exercise}
+Load the dataset `faithful`. Then:
+
+- Estimate and plot the density of `faithful$eruptions`.
+- Create a new plot and superimpose different density estimations with bandwidths equal to $0.1$, $0.5$, and $1$.
+- Get the density estimate at *exactly* the point $x=3.1$ using $h=0.15$ and the Epanechnikov kernel.
+
+```
+
+## Asymptotic properties {#dens-kdeasymp}
+
+Asymptotic results give us insights on the large-sample ($n\to\infty$) properties of an estimator. One might think why are they are useful, since in practice we only have *finite* sample sizes. Apart from purely theoretical reasons, asymptotic results usually give *highly valuable insights* on the properties of the method, typically simpler than finite-sample results (which might be analytically untractable). 
+
+Along this section we will assume the following assumptions:
+
+- **A1**. The density $f$ is twice continuously differentiable and square integrable.
+- **A2**. The kernel $K$ is a symmetric and bounded pdf with finite fourth moment^[This implies that $\int z^pK(z)\mathrm{d}z<\infty$, with $0\leq p\leq 4$. Note that the odd moments are zero due to symmetry.].
+- **A3**. $h=h_n$ is a deterministic sequence of bandwidths^[$h=h_n$ *always* depends on $n$ from now on, although the subscript is dropped for the ease of notation.] such that, when $n\to\infty$, $h\to0$ and $nh\to\infty$. 
+
+We need to introduce some notation. From now on, the integrals are thought to be over $\mathbb{R}$, if not stated otherwise. The second moment of the kernel is denoted as $\mu_2(K):=\int z^2K(z)\mathrm{d}z$. The squared integral of a function $f$, is denoted by $R(f):=\int f(x)^2\mathrm{d}x$. The *convolution* between two real functions $f$ and $g$, $f*g$, is the function
+\begin{align}
+(f*g)(x):=\int f(x-y)g(y)\mathrm{d}y=(g*f)(x).(\#eq:conv)
+\end{align}
+We are now ready to obtain the bias and variance of $\hat f(x;h)$. Recall that is not possible to apply the "binomial trick" we used previously since now the estimator is not piecewise constant. Instead of that, we use the linearity of the kde and the convolution definition. For the bias, recall that
+\begin{align}
+\mathbb{E}[\hat f(x;h)]=\frac{1}{n}\sum_{i=1}^n\mathbb{E}[K_h(x-X_i)]=\int K_h(x-y)f(y)\mathrm{d}y=(K_h * f)(x).(\#eq:kdekhbias)
+\end{align}
+Similarly, the variance is obtained as
+\begin{align}
+\mathbb{V}\mathrm{ar}[\hat f(x;h)]&=\frac{1}{n}((K_h^2*f)(x)-(K_h*f)^2(x)).(\#eq:kdekhvar)
+\end{align}
+These two expressions are exact, but they are hard to interpret. Equation \@ref(eq:kdekhbias) indicates that the estimator is *biased*, but it does not differentiate explicitly the effects of kernel, bandwidth and density on the bias. The same happens with \@ref(eq:kdekhvar), yet more emphasized. That is why the following *asymptotic* expressions are preferred.
+```{theorem, label = "kdebiasvar"}
+Under **A1**--**A3**, the bias and variance of the kde at $x$ are
+\begin{align}
+\mathrm{Bias}[\hat f(x;h)]&=\frac{\mu_2(K)}{2}f''(x)h^2+o(h^2),(\#eq:kdebias)\\
+\mathbb{V}\mathrm{ar}[\hat f(x;h)]&=\frac{R(K)}{nh}f(x)+o((nh)^{-1}).(\#eq:kdevar)
+\end{align}
+```
+
+```{proof}
+For the *bias* we consider the change of variables $z=\frac{x-y}{h}$, $y=x-hz$, $\mathrm{d}y=-h\mathrm{d}z$. The integral limits flip and we have:
+\begin{align}
+\mathbb{E}[\hat f(x;h)]=\int K_h(x-y)f(y)\mathrm{d}y=\int K(z)f(x-hz)\mathrm{d}z.(\#eq:kdebias1)
+\end{align}
+Since $h\to0$, an applycation of Taylor's theorem gives
+\begin{align}
+f(x-hz)=f(x)+hzf'(x)+\frac{1}{2}h^2z^2f''(x)+o(h^2z^2). (\#eq:kdebias2)
+\end{align}
+Substituting \@ref(eq:kdebias2) in \@ref(eq:kdebias1), and bearing in mind that $K$ is a symmetric density around $0$, we have
+\begin{align*}
+\int K(z)f(x-hz)\mathrm{d}z&=\int K(z)\left\{f(x)+hzf'(x)+\frac{1}{2}h^2z^2f''(x)+o(h^2z^2)\right\}\mathrm{d}z\\
+&=f(x)+\frac{1}{2}h^2\mu_2(K)f''(x)+o(h^2)
+\end{align*}
+which provides \@ref(eq:kdebias). 
+
+For the *variance*, first note that 
+\begin{align}
+\mathbb{V}\mathrm{ar}[\hat f(x;h)]&=\frac{1}{n^2}\sum_{i=1}^n\mathbb{V}\mathrm{ar}[K_h(x-X_i)]\notag\\
+&=\frac{1}{n}\left\{\mathbb{E}[K_h^2(x-X)]-\mathbb{E}[K_h(x-X)]^2\right\}. (\#eq:kdevar1)
+\end{align}
+The second term of \@ref(eq:kdevar1) is already computed, so we focus on the first. Using the previous change of variables, we have:
+\begin{align}
+\mathbb{E}[K_h^2(x-X)]&=\frac{1}{h}\int K^2(z)f(x-hz)\mathrm{d}z\notag\\
+&=\frac{1}{h}\int K^2(z)\left\{f(x)+O(hz)\right\}\mathrm{d}z\notag\\
+&=\frac{R(K)}{h}f(x)+O(1). (\#eq:kdevar2)
+\end{align}
+Plugging-in \@ref(eq:kdevar1) into \@ref(eq:kdevar2) gives
+\begin{align*}
+\mathbb{V}\mathrm{ar}[\hat f(x;h)]&=\frac{1}{n}\left\{\frac{R(K)}{h}f(x)+O(1)-O(1)\right\}\\
+&=\frac{R(K)}{nh}f(x)+o((nh)^{-1}),
+\end{align*}
+since $n^{-1}=o((nh)^{-1})$.
+```
+
+```{remark}
+Integrating little-$o$'s is a delicate issue. In general, integrating a $o^x(1)$ quantity, possibly dependent on $x$, does not provide an $o(1)$. In other words: $\int o^x(1)\mathrm{d}x\neq o(1)$. If the previous hold with equality, then the limits and integral will be interchangeable. But this is not always true -- only if certains conditions are met; recall the dominated convergence Theorem (Theorem \@ref(thm:dct)). If one wants to be completely rigorous on the two implicit commutations of integrals and limits that took place in the proof, it is necessary to have explicit control of the remainder via Taylor's theorem (Theorem \@ref(thm:tay)) and then apply the dominated convergence Theorem. For simplicity in the exposition, we avoid this.
+```
+
+The bias and variance expressions \@ref(eq:kdebias) and \@ref(eq:kdevar) yield interesting insights (see Figure \@ref(fig:movinghist) for their visualization):
+
+- The bias decreases with $h$ *quadratically*. In addition, the bias at $x$ is directly proportional to $f''(x)$. This has an interesting interpretation:
+
+    - The bias is negative in concave regions, *i.e.* $\{x\in\mathbb{R}:f(x)''<0\}$. These regions correspod to **peaks and modes of $f$**, where the **kde underestimates $f$** (tends to be below $f$). 
+    - Conversely, the bias is positive in convex regions, *i.e.* $\{x\in\mathbb{R}:f(x)''>0\}$. These regions correspod to **valleys and tails of $f$**, where the **kde overestimates $f$** (tends to be above $f$).
+    - **The wilder the curvature $f''$, the harder to estimate $f$**. Flat density regions are easier to estimate than wiggling regions with high curvature (several modes).
+
+- The variance depends directly on $f(x)$. **The higher the density, the more variable is the kde.** Interestingly, the variance decreases as a factor of $(nh)^{-1}$, a consequence of $nh$ playing the role of the *effective sample size* for estimating $f(x)$. The density at $x$ is not estimated using all the sample points, but only the fraction $nh$ in a neighborhood of $x$.
+
+The MSE of the kde is trivial to obtain from the bias and variance:
+
+```{corollary}
+Under **A1**--**A3**, the MSE of the kde at $x$ is
+\begin{align}
+\mathrm{MSE}[\hat f(x;h)]&=\frac{\mu^2_2(K)}{4}(f''(x))^2+\frac{R(K)}{nh}f(x)+o(h^4+(nh)^{-1}).(\#eq:kdemse)
+\end{align}
+Therefore, the kde is pointwise consistent in MSE, *i.e.*, $\hat f(x;h)\stackrel{2}{\longrightarrow}f(x)$.
+```
+```{proof}
+We apply that $\mathrm{MSE}[\hat f(x;h)]=(\mathbb{E}[\hat f(x;h)]-f(x))^2+\mathbb{V}\mathrm{ar}[\hat f(x;h)]$ and that $(O(h^2)+o(h^2))^2=O(h^4)+o(h^4)$. Since $\mathrm{MSE}[\hat f(x;h)]\to0$ when $n\to\infty$, consistency follows.
+```
+
+Finally, we prove the asymptotic pointwise normality of the estimator.
+
+```{theorem, label = "point"}
+Under **A1**--**A3**,
+\begin{align}
+\sqrt{nh}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])\stackrel{d}{\longrightarrow}\mathcal{N}(0,R(K)f(x)),(\#eq:kdenorm1)\\
+\sqrt{nh}\left(\hat f(x;h)-f(x)-\frac{\mu_2(K)}{2}f''(x)h^2\right)\stackrel{d}{\longrightarrow}\mathcal{N}(0,R(K)f(x)).(\#eq:kdenorm2)
+\end{align}
+```
+```{proof}
+First note that $K_h(x-X_n)$ is a sequence of independendent but *not* identically distributed random variables: $h$ depends on $n$. Therefore, we look forward to apply Theorem \@ref(thm:lya).
+
+We prove first \@ref(eq:kdenorm1). For simplicity, denote $K_i:=K_h(x-X_i)$, $i=1,\ldots,n$. From the proof of Theorem \@ref(thm:kdebiasvar) we know that $\mathbb{E}[K_i]=\mathbb{E}[\hat f(x;h)]=f(x)+o(1)$ and 
+$$
+s_n^2=\sum_{i=1}^n \mathbb{V}\mathrm{ar}[K_i]=n^2\mathbb{V}\mathrm{ar}[\hat f(x;h)]=n\frac{R(K)}{h}f(x)(1+o(1)).
+$$
+An application of the $C_p$ inequality (first) and Jensen's inequality (second), gives: 
+$$
+\mathbb{E}\left[|K_i+\mathbb{E}[K_i]|^{2+\delta}\right]\leq C_{2+\delta}\left(\mathbb{E}\left[|K_i|^{2+\delta}\right]+|\mathbb{E}[K_i]|^{2+\delta}\right)\leq 2C_{2+\delta}\mathbb{E}\left[|K_i|^{2+\delta}\right]=O\left(\mathbb{E}\left[|K_i|^{2+\delta}\right]\right).
+$$
+In addition, we have that by a Taylor expansion after $z=\frac{x-y}{h}$:
+\begin{align*}
+\mathbb{E}\left[|K_i|^{2+\delta}\right]&=\frac{1}{h^{2+\delta}}\int K^{2+\delta}\left(\frac{x-y}{h}\right)f(y)\mathrm{d}y\\
+&=\frac{1}{h^{1+\delta}}\int K^{2+\delta}(z)f(x-hz)\mathrm{d}y\\
+&=\frac{1}{h^{1+\delta}}\int K^{2+\delta}(z)(f(x)+o(1))\mathrm{d}y\\
+&=O\left(h^{-(1+\delta)}\right).
+\end{align*}
+(Taking for example $\delta\leq2$ due to **A2**. The same previous remark on the remainder applies.)
+
+Then:
+\begin{align}
+\frac{1}{s_n^{2+\delta}}\sum_{i=1}^n\mathbb{E}\left[|K_i-\mathbb{E}[\hat f(x;h)]|^{2+\delta}\right]=\left(\frac{h}{nR(K)f(x)}\right)^{1+\frac{\delta}{2}}(1+o(1))O\left(nh^{-(1+\delta)}\right)=O\left((nh)^{-\frac{\delta}{2}}\right)
+\end{align}
+and the Lyapunov's condition is satisfied. As a consequence, \@ref(eq:kdenorm1) is proved.
+
+To prove \@ref(eq:kdenorm2), we consider:
+$$
+\sqrt{nh}\left(\hat f(x;h)-f(x)-\frac{\mu_2(K)}{2}f''(x)h^2\right)=\sqrt{nh}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)]+o(h^2)).
+$$
+Due to Example \@ref(exm:das) and Proposition \@ref(prp:ohps), we can prove that $\hat f(x;h)-\mathbb{E}[\hat f(x;h)]=o_\mathbb{P}(1)$. Then, $\hat f(x;h)-\mathbb{E}[\hat f(x;h)]+o(h^2)=(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])(1+o_\mathbb{P}(h^2))$. Therefore, Slutsky's theorem and \@ref(eq:kdenorm2) give:
+\begin{align*}
+\sqrt{nh}&\left(\hat f(x;h)-f(x)-\frac{\mu_2(K)}{2}f''(x)h^2\right)\\
+&=\sqrt{nh}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])(1+o_\mathbb{P}(h^2))\stackrel{d}{\longrightarrow}\mathcal{N}(0,R(K)f(x)).
+\end{align*}
+
+```
+
+Note the rate $\sqrt{nh}$ in the asymptotic normality results. This is different from the standard CLT rate $\sqrt{n}$ (see Theorem \@ref(thm:clt)). It is *slower*: the variance of the limiting normal distribution decreases as $O((nh)^{-1})$ and not as $O(n^{-1})$. This phenomenon is related with the effective sample size used in the smoothing.
+
+## Bandwidth selection {#dens-bwd}
+
+As we saw in the previous sections, bandwidth selection is a key issue in density estimation. The purpose of this section is to introduce objective and automatic bandwidth selectors that attempt to minimize the estimation error of the target density $f$.
+
+The first step is to define a global, rather than local, error criterion. The *Integrated Squared Error* (ISE),
+$$
+\mathrm{ISE}[\hat f(\cdot,h)]:=\int (\hat f(x;h)-f(x))^2\mathrm{d}x,
+$$
+is the squared distance between the kde and the target density. The ISE is a random quantity, since it depends directly on the sample $X_1,\ldots,X_n$. As a consequence, looking for an optimal-ISE bandwidth is a hard task, since it the optimality is dependent on the sample itself and not only on the population and $n$. To avoid this problematic, it is usual to compute the *Mean Integrated Squared Error* (MISE):
+$$
+\mathrm{MISE}[\hat f(\cdot;h)]:=\mathbb{E}\left[\mathrm{ISE}[\hat f(\cdot,h)]\right]=\mathbb{E}\left[\int (\hat f(x;h)-f(x))^2\mathrm{d}x\right]=\int \mathbb{E}\left[(\hat f(x;h)-f(x))^2\right]\mathrm{d}x=\int \mathrm{MSE}[\hat f(x;h)]\mathrm{d}x.
+$$
+The MISE is convenient due to its mathematical tractability and its natural relation with the MSE. There are, however, other error criteria that present attractive properties, such as the *Mean Integrated Absolute Error* (MIAE):
+$$
+\mathrm{MIAE}[\hat f(\cdot;h)]:=\mathbb{E}\left[\int |\hat f(x;h)-f(x)|\mathrm{d}x\right]=\int \mathbb{E}\left[|\hat f(x;h)-f(x)|^2\right]\mathrm{d}x.
+$$
+The MIAE, unless the MISE, is invariant with respect to monotone transformations of the data. For example, if $g(x)=f(t^{-1}(x))(t^{-1})'(x)$ is the density of $Y=t(X)$ and $X\sim f$, then if the change of variables $y=t(x)$ is made,
+$$
+\int |\hat f(x;h)-f(x)|\mathrm{d}x=\int |\hat f(t^{-1}(y);h)-f(t^{-1}(y))|)(t^{-1})'(y)\mathrm{d}y=\int |\hat g(y;h)-g(y)|\mathrm{d}y.
+$$
+Despite this appealing property, the analysis of MIAE is substantially more complicated. We refer to @Devroye1985 for a comprehensive treatment of absolute value metrics for kde.
+
+Once the MISE is set as the error criterion to be minimized, our aim is to find
+$$
+h_\mathrm{MISE}=\arg\min_{h>0}\mathrm{MISE}[\hat f(\cdot;h)].
+$$
+For that purpose, we need an explicit expression of the mise that we can attempt to minimise. An asymptotic expansion for the MISE can be easily derived from the MSE expression.
+
+```{corollary}
+Under **A1**--**A3**,
+\begin{align}
+\mathrm{MISE}[\hat f(\cdot;h)]&=\frac{\mu^2_2(K)}{4}R(f'')+\frac{R(K)}{nh}+o(h^4+(nh)^{-1}).(\#eq:kdemise)
+\end{align}
+Therefore, $\mathrm{MISE}[\hat f(\cdot;h)]\to0$ when $n\to\infty$.
+```
+```{proof}
+Trivial.
+```
+
+The dominating part of the MISE is denoted as AMISE, which stands for *Asymptotic MISE*: $\mathrm{AMISE}[\hat f(\cdot;h)]=\frac{\mu^2_2(K)}{4}R(f'')h^4+\frac{R(K)}{nh}$. Due to its closed expression, it is possible to obtain a bandwidth that minimises the AMISE.
+
+```{corollary}
+The bandwidth that minimises the AMISE is
+\begin{align}
+h_\mathrm{AMISE}=\left[\frac{R(K)}{\mu_2^2(K)R(f'')n}\right]^{1/5}.(\#eq:hamise)
+\end{align}
+```
+```{proof}
+Solving $\frac{\mathrm{d}}{\mathrm{d} h}\mathrm{AMISE}[\hat f(\cdot;h)]=\mu_2^2(K)R(f'')h^3-R(K)n^{-1}h^{-2}=0$ yields the result.
+```
+
+Unfortunately, the AMISE bandwidth depends on $R(f'')=\int(f''(x))^2\mathrm{d}x$, which measures the *curvature* of the density. As a consequence, it can not be readily applied in practise. In the next subsection we will see how to plug-in estimates for $R(f'')$.
+
+### Plug-in rules {#dens-plug-in}
+
+A simple solution to estimate $R(f'')$ is to assume that $f$ is the density of a $\mathcal{N}(\mu,\sigma^2)$, and then plug-in the form of the curvature for fuch density:
+$$
+R(\phi''_\sigma(\cdot-\mu))=\frac{3}{8\pi^{1/2}\sigma^5}.
+$$
+While doing so, we approximate the curvature of an arbitrary density by means of the curvature of a Normal. We have that
+$$
+h_\mathrm{AMISE}=\left[\frac{8\pi^{1/2}R(K)}{3\mu_2^2(K)n}\right]^{1/5}\sigma.
+$$
+Interestingly, the bandwidth is directly proportional to the standard deviation of the target density. Replacing $\sigma$ by an estimate yields the *normal scale bandwidth selector*, which we denote by $\hat h_\mathrm{NS}$ to emphasize its randomness:
+$$
+\hat h_\mathrm{NS}=\left[\frac{8\pi^{1/2}R(K)}{3\mu_2^2(K)n}\right]^{1/5}\hat\sigma.
+$$
+The estimate $\hat\sigma$ can be chosen as the standard deviation $s$, or, in order to avoid the effects of potential outliers, as the standardised interquantile range:
+$$
+\hat \sigma_{\mathrm{IQR}}:=\frac{X_{([0.75n])}-X_{([0.25n])}}{\Phi^{-1}(0.75)-\Phi^{-1}(0.25)}.
+$$
+@Silverman1986 suggests employing the minmum of both quantities, $\hat\sigma:=\min(s,\hat \sigma_{\mathrm{IQR}})$. When combined with a normal kernel, for which $\mu_2(K)=1$ and $R(K)=\phi_{\sqrt{2}}(0)=\frac{1}{2\sqrt{\pi}}$ (check \@ref(eq:fact2)), this particularizarion of $\hat h_{\mathrm{NS}}$ gives the famous *rule-of-thumb* for bandwidth selection:
+$$
+\hat h_\mathrm{RT}=1.06n^{1/5}\hat\sigma.
+$$
+This bandwidth selector is implemented in `R` through the function `bw.nrd` (not to confuse with `bw.nrd0`).
+
+The previous selector is an example of a *plug-in .
+
+$$
+R(f^{(s)})=\int f^{(s)}(x)^2\mathrm{d}x=(-1)^s\int f^{(2s)}(x)f(x)\mathrm{d}x
+$$
+
+
+$$
+\psi_r=\int f^{(r)}(x)f(x)\mathrm{d}x=\mathbb{E}[f^{(r)}(X)]
+$$
+for $r$ even.
+
+
+### Cross-validation selectors {dens-cv}
+
+least squares cross-validation (LSCV) also denoted unbiased cross-validation (or UCV).
+
+
+biased cross-validation (BCV)
+
+smoothed cross-validation (SCV) 
+
+
+App different bandwidth behaviors. Figure \@ref(fig:kdebwd).
+
+```{r, kdebwd, echo = FALSE, fig.cap = '.', screenshot.opts = list(delay = 15), dev = 'png', cache = TRUE, out.width = '90%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-bwd/', height = '550px')
+```
+
+To test the implementations, we consider the celebrated family of normal mixtures given by @Marron1992. These are available in the package `nor1mix`.
+
+```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
+library(nor1mix)
+
+```
+
+Some quick insights on the convergence results $n^\nu(\hat h/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(\mu,\sigma^2)$ are:
+
+- LSCV: $n^{-1/10}(\hat h_\mathrm{LSCV}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{LSCV}^2)$
+- BCV: $n^{-1/10}(\hat h_\mathrm{BCV}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{BCV}^2)$
+- DPI: $n^{-5/14}(\hat h_\mathrm{DPI}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{DPI}^2)$
+- SCV: $n^{-5/14}(\hat h_\mathrm{SCV}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{SCV}^2)$
+
+## Confidence intervals {#dens-ci}
+
+Obtaining a confidence interval (CI) for $f(x)$ is a hard task. Due to the bias results seen in Section \@ref(dens-kdeasymp), we know that the kde is biased for finite sample sizes, $\mathbb{E}[\hat f(x;h)]=(K_h*f)(x)$, and it is only *asymptotically* unbiased when $h\to0$. This bias is called the **smoothing bias** and in essence complicates the obtention of CIs for $f(x)$, but not of $(K_h*f)(x)$. Let's see with an illustrative example the differences between these two objects.
+
+Two well-known facts for normal densities (see Appendix C in @Wand1995) are:
+\begin{align}
+(\phi_{\sigma_1}(\cdot-\mu_1)*\phi_{\sigma_2}(\cdot-\mu_2))(x)&=\phi_{(\sigma_1^2+\sigma_2^2)^{1/2}}(x-\mu_1-\mu_2),(\#eq:fact1)\\
+\int\phi_{\sigma_1}(x-\mu_1)\phi_{\sigma_2}(x-\mu_2)\mathrm{d}x&=\phi_{(\sigma_1^2+\sigma_2^2)^{1/2}}(\mu_1-\mu_2),\\
+\phi_{\sigma}(x-\mu)^r&=\frac{1}{\sigma^{r-1}}(2\pi)^{(1-r)/2}\phi_{\sigma/ r^{1/2}}(x-\mu)\frac{1}{r^{1/2}}.(\#eq:fact2)
+\end{align}
+As a consequence, if $K=\phi$ (*i.e.*, $K_h=\phi_h$) and $f(\cdot)=\phi_\sigma(\cdot-\mu)$, we have that
+\begin{align}
+(K_h*f)(x)&=\phi_{(h^2+\sigma^2)^{1/2}}(x-\mu),(\#eq:normbias)
+(K_h^2*f)(x)&=\left(\frac{1}{(2\pi)^{1/2}h}\phi_{h/2^{1/2}}/2^{1/2}*f\right)(x)\notag\\
+&=\frac{1}{2\pi^{1/2}h}\left(\phi_{h/2^{1/2}}*f\right)(x)\notag\\
+&=\frac{1}{2\pi^{1/2}h}\phi_{(h^2/2+\sigma^2)^{1/2}}(x-\mu).(\#eq:normbias2)
+\end{align}
+Thus, the *exact* expectation of the kde for estimating the density of a $\mathcal{N}(\mu,\sigma^2)$ is the density of a $\mathcal{N}(\mu,\sigma^2+h^2)$. Clearly, when $h\to0$, the bias disappears (at expenses of increasing the variance, of course). Removing this finite-sample size bias is not simple: if the bias is expanded, $f''$ appears. Thus for attempting to unbias $\hat f(\cdot;h)$ we have to estimate $f''$, which is much more complicated than estimating $f$! Taking second derivatives on the kde does not simply work out-of-the-box, since the bandwidths for estimating $f$ and $f''$ scale differently. We refer the interested reader to Section 2.12 in @Wand1995 for a quick review of derivative kde.
+
+The previous deadlock can be solved if we limit our ambitions. Rather than constructing a confidence interval for $f(x)$, we will do it for $\mathbb{E}[\hat f(x;h)]=(K_h*f)(x)$. There is nothing wrong with this as long as we are careful when we report the results to make it clear that the CI is for $(K_h*f)(x)$ and not $f(x)$. 
+
+The building block for the CI for $\mathbb{E}[\hat f(x;h)]=(K_h*f)(x)$ is Theorem \@ref(thm:point), which stated that:
+$$
+\sqrt{nh}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])\stackrel{d}{\longrightarrow}\mathcal{N}(0,R(K)f(x)).
+$$
+Plugging-in $\hat f(x;h)=f(x)+O_\mathbb{P}(h^2+(nh)^{-1})=f(x)(1+o_\mathbb{P}(1))$ (see Exercise \@ref(exr:fop)) as an estimate for $f(x)$ in the variance, we have by the Slutsky's theorem that
+$$
+\sqrt{\frac{nh}{R(K)\hat f(x;h)}}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])=\sqrt{\frac{nh}{R(K)f(x)}}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])(1+o_\mathbb{P}(1))\stackrel{d}{\longrightarrow}\mathcal{N}(0,1).
+$$
+Therefore, an **asymptotic $100(1-\alpha)\%$ confidence interval for $\mathbb{E}[\hat f(x;h)]$** that can be straightforwardly computed is:
+\begin{align}
+I=\left(\hat f(x;h)\pm z_{\alpha}\sqrt{\frac{R(K)\hat f(x;h)}{nh}}\right).(\#eq:ci)
+\end{align}
+Recall that if we wanted to do obtain a CI with the second result in Theorem \@ref(thm:point) we will need to estimate $f''(x)$.
+
+```{remark}
+Several points regarding the CI require proper awareness:
+
+1. The CI is for $\mathbb{E}[\hat f(x;h)]=(K_h*f)(x)$, not $f(x)$.
+2. The CI is **pointwise**. That means that $\mathbb{P}\left[\mathbb{E}[\hat f(x;h)]\in I\right]\approx 1-\alpha$ for each $x\in\mathbb{R}$, but **not simultaneously**. This is, $\mathbb{P}\left[\mathbb{E}[\hat f(x;h)]\in I,\,\forall x\in\mathbb{R}\right]\neq 1-\alpha$.
+3. We are approximating $f(x)$ in the variance by $\hat f(x;h)=f(x)+O_\mathbb{P}(h^2+(nh)^{-1})$. Additionally, the convergence to a Normal distribution happens at rate $\sqrt{nh}$. Hence both $h$ and $nh$ need to small and large, respectively, for a good coverage.
+4. The CI is for a **deterministic bandwidth** $h$ (*i.e.*, not selected from the sample), which is not usually the case in practise. If a bandwidth selector is employed, the coverage will be affected, specially for small $n$.
+
+```
+
+We illustrate the construction of the \@ref(eq:ci) in for the situation where the reference density is a $\mathcal{N}(\mu,\sigma^2)$ and the normal kernel is employed. This allows to use \@ref(eq:normbias)
+and \@ref(eq:normbias2) in combination \@ref(eq:kdekhbias) and \@ref(eq:kdekhvar) with to obtain:
+\begin{align*}
+\mathbb{E}[\hat f(x;h)]&=\phi_{(h^2+\sigma^2)^{1/2}}(x-\mu),\\
+\mathbb{V}\mathrm{ar}[\hat f(x;h)]&=\frac{1}{n}\left(\frac{\phi_{(h^2/2+\sigma^2)^{1/2}}(x-\mu)}{2\pi^{1/2}h}-(\phi_{(h^2+\sigma^2)^{1/2}}(x-\mu))^2\right).
+\end{align*}
+
+The following piece of code evaluates the proportion of times that $\mathbb{E}[\hat f(x;h)]$ belongs to $I$ for each $x\in\mathbb{R}$, both estimating and knowing the variance in the asymptotic distribution.
+
+```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
+# R(K) for a normal
+Rk <- 1 / (2 * sqrt(pi))
+
+# Generate a sample from a N(mu, sigma^2)
+n <- 100
+mu <- 0
+sigma <- 1
+set.seed(123456)
+x <- rnorm(n = n, mean = mu, sd = sigma)
+
+# Compute the kde (NR bandwidth)
+kde <- density(x = x, from = -4, to = 4, n = 1024, bw = "nrd")
+
+# Selected bandwidth
+h <- kde$bw
+
+# Estimate the variance
+hatVarKde <- kde$y * Rk / (n * h)
+
+# True expectation and variance (because the density is a normal)
+EKh <- dnorm(x = kde$x, mean = mu, sd = sqrt(sigma^2 + h^2))
+varKde <- (dnorm(kde$x, mean = mu, sd = sqrt(h^2 / 2 + sigma^2)) / 
+             (2 * sqrt(pi) * h) - EKh^2) / n
+
+# CI with estimated variance
+alpha <- 0.05
+zalpha <- qnorm(1 - alpha/2)
+ciLow1 <- kde$y - zalpha * sqrt(hatVarKde)
+ciUp1 <- kde$y + zalpha * sqrt(hatVarKde)
+
+# CI with known variance
+ciLow2 <- kde$y - zalpha * sqrt(varKde)
+ciUp2 <- kde$y + zalpha * sqrt(varKde)
+
+# Plot estimate, CIs and expectation
+plot(kde, main = "Density and CIs", ylim = c(0, 1))
+lines(kde$x, ciLow1, col = "gray")
+lines(kde$x, ciUp1, col = "gray")
+lines(kde$x, ciUp2, col = "gray", lty = 2)
+lines(kde$x, ciLow2, col = "gray", lty = 2)
+lines(kde$x, EKh, col = "red")
+legend("topright", legend = c("Estimate", "CI estimated var", 
+                              "CI known var", "Smoothed density"), 
+       col = c("black", "gray", "gray", "red"), lwd = 2, lty = c(1, 1, 2, 1))
+```
+
+The above code computes the ci. But it dos not show any insight on the effective coverage of the ci. The next simulation exercise deals with this issue.
+
+```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
+# Simulation setting
+n <- 100; h <- 0.2
+mu <- 0; sigma <- 1 # Normal parameters
+M <- 5e2 # Number of replications in the simulation
+nGrid <- 512 # Number of x's for computing the kde
+alpha <- 0.05; zalpha <- qnorm(1 - alpha/2) # alpha for CI
+
+# Compute expectation and variance
+kde <- density(x = 0, bw = h, from = -4, to = 4, n = nGrid) # Just to get kde$x
+EKh <- dnorm(x = kde$x, mean = mu, sd = sqrt(sigma^2 + h^2))
+varKde <- (dnorm(kde$x, mean = mu, sd = sqrt(h^2 / 2 + sigma^2)) / 
+           (2 * sqrt(pi) * h) - EKh^2) / n
+
+# For storing if the mean is inside the CI
+insideCi1 <- insideCi2 <- matrix(nrow = M, ncol = nGrid)
+
+# Simulation
+set.seed(12345)
+for (i in 1:M) {
+  
+  # Sample & kde
+  x <- rnorm(n = n, mean = mu, sd = sigma)
+  kde <- density(x = x, bw = h, from = -4, to = 4, n = nGrid)
+  hatSdKde <- sqrt(kde$y * Rk / (n * h))
+  
+  # CI with estimated variance
+  ciLow1 <- kde$y - zalpha * hatSdKde
+  ciUp1 <- kde$y + zalpha * hatSdKde
+  
+  # CI with known variance
+  ciLow2 <- kde$y - zalpha * sqrt(varKde)
+  ciUp2 <- kde$y + zalpha * sqrt(varKde)
+  
+  # Check if for each x the mean is inside the CI
+  insideCi1[i, ] <- EKh > ciLow1 & EKh < ciUp1
+  insideCi2[i, ] <- EKh > ciLow2 & EKh < ciUp2
+  
+}
+
+# Plot results
+plot(kde$x, colMeans(insideCi1), ylim = c(0.25, 1), type = "l", 
+     main = "Coverage CIs", xlab = "x", ylab = "Coverage")
+lines(kde$x, colMeans(insideCi2), col = 4)
+abline(h = 1 - alpha, col = 2)
+abline(h = 1 - alpha + c(-1, 1) * qnorm(0.975) * 
+         sqrt(alpha * (1 - alpha) / M), col = 2, lty = 2)
+legend(x = "bottom", legend = c("CI estimated var", "CI known var", 
+                                "Nominal level", 
+                                "95% CI for the nominal level"),
+       col = c(1, 4, 2, 2), lwd = 2, lty = c(1, 1, 1, 2))
+```
+
+```{exercise}
+Explore the coverage of the asymptotic CI for varying values of $h$. To that end, adapt the previous coe to workin a `manipulate` environment like the example given below.
+```
+
+```{r, echo = TRUE, eval = FALSE, collapse = TRUE, cache = TRUE}
+# Load manipulate
+# install.packages("manipulate")
+library(manipulate) 
+
+# Sample
+x <- rnorm(100)
+
+# Simple plot of kde for varying h
+manipulate({
+  
+  kde <- density(x = x, from = -4, to = 4, bw = h)
+  plot(kde, ylim = c(0, 1), type = "l", main = "")
+  curve(dnorm(x), from = -4, to = 4, col = 2, add = TRUE)
+  rug(x)
+
+}, h = slider(min = 0.01, max = 2, initial = 0.5, step = 0.01))
+```
+
+## Multivariate extension {#dens-mult}
+
+Setting and estimator. 
+
+Product Kernels. 
+
+Bias and variance. Asymptotic normality. 
+
+Bandwidth selectors. Normal. UCV. BCV. PI.
+
+Implementation.
+
+```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
+# 
+```
+
+## Practical issues {#dens-prac}
+
+### Sampling {#dens-sampling}
+
+1. Choose
+2. Sample
+
+### Boundary issues and transformations {#dens-transf}
+
+
+$$
+f(x)=g(t(x))t'(x)
+$$
+
+\begin{align}
+\hat f_T(x;h,t):=\frac{1}{n}\sum_{i=1}^nK_h(t(x)-t(X_i))t'(x) (\#eq:tkde)
+\end{align}
+
+Note that $h$ is in the scale of $t(X_i)$, not $X_i$. Hence bandwidth selection can be done in terms of the previously seen bandwidth selectors applied to $\{t(X_1),\ldots,t(X_n)\}$.
+
+Some common transformations are
+
+| Transformation |      Useful for    |   $t(x)$   |    $t'(x)$    |
+|:--------------:|:------------------:|:----------:|:-------------:|
+| Log | Data in $(a,\infty)$, $a\in\mathbb{R}$   | $\log(x-a)$  | $\frac{1}{x-a}$ |
+| Probit | Data in $(a,b)$   | $\Phi\left(\frac{x-a}{b-a}\right)$  | $\frac{1}{b-a}\phi\left(\frac{x-a}{b-a}\right)$ |
+| Shifted power | Heavily skewed data in $\mathbb{R}$ and above $-\lambda_1$  | $\begin{cases}(x+\lambda_1)^{\lambda_2}\mathrm{sign}(\lambda_2),&\lambda_2\neq0,\\\log(x+\lambda_1),&\lambda_2=0.\end{cases}$ | $\begin{cases}\lambda_2(x+\lambda_1)^{\lambda_2-1}\mathrm{sign}(\lambda_2),&\lambda_2\neq0,\\\frac{1}{x+\lambda_1},&\lambda_2=0.\end{cases}$ |
+
+
+App transformation
+
+```{r, kdetransf, echo = FALSE, fig.cap = '.', screenshot.opts = list(delay = 15), dev = 'png', cache = TRUE, out.width = '90%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/', height = '550px')
+```
+
+```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
+# 
+```
+
+
+## Exercises {#dens-exercises}
+
+This is the list of evaluable exercises for Chapter \@ref(dens). The number of stars represents an estimate of their difficulty: easy ($\star$), medium ($\star\star$), and hard ($\star\star\star$).
+
+```{exercise}
+(theoretical, $\star$) Prove that the histogram \@ref(eq:hist) is a proper density estimate (a nonnegative density that integrates one). Obtain its associated distribution function. What is its difference with respect to the ecdf \@ref(eq:ecdf)?
+```
+
+```{exercise}
+(theoretical, $\star$, adapted from Exercise 2.1 in @Wand1995) Derive the result \@ref(eq:kdekhvar). Then obtain the *exact* MSE and MISE using \@ref(eq:kdekhbias) and \@ref(eq:kdekhvar).
+```
+
+```{exercise}
+(theoretical, $\star\star$) Conditionally on the sample $X_1,\ldots,X_n$, compute the expectation and variance of the kde \ref(eq:kde) and compare them with the sample mean and variance. What is the effect of $h$ in them?
+```
+
+```{exercise}
+(theoretical, $\star\star$, Exercise 3.3 in @Wand1995) Show that
+$$
+\mathbb{E}[\mathrm{LSCV}(h)]=\mathrm{MISE}[\hat f(\cdot;h)]-R(f).
+$$
+```
+
+```{exercise, label = "fop"}
+(theoretical, $\star\star\star$) Show that:
+
+- $\hat f(x;h)=f(x)+o(h^2)+O_\mathbb{P}\left((nh)^{-\frac{1}{2}}\right)=f(x)(1+o_\mathbb{P}(1))$.
+- $\frac{1}{n}\sum_{i=1}^n(x-X_i)K_h(x-X_i)=\mu_2(K)f'(x)h^2+o(h^2)+O_\mathbb{P}\left(n^{-\frac{1}{2}}h^{\frac{1}{2}}\right)$.
+
+Then, provide a similar expansion result for $\frac{1}{n}\sum_{i=1}^n(x-X_i)^2K_h(x-X_i)$. *Hint*: use Chebychev inequality.
+```
+
+```{exercise}
+(theoretical, $\star\star\star$, Exercise 2.23 in @Wand1995) Show that the bias and variance for the transformation kde \@ref(eq:tkde) are
+\begin{align*}
+\mathrm{Bias}[\hat f_T(x;h,t)]&=\frac{\mu_2(K)}{2}g''(t(x))t'(x)h^2+o(h^2),\\
+\mathbb{V}\mathrm{ar}[\hat f_T(x;h,t)]&=\frac{R(K)}{nh}g(t(x))t'(x)^2+o((nh)^{-1}),
+\end{align*}
+where $g$ is the density of $t(X)$. Usig these results, prove that
+\begin{align*}
+\mathrm{AMISE}[\hat f_T(\cdot;h,t)]=\frac{1}{4}h^4\mu_2(K)^2\int t'(t^{-1}(x))g''(x)^2\mathrm{d}x+\frac{R(K)}{nh}\mathbb{E}[t'(X)].
+\end{align*}
+```
+
+```{exercise}
+(practical, $\star$) TODO. Faithful bivariate.
+```
+
+```{exercise}
+(practical, $\star$) The kde can be used to smoothly resample a dataset. To that end, first cumpute the kde of the dataset and then employ the algorithm of Section \@ref(dens-prac). Implement this resampling as a function that takes as arguments the dataset, the bandwidth $h$, and the number of sampled points $M$ wanted from the dataset. Use the Gaussian kernel for simplicity. Test the implementation with the `faithful` dataset and different bandwidths.
+```
+
+```{exercise}
+(practical, $\star\star$, Exercise 6.5 in @Wasserman2006)
+Data on the salaries of the chief executive officer of 60 companies is available at <http://lib.stat.cmu.edu/DASL/Datafiles/ceodat.html>. Investigate the distribution of salaries using a kde. Use $\hat h_\mathrm{LSCV}$ to choose the amount of smoothing. Also consider $\hat h_\mathrm{NS}$. There appear to be a few bumps in the density. Are they real? Use confidence bands to address this question. Finally, comment on the resulting estimates.
+```
+
+```{exercise}
+(practical, $\star\star$) Implement the transformation kde \@ref(eq:tkde) for the three transformations given in Section \@ref(dens-prac). You can modify the `density` function in `R` and add an extra argument for selecting the kind of transformation.
+```
+
+```{exercise}
+(practical, $\star\star\star$) A bandwidth selector is a random variable. Visualizing its density can help to understand its behaviour, especially if it is compared with the asymptotic optimal bandwidth $h_\mathrm{AMISE}$. Create a script that does the following steps:
+
+1. For $j=1,\ldots,M=1000$:
+
+    - Simulates a sample from a model mixture of `nor1mix`.
+    - Computes the bandwidth selectors $\hat h_{\mathrm{NS}}$, $\hat h_{\mathrm{BCV}}$, $\hat h_{\mathrm{UCV}}$, $\hat h_{\mathrm{DPI}}$, and $\hat h_{\mathrm{SCV}}$ and stores them.
+    
+2. Estimates the density of each bandwidth selector from its corresponding sample of size $M$.
+3. Plots the estimated densities together.
+4. Draws a vertical line for representing the $h_\mathrm{AMISE}$ bandwidth
+
+Describe the results for the "Claw" and "Bimodal" densities in `nor1mix`, for sample sizes $n=100,500$.
+```
+
+```{exercise}
+(practical, $\star\star\star$) Exact mixtures and compare amise and mise for mixtures in @Marron1992. \@ref(eq:conv) Gaussian kernel (See e.g. Appendix C in @Wand1995) . Present your findings TODO
+
+```
+
