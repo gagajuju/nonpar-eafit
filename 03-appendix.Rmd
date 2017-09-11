@@ -18,7 +18,7 @@ If there is any Linux user, kindly follow the corresponding instructions [here](
 1. The code is written in scripts in the *source panel* (upper-right panel in Figure \@ref(fig:rstudio));
 2. for running a line or code selection from the script in the *console* (first tab in the lower-right panel in Figure \@ref(fig:rstudio)), you do it with the keyboard shortcut `'Ctrl+Enter'` (Windows and Linux) or `'Cmd+Enter'` (Mac OS X).
 
-```{r, rstudio, echo = FALSE, out.width = '90%', fig.align = 'center', fig.cap = 'Main window of `RStudio`. The red showws the code panel and the yellow shows the console output. Extracted from <https://www.rstudio.com/wp-content/uploads/2016/01/rstudio-IDE-cheatsheet.pdf>.', cache = TRUE}
+```{r, rstudio, echo = FALSE, out.width = '90%', fig.cap = 'Main window of `RStudio`. The red showws the code panel and the yellow shows the console output. Extracted from <https://www.rstudio.com/wp-content/uploads/2016/01/rstudio-IDE-cheatsheet.pdf>.', cache = TRUE}
 knitr::include_graphics("images/images/RStudio.png")
 ```
 
@@ -68,6 +68,7 @@ Compute:
 - $\frac{e^{2}+\sin(2)}{\cos^{-1}\left(\tfrac{1}{2}\right)+2}$. *Answer*: `2.723274`.
 - $\sqrt{3^{2.5}+\log(10)}$. *Answer*: `4.22978`.
 - $(2^{0.93}-\log_2(3 + \sqrt{2+\sin(1)}))10^{\tan(1/3))}\sqrt{3^{2.5}+\log(10)}$. *Answer*: `-3.032108`.
+
 ```
 
 #### Variables and assignment {-}
@@ -216,6 +217,7 @@ Do the following:
 - What is the maximum of $y$? Where is it placed?
 - Sort $y$ increasingly and obtain the 5th and 76th positions. *Answer*: `c(4,75)`.
 - Compute the covariance between $y$ and $y$. Compute the variance of $y$. Why do you get the same result?
+
 ```
 
 #### Matrices, data frames, and lists {-}
@@ -334,6 +336,7 @@ Do the following:
 - Get the dimensions of `faithful` and show beginning of the data.
 - Retrieve the fifth observation of `eruptions` in two different ways.
 - Obtain a summary of `waiting`.
+
 ```
 
 #### Vector-related functions {-}
@@ -682,7 +685,7 @@ apply(A, 2, function(x) x^2)
 ```{exercise}
 Do the following:
 
-- Create a function that takes as argument $n$ and returns the value of $\sum_{i=1}^ni^2.
+- Create a function that takes as argument $n$ and returns the value of $\sum_{i=1}^n i^2$.
 - Create a function that takes as input the argument $N$ and then plots the curve $(n, \sum_{i=1}^n \sqrt{i})$ for $n=1,\ldots,N$. *Hint*: use `sapply`.
 
 ```
@@ -745,7 +748,7 @@ for (i in 1:1000) {
 ```{exercise}
 Do the following:
 
-- Compute $\mathbf{C}_{n\times k}$ in $\mathbf{C}_{n\times k}=\mathbf{A}_{n\times m} \mathbf{B}_{m\times k}$ from $\mathbf{A}$ and $\mathbf{B}. Use that $c_{i,j}=\sum_{l=1}^ma_{i,l}b_{l,j}$. Test the implementation with simple examples.
+- Compute $\mathbf{C}_{n\times k}$ in $\mathbf{C}_{n\times k}=\mathbf{A}_{n\times m} \mathbf{B}_{m\times k}$ from $\mathbf{A}$ and $\mathbf{B}$. Use that $c_{i,j}=\sum_{l=1}^ma_{i,l}b_{l,j}$. Test the implementation with simple examples.
 - Create a function that samples a $\mathcal{N}(0,1)$ and returns the first sampled point that is larger than $4$.
 - Create a function that simulates $N$ samples from the distribution of $\max(X_1,\ldots,X_n)$ where $X_1,\ldots,X_n$ are iid $\mathcal{U}(0,1)$. 
 

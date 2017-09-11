@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-CC_BY--NC--SA_4.0-blue.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-![KDE animation](https://raw.githubusercontent.com/egarpor/project-kde/master/images/kde.gif)
+![KDE animation](https://github.com/egarpor/nonpar-eafit/blob/master/images/images/kde.gif)
 
 ## Overview
 
