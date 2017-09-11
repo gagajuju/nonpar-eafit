@@ -1,6 +1,6 @@
 bookdown::gitbook:
   css: css/style.css
-  split_by: chapter
+  split_by: section
   includes:
     in_header: analytics/script.html
   config:
@@ -8,13 +8,13 @@ bookdown::gitbook:
       collapse: subsection
       scroll_highlight: true
       before: |
-        <li><a href="./">Short course on nonparametric density and regression estimation</a></li>
+        <li><a href="./">A short course on nonparametric density and regression estimation</a></li>
       after: |
         <li><a href="https://bookdown.org/" target="blank">Published with bookdown</a></li>
     toolbar:
       position: fixed
     edit:
-      link: https://github.com/egarpor/nonpar-eafitametrics/edit/master/%s
+      link: https://github.com/egarpor/nonpar-eafit/edit/master/%s
     download: [pdf, epub]
     search: true
     fontsettings:

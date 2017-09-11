@@ -133,7 +133,7 @@ These two results provide interesting insights on the effect of $h$:
 The animation in Figure \@ref(fig:movinghist) illustrates the previous points and gives insight on how the performance of \@ref(eq:movhist) varies smoothly with $h$.
 
 ```{r, movinghist, echo = FALSE, fig.cap = 'Bias and variance for the moving histogram. The animation shows how for small bandwidths the bias of $\\hat f_N(x;h)$ on estimating $f(x)$ is small, but the variance is high, and how for large bandwidths the bias is large and the variance is small. The variance is represented by the asymptotic $95\\%$ confidence intervals for $\\hat f_N(x;h)$.', screenshot.opts = list(delay = 15), dev = 'png', cache = TRUE, out.width = '90%'}
-knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/bias-var-movhist/', height = '550px')
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/bias-var-movhist/', height = '900px')
 ```
 
 Estimator \@ref(eq:movhist) raises an important question: **Why giving the same weight to all $X_1,\ldots,X_n$ in $(x-h, x+h)$?** After all, we are estimating $f(x)=F'(x)$ by estimating $\frac{F(x+h)-F(x-h)}{2h}$ through the relative frequency of $X_1,\ldots,X_n$ in $(x-h,x+h)$. Should not be the data points closer to $x$ more important than the ones further away? The answer to this question shows that \@ref(eq:movhist) is indeed a particular case of a wider class of density estimators. 
@@ -157,7 +157,7 @@ A common notation is $K_h(z):=\frac{1}{h}K\left(\frac{z}{h}\right)$, so $\hat f(
 Several types of kernels are possible. The most popular is the *Gaussian kernel* $K(z)=\phi(z)$, although the *Epanechnikov kernel*, $K(z)=\frac{3}{4}(1-z^2)1_{|z|<1}$, is slightly more efficient, as we will see later. The *rectangular kernel* $K(z)=\frac{1}{2}1_{\{|z|<1\}}$ yields the moving histogram as a particular case. The kde inherits the smoothness properties of the kernel. That means, for example, \@ref(eq:kde) with a Gaussian kernel is infinitely differentiable. But with an Epanechnikov kernel, \@ref(eq:kde) is only first differentiable, and with a rectangular kernel is not even continuous. However, if a certain smoothness is guaranteed (continuity at least), the *choice of the kernel has little importance in practise* (at least compared with the choice of $h$). Figure \@ref(fig:kdeconst) illustrates the construction of the kde and the bandwidth and kernel effects.
 
 ```{r, kdeconst, echo = FALSE, fig.cap = 'Construction of the kernel density estimator. The animation shows how the bandwidth and kernel affect the density estimate, and how the kernels are rescaled densities with modes at the data points.', screenshot.opts = list(delay = 15), dev = 'png', cache = TRUE, out.width = '90%'}
-knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/', height = '550px')
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/', height = '900px')
 ```
 
 Implementation of kde in `R` is built-in through the `density` function. The function automatically chooses the bandwidth $h$ using a *bandwith selector* which will be studied in detail in Section \@ref(dens-bwd).
@@ -283,7 +283,7 @@ The MSE of the kde is trivial to obtain from the bias and variance:
 ```{corollary}
 Under **A1**--**A3**, the MSE of the kde at $x$ is
 \begin{align}
-\mathrm{MSE}[\hat f(x;h)]&=\frac{\mu^2_2(K)}{4}(f''(x))^2+\frac{R(K)}{nh}f(x)+o(h^4+(nh)^{-1}).(\#eq:kdemse)
+\mathrm{MSE}[\hat f(x;h)]&=\frac{1}{4}\mu^2_2(K)(f''(x))^2+\frac{R(K)}{nh}f(x)+o(h^4+(nh)^{-1}).(\#eq:kdemse)
 \end{align}
 Therefore, the kde is pointwise consistent in MSE, *i.e.*, $\hat f(x;h)\stackrel{2}{\longrightarrow}f(x)$.
 ```
@@ -366,12 +366,12 @@ Once the MISE is set as the error criterion to be minimized, our aim is to find
 $$
 h_\mathrm{MISE}=\arg\min_{h>0}\mathrm{MISE}[\hat f(\cdot;h)].
 $$
-For that purpose, we need an explicit expression of the mise that we can attempt to minimise. An asymptotic expansion for the MISE can be easily derived from the MSE expression.
+For that purpose, we need an explicit expression of the MISE that we can attempt to minimize. An asymptotic expansion for the MISE can be easily derived from the MSE expression.
 
 ```{corollary}
 Under **A1**--**A3**,
 \begin{align}
-\mathrm{MISE}[\hat f(\cdot;h)]&=\frac{\mu^2_2(K)}{4}R(f'')+\frac{R(K)}{nh}+o(h^4+(nh)^{-1}).(\#eq:kdemise)
+\mathrm{MISE}[\hat f(\cdot;h)]&=\frac{1}{4}\mu^2_2(K)R(f'')h^4+\frac{R(K)}{nh}+o(h^4+(nh)^{-1}).(\#eq:kdemise)
 \end{align}
 Therefore, $\mathrm{MISE}[\hat f(\cdot;h)]\to0$ when $n\to\infty$.
 ```
@@ -379,23 +379,30 @@ Therefore, $\mathrm{MISE}[\hat f(\cdot;h)]\to0$ when $n\to\infty$.
 Trivial.
 ```
 
-The dominating part of the MISE is denoted as AMISE, which stands for *Asymptotic MISE*: $\mathrm{AMISE}[\hat f(\cdot;h)]=\frac{\mu^2_2(K)}{4}R(f'')h^4+\frac{R(K)}{nh}$. Due to its closed expression, it is possible to obtain a bandwidth that minimises the AMISE.
+The dominating part of the MISE is denoted as AMISE, which stands for *Asymptotic MISE*: $\mathrm{AMISE}[\hat f(\cdot;h)]=\frac{1}{4}\mu^2_2(K)R(f'')h^4+\frac{R(K)}{nh}$. Due to its closed expression, it is possible to obtain a bandwidth that minimizes the AMISE.
 
 ```{corollary}
 The bandwidth that minimises the AMISE is
-\begin{align}
-h_\mathrm{AMISE}=\left[\frac{R(K)}{\mu_2^2(K)R(f'')n}\right]^{1/5}.(\#eq:hamise)
-\end{align}
+$$
+h_\mathrm{AMISE}=\left[\frac{R(K)}{\mu_2^2(K)R(f'')n}\right]^{1/5}.
+$$
+The optimal AMISE is: 
+$$
+\inf_{h>0}\mathrm{AMISE}[\hat f(\cdot;h)]=\frac{5}{4}(\mu_2^2(K)R(K)^4)^{4/5}R(f'')^{1/5}n^{-4/5}.
+$$
 ```
 ```{proof}
-Solving $\frac{\mathrm{d}}{\mathrm{d} h}\mathrm{AMISE}[\hat f(\cdot;h)]=\mu_2^2(K)R(f'')h^3-R(K)n^{-1}h^{-2}=0$ yields the result.
+Solving $\frac{\mathrm{d}}{\mathrm{d} h}\mathrm{AMISE}[\hat f(\cdot;h)]=\mu_2^2(K)R(f'')h^3-R(K)n^{-1}h^{-2}=0$ yields $h_\mathrm{AMISE}$ and $\mathrm{AMISE}[\hat f(\cdot;h_\mathrm{AMISE})]$ gives the AMISE-optimal error.
+
 ```
 
-Unfortunately, the AMISE bandwidth depends on $R(f'')=\int(f''(x))^2\mathrm{d}x$, which measures the *curvature* of the density. As a consequence, it can not be readily applied in practise. In the next subsection we will see how to plug-in estimates for $R(f'')$.
+The AMISE-optimal order deserves some further inspection. It can be seen in Section 3.2 of @Scott2015 that the AMISE-optimal order for the *histogram* of Section \@ref(dens-hist) is $\left(\frac{3}{4}\right)^{2/3}R(f')^{1/3}n^{-2/3}$. Two facts are of interest. First, the MISE of the histogram is asymptotically larger than the MISE of the kde ($n^{-4/5}=o(n^{-2/3})$). This is a quantification of the quite apparent visual improvement of the kde over the histogram. Second, $R(f')$ appears instead of $R(f'')$, evidencing that the histogram is affected not only by the curvature of the target density $f$ but also by how fast it varies.
+
+Unfortunately, the AMISE bandwidth depends on $R(f'')=\int(f''(x))^2\mathrm{d}x$, which measures the *curvature* of the density. As a consequence, it can not be readily applied in practice. In the next subsection we will see how to plug-in estimates for $R(f'')$.
 
 ### Plug-in rules {#dens-plug-in}
 
-A simple solution to estimate $R(f'')$ is to assume that $f$ is the density of a $\mathcal{N}(\mu,\sigma^2)$, and then plug-in the form of the curvature for fuch density:
+A simple solution to estimate $R(f'')$ is to assume that $f$ is the density of a $\mathcal{N}(\mu,\sigma^2)$, and then plug-in the form of the curvature for such density:
 $$
 R(\phi''_\sigma(\cdot-\mu))=\frac{3}{8\pi^{1/2}\sigma^5}.
 $$
@@ -403,62 +410,342 @@ While doing so, we approximate the curvature of an arbitrary density by means of
 $$
 h_\mathrm{AMISE}=\left[\frac{8\pi^{1/2}R(K)}{3\mu_2^2(K)n}\right]^{1/5}\sigma.
 $$
-Interestingly, the bandwidth is directly proportional to the standard deviation of the target density. Replacing $\sigma$ by an estimate yields the *normal scale bandwidth selector*, which we denote by $\hat h_\mathrm{NS}$ to emphasize its randomness:
+Interestingly, the bandwidth is directly proportional to the standard deviation of the target density. Replacing $\sigma$ by an estimate yields the **normal scale bandwidth selector**, which we denote by $\hat h_\mathrm{NS}$ to emphasize its randomness:
 $$
 \hat h_\mathrm{NS}=\left[\frac{8\pi^{1/2}R(K)}{3\mu_2^2(K)n}\right]^{1/5}\hat\sigma.
 $$
-The estimate $\hat\sigma$ can be chosen as the standard deviation $s$, or, in order to avoid the effects of potential outliers, as the standardised interquantile range:
+The estimate $\hat\sigma$ can be chosen as the standard deviation $s$, or, in order to avoid the effects of potential outliers, as the standardized interquantile range:
 $$
 \hat \sigma_{\mathrm{IQR}}:=\frac{X_{([0.75n])}-X_{([0.25n])}}{\Phi^{-1}(0.75)-\Phi^{-1}(0.25)}.
 $$
-@Silverman1986 suggests employing the minmum of both quantities, $\hat\sigma:=\min(s,\hat \sigma_{\mathrm{IQR}})$. When combined with a normal kernel, for which $\mu_2(K)=1$ and $R(K)=\phi_{\sqrt{2}}(0)=\frac{1}{2\sqrt{\pi}}$ (check \@ref(eq:fact2)), this particularizarion of $\hat h_{\mathrm{NS}}$ gives the famous *rule-of-thumb* for bandwidth selection:
+@Silverman1986 suggests employing the minimum of both quantities, 
+\begin{align}
+\hat\sigma=\min(s,\hat \sigma_{\mathrm{IQR}}). (\#eq:sigmahat)
+\end{align}
+When combined with a normal kernel, for which $\mu_2(K)=1$ and $R(K)=\phi_{\sqrt{2}}(0)=\frac{1}{2\sqrt{\pi}}$ (check \@ref(eq:fact2)), this particularization of $\hat h_{\mathrm{NS}}$ gives the famous **rule-of-thumb** for bandwidth selection:
 $$
-\hat h_\mathrm{RT}=1.06n^{1/5}\hat\sigma.
-$$
-This bandwidth selector is implemented in `R` through the function `bw.nrd` (not to confuse with `bw.nrd0`).
-
-The previous selector is an example of a *plug-in .
-
-$$
-R(f^{(s)})=\int f^{(s)}(x)^2\mathrm{d}x=(-1)^s\int f^{(2s)}(x)f(x)\mathrm{d}x
+\hat h_\mathrm{RT}=\left(\frac{4}{3}\right)^{1/5}n^{-1/5}\hat\sigma\approx1.06n^{-1/5}\hat\sigma.
 $$
 
+$\hat h_{\mathrm{RT}}$ is implemented in `R` through the function `bw.nrd` (not to confuse with `bw.nrd0`).
+```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
+# Data
+x <- rnorm(100)
 
-$$
-\psi_r=\int f^{(r)}(x)f(x)\mathrm{d}x=\mathbb{E}[f^{(r)}(X)]
-$$
-for $r$ even.
+# Rule-of-thumb
+bw.nrd(x = x)
 
-
-### Cross-validation selectors {dens-cv}
-
-least squares cross-validation (LSCV) also denoted unbiased cross-validation (or UCV).
-
-
-biased cross-validation (BCV)
-
-smoothed cross-validation (SCV) 
-
-
-App different bandwidth behaviors. Figure \@ref(fig:kdebwd).
-
-```{r, kdebwd, echo = FALSE, fig.cap = '.', screenshot.opts = list(delay = 15), dev = 'png', cache = TRUE, out.width = '90%'}
-knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-bwd/', height = '550px')
+# Same as
+iqr <- diff(quantile(x, c(0.75, 0.25))) / diff(qnorm(c(0.75, 0.25)))
+1.06 * length(x)^(-1/5) * min(sd(x), iqr)
 ```
 
-To test the implementations, we consider the celebrated family of normal mixtures given by @Marron1992. These are available in the package `nor1mix`.
+The previous selector is an example of a **zero-stage plug-in** selector, a terminology which lays on the fact that $R(f'')$ was estimated by plugging-in a parametric assumption at the "very beginning". Because we could have opted to estimate $R(f'')$ nonparametrically and then plug-in the estimate into into $h_\mathrm{AMISE}$. Let's explore this possibility in more detail. But first, note the useful equality
+$$
+\int f^{(s)}(x)^2\mathrm{d}x=(-1)^s\int f^{(2s)}(x)f(x)\mathrm{d}x.
+$$
+This holds by a iterative application of integration by parts. For example, for $s=2$, take $u=f'(x)$ and $\mathrm{d}v=f''(x)\mathrm{d}x$. This gives
+$$
+\int f''(x)^2\mathrm{d}x=[f''(x)f'(x)]_{-\infty}^{+\infty}-\int f'(x)f'''(x)\mathrm{d}x=-\int f'(x)f'''(x)\mathrm{d}x
+$$
+under the assumption that the derivatives vanish at infinity. Applying again integration by parts with $u=f'(x)$ and $\mathrm{d}v=f''(x)\mathrm{d}x$ gives the result. This simple derivation has an important consequence: for estimating the functionals $R(f^{(s)})$ it is only required to estimate for $r=2s$ the functionals
+$$
+\psi_r:=\int f^{(r)}(x)f(x)\mathrm{d}x=\mathbb{E}[f^{(r)}(X)].
+$$
+Particularly, $R(f'')=\psi_4$.
+
+Thanks to the previous expression, a possible way to estimate $\psi_r$ nonparametrically is
+\begin{align}
+\hat\psi_r(g)=\frac{1}{n}\sum_{i=1}^n\hat f^{(r)}(X_i;g)=\frac{1}{n^2}\sum_{i=1}^n\sum_{j=1}^nL_g^{(r)}(X_i-X_j),(\#eq:psir)
+\end{align}
+where $\hat f^{(r)}(\cdot;g)$ is the $r$-th derivative of a kde with bandwidth $g$ and kernel $L$, *i.e.* $\hat f^{(r)}(x;g)=\frac{1}{nh^r}\sum_{i=1}^nL^{(r)}\left(\frac{x-X_i}{g}\right)$. Note that $g$ and $L$ can be different from $h$ and $K$, respectively. It turns out that estimating $\psi_r$ involves the adequate selection of a bandwidth $g$. The agenda is analogous to the one for $h_\mathrm{AMISE}$, but now taking into account that both $\hat\psi_r(g)$ and $\psi_r$ are *scalar* quantities:
+
+1. Under certain regularity assumptions (see Section 3.5 in @Wand1995 for full details), the asymptotic bias and variance of $\hat\psi_r(g)$ are obtained. With them, we can compute the asymptotic expansion of the MSE and obtain the *Asymptotic Mean Squared Error* AMSE:
+\begin{align*}
+\mathrm{AMSE}[\hat \psi_r(r)]=&\,\left\{\frac{L^{(r)}(0)}{ng^{r+1}}+\frac{\mu_2(L)\psi_{r+2}g^2}{4}\right\}+\frac{2R(L^{(r)})\psi_0}{n^2g^{2r+1}}\\
+&+\frac{4}{n}\left\{\int f^{(r)}(x)^2f(x)\mathrm{d}x-\psi_r^2\right\}.
+\end{align*}
+*Note*: $k$ is the highest integer such that $\mu_k(L)>0$. In these notes we have restricted to the case $k=2$ for the kernels $K$, but there are theoretical gains if one allows *high-order kernels* $L$ with vanishing even moments larger than $2$ for estimating $\psi_r$.
+
+2. Obtain the AMSE-optimal bandwidth:
+$$
+g_\mathrm{AMSE}=\left[-\frac{k!L^{(r)}(0)}{\mu_k(L)\psi_{r+k}n}\right]^{1/(r+k+1)}
+$$
+The order of the optimal AMSE is 
+$$\inf_{g>0}\mathrm{AMSE}[\hat \psi_r(r)]=\begin{cases}
+O(n^{-(2k+1)/(r+k+1)}),&k<r,\\
+O(n^{-1}),&k\geq r,
+\end{cases}$$
+which shows that a parametric-like rate of convergence can be achieved with high-order kernels. If we consider $L=K$ and $k=2$, then
+$$
+g_\mathrm{AMSE}=\left[-\frac{2K^{(r)}(0)}{\mu_2(L)\psi_{r+2}n}\right]^{1/(r+3)}.
+$$
+
+The above result has a major problem: it depends on $\psi_{r+2}$! Thus if we want to estimate $R(f'')=\psi_4$ by $\hat\psi_4(g_\mathrm{AMSE})$ we will need to estimate $\psi_6$. But $\hat\psi_6(g_\mathrm{AMSE})$ will depend on $\psi_8$ and so on. The solution to this convoluted problem is to stop estimating the functional $\psi_r$ after a given number $\ell$ of *stages*, therefore the terminology **$\ell$-stage plug-in selector**. At the $\ell$ stage, the functional $\psi_{\ell+4}$ in the AMSE-optimal bandwidth for estimating $\psi_{\ell+2}$ is computed assuming that the density is a $\mathcal{N}(\mu,\sigma^2)$, for which
+$$
+\psi_r=\frac{(-1)^{r/2}r!}{(2\sigma)^{r+1}(r/2)!\sqrt{\pi}},\quad \text{for }r\text{ even.}
+$$
+Typically, **two stages** are considered a good trade-off between bias (mitigated when $\ell$ increases) and variance (augments with $\ell$) of the plug-in selector. This is the method proposed by @Sheather1991, where they consider $L=K$ and $k=2$, yielding what we call the **direct plug-in** (DPI). The algorithm is:
+
+1. Estimate $\psi_8$ using $\hat\psi_8^\mathrm{NS}:=\frac{105}{32\sqrt{\pi}\hat\sigma^9}$, where $\hat\sigma$ is given in \@ref(eq:sigmahat) 
+2. Estimate $\psi_6$ using $\hat\psi_6(g_1)$ from \@ref(eq:psir), where 
+$$
+g_1:=\left[-\frac{2K^{(6)}(0)}{\mu_2(K)\hat\psi^\mathrm{NS}_{8}n}\right]^{1/9}.
+$$
+3. Estimate $\psi_4$ using $\hat\psi_4(g_2)$ from \@ref(eq:psir), where
+$$
+g_2:=\left[-\frac{2K^{(4)}(0)}{\mu_2(K)\hat\psi_6(g_1)n}\right]^{1/7}.
+$$
+4. The selected bandwidth is
+$$
+\hat h_{\mathrm{DPI}}:=\left[\frac{R(K)}{\mu_2^2(K)\hat\psi_4(g_2)n}\right]^{1/5}.
+$$
+
+```{remark}
+The derivatives $K^{(r)}$ for the Gaussian kernel can be obtained using *Hermite polynmials*: $\phi^{(r)}(x)=\phi(x)H_r(x)$. For $r=4,6$, $H_4(x)=x^4-6x^2+3$ and $H_6(x)=x^6-16x^4+45x^2-15$.
+```
+
+$\hat h_{\mathrm{DPI}}$ is implemented in `R` through the function `bw.SJ` (use `method = "dpi"`). The package `ks` provides `hpi`, which is a faster implementation that allows for more flexibility and has a somehow more complete documentation.
+```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
+# Data
+x <- rnorm(100)
+
+# Rule-of-thumb
+bw.SJ(x = x, method = "dpi")
+
+# Similar to
+library(ks)
+hpi(x) # Default is two-stages
+```
+
+### Cross-validation {#dens-cv}
+
+We turn now our attention to a different philosophy of bandwidth estimation. Instead of trying to minimise the AMISE by plugging-in estimates for the unknown curvature term, we directly attempt to minimise the MISE by using the sample twice: one for computing the kde and other for *evalauting* its performance on estimating $f$. To avoid the clear dependence on the sample, we do this evaluation in a *cross-validatory* way: the data used for computing the kde is *not* used for its evaluation.
+
+We begin by expanding the square in the MISE expression:
+\begin{align*}
+\mathrm{MISE}[\hat f(\cdot;h)]&=\mathbb{E}\left[\int (\hat f(x;h)-f(x))^2\mathrm{d}x\right]=\mathbb{E}\left[\int \hat f(x;h)^2\mathrm{d}x\right]-2\mathbb{E}\left[\int \hat f(x;h)f(x)\mathrm{d}x\right]\\
+&+\int f(x)^2\mathrm{d}x.
+\end{align*}
+Since the last term does not depend on $h$, minimizing $\mathrm{MISE}[\hat f(\cdot;h)]$ is equivalent to minimizing
+$$
+\mathbb{E}\left[\int \hat f(x;h)^2\mathrm{d}x\right]-2\mathbb{E}\left[\int \hat f(x;h)f(x)\mathrm{d}x\right].
+$$
+This quantity is unknown, but it can be estimated unbiasedly (see Exercise \@ref(exr:lscv)) by
+\begin{align}
+\mathrm{LSCV}(h):=\int\hat f(x;h)^2\mathrm{d}x-2n^{-1}\sum_{i=1}^n\hat f_{-i}(X_i;h),(\#eq:lscv)
+\end{align}
+where $\hat f_{-i}(\cdot;h)$ is the *leave-one-out* kde and is based on the sample with the $X_i$ removed:
+$$
+\hat f_{-i}(x;h)=\frac{1}{n-1}\sum_{\substack{j=1\\j\neq i}}^n K_h(x-X_j).
+$$
+The motivation for \@ref(eq:lscv) is the following. The first term is unbiased by design. The second arises from approximating $\int \hat f(x;h)f(x)\mathrm{d}x$ by Monte Carlo, or in other words, by replacing $f(x)\mathrm{d}x=\mathrm{d}F(x)$ with $\mathrm{d}F_n(x)$. This gives
+$$
+\int \hat f(x;h)f(x)\mathrm{d}x\approx\frac{1}{n}\sum_{i=1}^n \hat f(X_i;h)
+$$
+and, in order to mitigate the dependence of the sample, we replace $\hat f(X_i;h)$ by $\hat f_{-i}(X_i;h)$ above. In that way, we use the sample for estimating the integral involving $\hat f(\cdot;h)$, but fo each $X_i$ we compute the kde on the *remaining* points. The **least squares cross-validation** (LSCV) selector, also denoted **unbiased cross-validation** (UCV) selector, is defined as
+$$
+\hat h_\mathrm{LSCV}:=\arg\min_{h>0}\mathrm{LSCV}(h).
+$$
+Numerical optimization is required for obtaining $\hat h_\mathrm{LSCV}$, contraty to the previous plug-in selectos, and there is little control on the shape of the objective function. This will be also the case for the forthcoming bandwidth selectors. The following remark warns about the dangers of numerical optimization in this context.
+
+```{remark}
+Numerical optimization of the LSCV function can be challenging. In practise, several local minima are possible, and the roughness of the objective function can vary notably depending on $n$ and $f$. As a consquence, optimization routines may get trapped in spurious solutions. To be on the safe side, it is always advisable to check the solution by plotting $\mathrm{LSCV}(h)$ for a range of $h$, or to perform a search in a bandwidth grid: $\hat h_\mathrm{LSCV}\approx\arg\min_{h_1,\ldots,h_G}\mathrm{LSCV}(h)$. 
+```
+
+$\hat h_{\mathrm{LSCV}}$ is implemented in `R` through the function `bw.ucv`. `bw.ucv` uses `R`'s `optimize`, which is quite sensible to the selection of the search interval (long intervals containing the solution may lead to unsatisfactory termination of the search; and short intervals might not contain the minimum). Therefore, some care is needed and that is why the `bw.ucv.mod` function is presented.
 
 ```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
-library(nor1mix)
+# Data
+set.seed(123456)
+x <- rnorm(100)
 
+# UCV gives a warning
+bw.ucv(x = x)
+
+# Extend search interval
+args(bw.ucv)
+bw.ucv(x = x, lower = 0.01, upper = 1)
+
+# bw.ucv.mod replaces the optimization routine of bw.ucv by an exhaustive search on
+# "h.grid" (chosen adaptatively from the sample) and optionally plots the LSCV curve
+# with "plot.cv"
+bw.ucv.mod <- function(x, nb = 1000L, 
+                       h.grid = diff(range(x)) * (seq(0.1, 1, l = 200))^2, 
+                       plot.cv = FALSE) {
+  if ((n <- length(x)) < 2L) 
+    stop("need at least 2 data points")
+  n <- as.integer(n)
+  if (is.na(n)) 
+    stop("invalid length(x)")
+  if (!is.numeric(x)) 
+    stop("invalid 'x'")
+  nb <- as.integer(nb)
+  if (is.na(nb) || nb <= 0L) 
+    stop("invalid 'nb'")
+  storage.mode(x) <- "double"
+  hmax <- 1.144 * sqrt(var(x)) * n^(-1/5)
+  Z <- .Call(stats:::C_bw_den, nb, x)
+  d <- Z[[1L]]
+  cnt <- Z[[2L]]
+  fucv <- function(h) .Call(stats:::C_bw_ucv, n, d, cnt, h)
+  # h <- optimize(fucv, c(lower, upper), tol = tol)$minimum
+  # if (h < lower + tol | h > upper - tol) 
+  #   warning("minimum occurred at one end of the range")
+  obj <- sapply(h.grid, function(h) fucv(h))
+  h <- h.grid[which.min(obj)]
+  if (plot.cv) {
+    plot(h.grid, obj, type = "o")
+    rug(h.grid)
+    abline(v = h, col = 2, lwd = 2)
+  }
+  h
+}
+
+# Compute the bandwidth and plot the LSCV curve
+bw.ucv.mod(x = x, plot.cv = TRUE)
+
+# We can compare with the default bw.ucv output
+abline(v = bw.ucv(x = x), col = 3)
 ```
 
-Some quick insights on the convergence results $n^\nu(\hat h/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(\mu,\sigma^2)$ are:
+The next cross-validation selector is based on **biased cross-validation** (BCV). The BCV selector presents a hybrid strategy that combines plug-in and cross-validation ideas. It starts by considering the AMISE expression in \@ref(eq:kdemise)
+$$
+\mathrm{AMISE}[\hat f(\cdot;h)]=\frac{1}{4}\mu^2_2(K)R(f'')h^4+\frac{R(K)}{nh}
+$$
+and then plugs-in an estimate for $R(f'')$ based on a modification of $R(\hat{f}''(\cdot;h))$. The modification is 
+\begin{align}
+\widetilde{R(f'')}:=&\,R(\hat{f}''(\cdot;h))-\frac{R(K'')}{nh^5}\notag\\
+=&\,\frac{1}{n}\sum_{i=1}^n\sum_{\substack{j=1}{j\neq i}}^n(K_h''*K_h'')(X_i-X_j)(\#eq:Rtilde),
+\end{align}
+a *leave-out-diagonals* estimate of $R(f'')$. It is designed to reduce the bias of $R(\hat{f}''(\cdot;h))$, since 
+$\mathbb{E}\left[R(\hat{f}''(\cdot;h))\right]=R(f'')+\frac{R(K'')}{nh^5}+O(h^2)$. [@Scott1987]. Plugging-in \@ref(eq:Rtilde) into the AMISE expression yields the BCV objective function and BCV bandwidth selector:
+\begin{align*}
+\mathrm{BCV}(h)&:=\frac{1}{4}\mu^2_2(K)\widetilde{R(f'')}h^4+\frac{R(K)}{nh},\\
+\hat h_\mathrm{BCV}&:=\arg\min_{h>0}\mathrm{BCV}(h).
+\end{align*}
 
-- LSCV: $n^{-1/10}(\hat h_\mathrm{LSCV}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{LSCV}^2)$
-- BCV: $n^{-1/10}(\hat h_\mathrm{BCV}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{BCV}^2)$
-- DPI: $n^{-5/14}(\hat h_\mathrm{DPI}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{DPI}^2)$
-- SCV: $n^{-5/14}(\hat h_\mathrm{SCV}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{SCV}^2)$
+The appealing property of $\hat h_\mathrm{BCV}$ is that it has a considerably smaller variance compared to $\hat h_\mathrm{LSCV}$. This reduction in variance comes at the price of an increased bias, which tends to make $\hat h_\mathrm{BCV}$ larger than $h_\mathrm{MISE}$.
+
+$\hat h_{\mathrm{BCV}}$ is implemented in `R` through the function `bw.bcv`. Again, `bw.bcv` uses `R`'s `optimize` so the `bw.bcv.mod` function is presented to have better guarantees on finding the adequate minimum.
+
+```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
+# Data
+set.seed(123456)
+x <- rnorm(100)
+
+# BCV gives a warning
+bw.bcv(x = x)
+
+# Extend search interval
+args(bw.bcv)
+bw.bcv(x = x, lower = 0.01, upper = 1)
+
+# bw.bcv.mod replaces the optimization routine of bw.bcv by an exhaustive search on
+# "h.grid" (chosen adaptatively from the sample) and optionally plots the BCV curve
+# with "plot.cv"
+bw.bcv.mod <- function(x, nb = 1000L, 
+                       h.grid = diff(range(x)) * (seq(0.1, 1, l = 200))^2, 
+                       plot.cv = FALSE) {
+  if ((n <- length(x)) < 2L) 
+    stop("need at least 2 data points")
+  n <- as.integer(n)
+  if (is.na(n)) 
+    stop("invalid length(x)")
+  if (!is.numeric(x)) 
+    stop("invalid 'x'")
+  nb <- as.integer(nb)
+  if (is.na(nb) || nb <= 0L) 
+    stop("invalid 'nb'")
+  storage.mode(x) <- "double"
+  hmax <- 1.144 * sqrt(var(x)) * n^(-1/5)
+  Z <- .Call(stats:::C_bw_den, nb, x)
+  d <- Z[[1L]]
+  cnt <- Z[[2L]]
+  fbcv <- function(h) .Call(stats:::C_bw_bcv, n, d, cnt, h)
+  # h <- optimize(fbcv, c(lower, upper), tol = tol)$minimum
+  # if (h < lower + tol | h > upper - tol) 
+  #   warning("minimum occurred at one end of the range")
+  obj <- sapply(h.grid, function(h) fbcv(h))
+  h <- h.grid[which.min(obj)]
+  if (plot.cv) {
+    plot(h.grid, obj, type = "o")
+    rug(h.grid)
+    abline(v = h, col = 2, lwd = 2)
+  }
+  h
+}
+
+# Compute the bandwidth and plot the BCV curve
+bw.bcv.mod(x = x, plot.cv = TRUE)
+
+# We can compare with the default bw.bcv output
+abline(v = bw.bcv(x = x), col = 3)
+```
+
+### Comparison of bandwidth selectors {#dens-comp}
+
+We state next some insights from the convergence results of the DPI, LSCV, and BCV selectors. All of them are based in results of the kind 
+$$
+n^\nu(\hat h/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma^2),
+$$
+where $\sigma^2$ depends only on $K$ and $f$, and measures how variable is the selector. The rate $n^\nu$ serves to quantify how fast the relative $\hat h/h_\mathrm{MISE}-1$ decreases (the larger the $\nu$, the faster the convergence). Under certain regularity conditions, we have::
+
+- $n^{1/10}(\hat h_\mathrm{LSCV}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{LSCV}^2)$ and $n^{1/10}(\hat h_\mathrm{BCV}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{BCV}^2)$. Both selectors have a slow rate of convergence (compare it with the $n^{1/2}$ of the CLT). Inspection of the variances of both selectors reveals that, for the Gaussian kernel $\sigma_\mathrm{LSCV}^2/\sigma_\mathrm{BCV}^2\approx 15.7$. Therefore, LSCV is considerably more variable than BCV.
+
+- $n^{-5/14}(\hat h_\mathrm{DPI}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{DPI}^2)$. Thus, the DPI selector has a convergence rate much faster than the cross-validation selectors. There is an appealing explanation for this phenomenon. Recall that $\hat h_\mathrm{BCV}$ minimices the slightly modified version of $\mathrm{BCV}(h)$ given by
+$$
+\frac{1}{4}\mu_2^2(K)\tilde\psi_4(h)h^4+\frac{R(K)}{nh}
+$$
+and
+$$
+\tilde\psi_4(h):=\frac{1}{n(n-1)}\sum_{i=1}^n\sum_{\substack{j=1\\j\neq i}}^n(K_h''*K_h'')(X_i-X_j)=\frac{n}{n-1}\widetilde{R(f'')}.
+$$
+$\tilde\psi_4$ is a leave-out-diagonals estimate of $\psi_4$. Despite being different from $\hat\psi_4$, it serves for building a DPI analogous to BCV points towards the precise fact that drags down the performance of BCV. The modified version of the DPI minimises
+$$
+\frac{1}{4}\mu_2^2(K)\tilde\psi_4(g)h^4+\frac{R(K)}{nh},
+$$
+where $g$ is independent of $h$. The two methods differ on the the way $g$ is chosen: BCV sets $g=h$ and the modified DPI looks for the best $g$ in terms of the $\mathrm{AMSE}[\tilde\psi_4(g)]$. It can be seen that $g_\mathrm{AMSE}=O(n^{-2/13})$, whereas the $h$ used in BCV is asymptotically $O(n^{-1/5})$. This suboptimality on the choice of $g$ is the reason of the asymptotic deficiency of BCV.
+
+We focus now on exploring the empirical performance of bandwidth selectors. The workhorse for doing that is simulation. A popular collection of simulation scenarios was given by @Marron1992 and are conveniently available through the package `nor1mix`. They forma collection of Gaussian $r$-mixtures of the form
+$$
+f(x;\boldsymbol\mu,\boldsymbol\sigma,\mathbf{w}):=\sum_{j=1}^rw_j\phi_{\sigma_j}(x-\mu_j),\quad  w_j\geq0,\quad j=1,\ldots.r,\quad \sum_{j=1}^rw_j=1.
+$$
+Densities of this form are specially attractive since they allow for arbitrarily flexibility and, if the Gaussian kernel is employed, they allow for *explicit and exact* MISE expressions:
+\begin{align}
+\mathrm{MISE}_r[\hat f(\cdot;h)]&=\frac{1}{2\sqrt{\pi}nh}+\mathbf{w}'\{(1-n^{-1})\boldsymbol\Omega_2-2\boldsymbol\Omega_1+\boldsymbol\Omega_0\}\mathbf{w},\notag\\ (\boldsymbol\Omega_a)_{ij}&=\phi_{(ah^2+\sigma_i^2+\sigma_j^2)^{1/2}}(\mu_i-\mu_j),\quad i,j=1,\ldots,r.(\#eq:misenorm)
+\end{align}
+
+```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
+# Load package
+library(nor1mix)
+
+# Available models
+?MarronWand
+
+# Simulating
+samp <- rnorMix(n = 500, obj = MW.nm9) # MW object in the second argument
+hist(samp, freq = FALSE)
+
+# Density evaluation
+x <- seq(-4, 4, length.out = 400)
+lines(x, dnorMix(x = x, obj = MW.nm9), col = 2)
+
+# Plot a MW object directly 
+# A Gaussian with the same mean and variance is plotted in dashed lines
+par(mfrow = c(2, 2))
+plot(MW.nm5)
+plot(MW.nm7)
+plot(MW.nm10)
+plot(MW.nm12)
+lines(MW.nm10) # Also possible
+```
+
+Figure \@ref(fig:kdebwd) presents a visualization of the performance of the kde with different bandwidth selectors, carried out in the family of mixtures of @Marron1992.
+
+```{r, kdebwd, echo = FALSE, fig.cap = 'Performance comparison of bandwidth selectors. The RT, DPI, LSCV, and BCV are computed for each sample for a normal mixture density. For each sample, computes the ISEs of the selectors and sorts them from best to worst. Changing the scenarios gives insight on the adequacy of each selector to hard- and simple-to-estimate densities.', screenshot.opts = list(delay = 15), dev = 'png', cache = TRUE, out.width = '90%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-bwd/', height = '900px')
+```
 
 ## Confidence intervals {#dens-ci}
 
@@ -639,43 +926,36 @@ manipulate({
 }, h = slider(min = 0.01, max = 2, initial = 0.5, step = 0.01))
 ```
 
-## Multivariate extension {#dens-mult}
-
-Setting and estimator. 
-
-Product Kernels. 
-
-Bias and variance. Asymptotic normality. 
-
-Bandwidth selectors. Normal. UCV. BCV. PI.
-
-Implementation.
-
-```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
-# 
-```
-
 ## Practical issues {#dens-prac}
 
-### Sampling {#dens-sampling}
-
-1. Choose
-2. Sample
+We discuss in this section several practical issues for kernel density estimation.
 
 ### Boundary issues and transformations {#dens-transf}
 
+In Section \@ref(dens-kdeasymp) we assumed certain regularity conditions for $f$. Assumption **A1** stated that $f$ should be twice continuously differentiable (on $\mathbb{R}$). It is simple to think a counterexample for that: take any density with bounded support, for example an $\mathrm{Exp}(1)$ in $(0,\infty)$, as seen below.
 
-$$
-f(x)=g(t(x))t'(x)
-$$
+```{r, echo = TRUE, eval = FALSE, collapse = TRUE, cache = TRUE}
+# Sample from an Exp(1)
+set.seed(1234567)
+samp <- rexp(n = 500)
 
+# kde and density
+plot(density(samp), ylim = c(0, 1))
+curve(dexp(x), from = -2, to = 10, col = 2, add = TRUE)
+rug(samp)
+```
+
+What is happening is clear: the kde is spreading probability mass outside the support of $\mathrm{Exp}(1)$, because the kernels are functions defined in $\mathbb{R}$. Since the kde places probability mass at negative values, it takes it from the positive side, resulting in a severe negative bias around $0$. As a consequence, the kde does not integrate one in the support of the data. No matter what is the sample size considered, the kde will always have a **negative bias of $O(h)$ at the boundary**, instead of the standard $O(h^2)$.
+
+A simple approach to deal with the *boundary bis* is to map a compactly-supported density $f$ into a real-supported density $g$, that is simpler to estimate, by means of a transformation $t$:
+$$
+f(x)=g(t(x))t'(x).
+$$
+The *transformation kde* is obtained by replacing $g$ by the usual kde:
 \begin{align}
-\hat f_T(x;h,t):=\frac{1}{n}\sum_{i=1}^nK_h(t(x)-t(X_i))t'(x) (\#eq:tkde)
+\hat f_T(x;h,t):=\frac{1}{n}\sum_{i=1}^nK_h(t(x)-t(X_i))t'(x). (\#eq:tkde)
 \end{align}
-
-Note that $h$ is in the scale of $t(X_i)$, not $X_i$. Hence bandwidth selection can be done in terms of the previously seen bandwidth selectors applied to $\{t(X_1),\ldots,t(X_n)\}$.
-
-Some common transformations are
+Note that $h$ is in the scale of $t(X_i)$, not $X_i$. Hence another plus of this approach is that bandwidth selection can be done transparently in terms of the previously seen bandwidth selectors applied to $t(X_1),\ldots,t(X_n)$. A table with some common transformations is:
 
 | Transformation |      Useful for    |   $t(x)$   |    $t'(x)$    |
 |:--------------:|:------------------:|:----------:|:-------------:|
@@ -683,17 +963,102 @@ Some common transformations are
 | Probit | Data in $(a,b)$   | $\Phi\left(\frac{x-a}{b-a}\right)$  | $\frac{1}{b-a}\phi\left(\frac{x-a}{b-a}\right)$ |
 | Shifted power | Heavily skewed data in $\mathbb{R}$ and above $-\lambda_1$  | $\begin{cases}(x+\lambda_1)^{\lambda_2}\mathrm{sign}(\lambda_2),&\lambda_2\neq0,\\\log(x+\lambda_1),&\lambda_2=0.\end{cases}$ | $\begin{cases}\lambda_2(x+\lambda_1)^{\lambda_2-1}\mathrm{sign}(\lambda_2),&\lambda_2\neq0,\\\frac{1}{x+\lambda_1},&\lambda_2=0.\end{cases}$ |
 
-
-App transformation
-
-```{r, kdetransf, echo = FALSE, fig.cap = '.', screenshot.opts = list(delay = 15), dev = 'png', cache = TRUE, out.width = '90%'}
-knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/', height = '550px')
-```
+The code below illustrates how to compute a transformation kde in practise.
 
 ```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
-# 
+# Sample from an Exp(1)
+set.seed(1234567)
+samp <- rlnorm(n = 500)
+
+# kde with log-transformed data
+kde <- density(log(samp))
+plot(kde, main = "kde of transformed data")
+rug(log(samp))
+
+# Careful: kde$x is in the reals!
+range(kde$x)
+
+# Untransform kde$x so the grid is in (0, infty)
+kdeTransf <- kde
+kdeTransf$x <- exp(kdeTransf$x)
+
+# Transform the density using the chain rule
+kdeTransf$y <- kdeTransf$y * 1 / kdeTransf$x
+
+# Transformed kde
+plot(kdeTransf, main = "Transformed kde", xlim = c(0, 3))
+curve(dlnorm(x), col = 2, add = TRUE)
+rug(samp)
 ```
 
+<!-- App transformation -->
+
+<!-- ```{r, kdetransf, echo = FALSE, fig.cap = '.', screenshot.opts = list(delay = 15), dev = 'png', cache = TRUE, out.width = '90%'} -->
+<!-- knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/', height = '900px') -->
+<!-- ``` -->
+
+### Sampling {#dens-sampling}
+
+Sampling a kde is relatively straightforward. The trick is to recall
+$$
+\hat f(x;h)=\frac{1}{n}\sum_{i=1}^nK_h(x-X_i)
+$$
+as a mixture density made of $n$ mixture components in which each of them is sampled independently. The only part that might require special treatment is sampling from the density $K$, although for most of the implemented kernels `R` contains specific sampling functions. 
+
+The algorithm for sampling $N$ points goes as follows:
+
+1. Choose $i\in\{1,\ldots,n\}$ at random.
+2. Sample from $K_h(\cdot-X_i)=\frac{1}{h}K\left(\frac{\cdot-X_i}{h}\right)$.
+3. Repeat the previous steps $N$ times.
+
+Let's see a quick application.
+
+```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
+# Sample the Claw
+n <- 100
+set.seed(23456)
+samp <- rnorMix(n = n, obj = MW.nm10)
+
+# Kde
+h <- 0.1
+plot(density(samp, bw = h))
+
+# Naive sampling algorithm
+sampKde <- numeric(1e6)
+for (k in 1:1e6) {
+  
+  i <- sample(x = 1:100, size = 1)
+  sampKde[k] <- rnorm(n = 1, mean = samp[i], sd = h)
+  
+}
+
+# Add kde of the sampled kde - almost equal
+lines(density(sampKde), col = 2)
+
+# Sample 1e6 points from the kde
+i <- sample(x = 100, size = 1e6, replace = TRUE)
+sampKde <- rnorm(1e6, mean = samp[i], sd = h)
+
+# Add kde of the sampled kde - almost equal
+lines(density(sampKde), col = 3)
+
+```
+
+<!-- ## Multivariate extension {#dens-mult} -->
+
+<!-- Setting and estimator.  -->
+
+<!-- Product Kernels.  -->
+
+<!-- Assumptions. Bias and variance. Asymptotic normality. No Taylor -->
+
+<!-- Bandwidth selectors. Normal. UCV. BCV. PI. -->
+
+<!-- Implementation. -->
+
+<!-- ```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE} -->
+<!-- #  -->
+<!-- ``` -->
 
 ## Exercises {#dens-exercises}
 
@@ -711,7 +1076,7 @@ This is the list of evaluable exercises for Chapter \@ref(dens). The number of s
 (theoretical, $\star\star$) Conditionally on the sample $X_1,\ldots,X_n$, compute the expectation and variance of the kde \ref(eq:kde) and compare them with the sample mean and variance. What is the effect of $h$ in them?
 ```
 
-```{exercise}
+```{exercise, label = "lscv"}
 (theoretical, $\star\star$, Exercise 3.3 in @Wand1995) Show that
 $$
 \mathbb{E}[\mathrm{LSCV}(h)]=\mathrm{MISE}[\hat f(\cdot;h)]-R(f).
@@ -735,12 +1100,13 @@ Then, provide a similar expansion result for $\frac{1}{n}\sum_{i=1}^n(x-X_i)^2K_
 \end{align*}
 where $g$ is the density of $t(X)$. Usig these results, prove that
 \begin{align*}
-\mathrm{AMISE}[\hat f_T(\cdot;h,t)]=\frac{1}{4}h^4\mu_2(K)^2\int t'(t^{-1}(x))g''(x)^2\mathrm{d}x+\frac{R(K)}{nh}\mathbb{E}[t'(X)].
+\mathrm{AMISE}[\hat f_T(\cdot;h,t)]=\frac{1}{4}h^4\mu_2^2(K)\int t'(t^{-1}(x))g''(x)^2\mathrm{d}x+\frac{R(K)}{nh}\mathbb{E}[t'(X)].
 \end{align*}
 ```
 
 ```{exercise}
-(practical, $\star$) TODO. Faithful bivariate.
+(practical, $\star$) TODO. 
+<!-- Faithful bivariate. -->
 ```
 
 ```{exercise}
@@ -749,11 +1115,11 @@ where $g$ is the density of $t(X)$. Usig these results, prove that
 
 ```{exercise}
 (practical, $\star\star$, Exercise 6.5 in @Wasserman2006)
-Data on the salaries of the chief executive officer of 60 companies is available at <http://lib.stat.cmu.edu/DASL/Datafiles/ceodat.html>. Investigate the distribution of salaries using a kde. Use $\hat h_\mathrm{LSCV}$ to choose the amount of smoothing. Also consider $\hat h_\mathrm{NS}$. There appear to be a few bumps in the density. Are they real? Use confidence bands to address this question. Finally, comment on the resulting estimates.
+Data on the salaries of the chief executive officer of 60 companies is available at <http://lib.stat.cmu.edu/DASL/Datafiles/ceodat.html>. Investigate the distribution of salaries using a kde. Use $\hat h_\mathrm{LSCV}$ to choose the amount of smoothing. Also consider $\hat h_\mathrm{RT}$. There appear to be a few bumps in the density. Are they real? Use confidence bands to address this question. Finally, comment on the resulting estimates.
 ```
 
 ```{exercise}
-(practical, $\star\star$) Implement the transformation kde \@ref(eq:tkde) for the three transformations given in Section \@ref(dens-prac). You can modify the `density` function in `R` and add an extra argument for selecting the kind of transformation.
+(practical, $\star\star$) Implement the transformation kde \@ref(eq:tkde) for the three transformations given in Section \@ref(dens-prac). You can tweak the output of the `density` function in `R` and add an extra argument for selecting the kind of transformation. Or you can implement it directly from scratch. 
 ```
 
 ```{exercise}
@@ -762,7 +1128,7 @@ Data on the salaries of the chief executive officer of 60 companies is available
 1. For $j=1,\ldots,M=1000$:
 
     - Simulates a sample from a model mixture of `nor1mix`.
-    - Computes the bandwidth selectors $\hat h_{\mathrm{NS}}$, $\hat h_{\mathrm{BCV}}$, $\hat h_{\mathrm{UCV}}$, $\hat h_{\mathrm{DPI}}$, and $\hat h_{\mathrm{SCV}}$ and stores them.
+    - Computes the bandwidth selectors $\hat h_{\mathrm{RT}}$, $\hat h_{\mathrm{BCV}}$, $\hat h_{\mathrm{UCV}}$, and $\hat h_{\mathrm{DPI}}$, and stores them.
     
 2. Estimates the density of each bandwidth selector from its corresponding sample of size $M$.
 3. Plots the estimated densities together.
@@ -772,7 +1138,7 @@ Describe the results for the "Claw" and "Bimodal" densities in `nor1mix`, for sa
 ```
 
 ```{exercise}
-(practical, $\star\star\star$) Exact mixtures and compare amise and mise for mixtures in @Marron1992. \@ref(eq:conv) Gaussian kernel (See e.g. Appendix C in @Wand1995) . Present your findings TODO
+(practical, $\star\star\star$) Use \@ref(eq:misenorm) and the family of densities of @Marron1992 in `nor1mix` to compare the MISE and AMISE criteria. \@ref(eq:conv) Gaussian kernel (See e.g. Appendix C in @Wand1995) . Present your findings TODO 
 
 ```
 

@@ -1,6 +1,6 @@
 # (APPENDIX) Appendix {-}
 
-## Installation of `R` and `RStudio` {#app-install}
+# Installation of `R` and `RStudio` {#app-install}
 
 This is what you have to do in order to install `R` and `RStudio` in your own computer:
 
@@ -11,7 +11,7 @@ This is what you have to do in order to install `R` and `RStudio` in your own co
 
 If there is any Linux user, kindly follow the corresponding instructions [here](https://cran.r-project.org/) for installing `R`,  [download](https://www.rstudio.com/products/rstudio/download/#download) `RStudio` (only certain `Ubuntu` and `Fedora` versions are supported), and install it using your package manager.
 
-## Introduction to `RStudio` {#app-introRStudio}
+# Introduction to `RStudio` {#app-introRStudio}
 
 `RStudio` is the most employed Integrated Development Environment (IDE) for `R` nowadays. When you start `RStudio` you will see a window similar to Figure \@ref(fig:rstudio). There are a lot of items in the GUI, most of them described in the [`RStudio` IDE Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2016/01/rstudio-IDE-cheatsheet.pdf). The most important things to keep in mind are:
 
@@ -22,7 +22,7 @@ If there is any Linux user, kindly follow the corresponding instructions [here](
 knitr::include_graphics("images/images/RStudio.png")
 ```
 
-## Introduction to `R` {#app-introR}
+# Introduction to `R` {#app-introR}
 
 This section provides a collection of self-explainable snippets of the programming language `R` [@R-base] that show the very basics of the language. It is not meant to be an exhaustive introduction to `R`, but rather a reminder/panoramic of a collection of basic functions and methods.
 
@@ -32,7 +32,7 @@ In the following, `#` denotes comments to the code and `##` outputs of the code.
 rm(list = ls())
 ```
 
-### Simple computations
+#### Simple computations {-}
 
 ```{r, echo = TRUE, error = TRUE, collapse = TRUE, cache = TRUE}
 # The console can act as a simple calculator
@@ -70,7 +70,7 @@ Compute:
 - $(2^{0.93}-\log_2(3 + \sqrt{2+\sin(1)}))10^{\tan(1/3))}\sqrt{3^{2.5}+\log(10)}$. *Answer*: `-3.032108`.
 ```
 
-### Variables and assignment
+#### Variables and assignment {-}
 
 ```{r, echo = TRUE, error = TRUE, collapse = TRUE, cache = TRUE}
 # Any operation that you perform in R can be stored in a variable (or object)
@@ -113,7 +113,7 @@ Do the following:
 
 ```
 
-### Vectors
+#### Vectors {-}
 
 ```{r, echo = TRUE, collapse = TRUE, error = TRUE, cache = TRUE}
 # These are vectors - arrays of numbers
@@ -174,7 +174,7 @@ Do the following:
 
 ```
 
-### Some functions
+#### Some functions {-}
 
 ```{r, echo = TRUE, collapse = TRUE, error = TRUE, cache = TRUE}
 # Functions take arguments between parenthesis and transform them into an output
@@ -218,7 +218,7 @@ Do the following:
 - Compute the covariance between $y$ and $y$. Compute the variance of $y$. Why do you get the same result?
 ```
 
-### Matrices, data frames, and lists
+#### Matrices, data frames, and lists {-}
 
 ```{r, collapse = TRUE, error = TRUE, cache = TRUE}
 # A matrix is an array of vectors
@@ -292,7 +292,7 @@ Do the following:
 
 ```
 
-### More on data frames
+#### More on data frames {-}
 
 ```{r, echo = TRUE, collapse = TRUE, error = TRUE, cache = TRUE}
 # Let's begin importing the iris dataset
@@ -336,7 +336,7 @@ Do the following:
 - Obtain a summary of `waiting`.
 ```
 
-### Vector-related functions
+#### Vector-related functions {-}
 
 ```{r, echo = TRUE, collapse = TRUE, error = TRUE, cache = TRUE}
 # The function "seq" creates sequences of numbers equally separated
@@ -371,7 +371,7 @@ Do the following:
 
 ```
 
-### Logical conditions and subsetting
+#### Logical conditions and subsetting {-}
 
 ```{r, echo = TRUE, collapse = TRUE, error = TRUE, cache = TRUE}
 # Relational operators: x < y, x > y, x <= y, x >= y, x == y, x!= y
@@ -475,7 +475,7 @@ Do the following for the `iris` dataset:
 
 ```
 
-### Plotting functions
+#### Plotting functions {-}
 
 ```{r, echo = TRUE, collapse = TRUE, error = TRUE, cache = TRUE}
 # "plot" is the main function for plotting in R
@@ -532,7 +532,7 @@ Do the following:
 
 ```
 
-### Distributions
+#### Distributions {-}
 
 ```{r, echo = TRUE, collapse = TRUE, error = TRUE, cache = TRUE}
 # R allows to sample [r], compute density/probability mass functions [d],
@@ -614,7 +614,7 @@ Do the following:
 
 ```
 
-### Functions
+#### Functions {-}
 
 ```{r, echo = TRUE, collapse = TRUE, error = TRUE, cache = TRUE}
 # A function is a way of encapsulating a block of code so it can be reused easily
@@ -687,7 +687,7 @@ Do the following:
 
 ```
 
-### Control structures
+#### Control structures {-}
 
 ```{r, echo = TRUE, collapse = TRUE, error = TRUE, cache = TRUE}
 # The "for" statement allows to create loops that run along a given vector
