@@ -257,7 +257,7 @@ Substituting \@ref(eq:kdebias2) in \@ref(eq:kdebias1), and bearing in mind that 
 \begin{align*}
 \int &K(z)f(x-hz)\mathrm{d}z\\
 =&\,\int K(z)\big\{f(x)+hzf'(x)+\frac{1}{2}h^2z^2f''(x)
-&\left.+o(h^2z^2)\big\}\mathrm{d}z\\
+&+o(h^2z^2)\big\}\mathrm{d}z\\
 =&\,f(x)+\frac{1}{2}h^2\mu_2(K)f''(x)+o(h^2)
 \end{align*}
 which provides \@ref(eq:kdebias). 
@@ -1108,7 +1108,7 @@ This is the list of evaluable exercises for Chapter \@ref(dens). The number of s
 ```
 
 ```{exercise}
-(theoretical, $\star\star$) Conditionally on the sample $X_1,\ldots,X_n$, compute the expectation and variance of the kde \ref(eq:kde) and compare them with the sample mean and variance. What is the effect of $h$ in them?
+(theoretical, $\star\star$) Conditionally on the sample $X_1,\ldots,X_n$, compute the expectation and variance of the kde \@ref(eq:kde) and compare them with the sample mean and variance. What is the effect of $h$ in them?
 ```
 
 ```{exercise, label = "lscv"}
