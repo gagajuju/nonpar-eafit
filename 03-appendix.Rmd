@@ -18,7 +18,7 @@ If there is any Linux user, kindly follow the corresponding instructions [here](
 1. The code is written in scripts in the *source panel* (upper-right panel in Figure \@ref(fig:rstudio));
 2. for running a line or code selection from the script in the *console* (first tab in the lower-right panel in Figure \@ref(fig:rstudio)), you do it with the keyboard shortcut `'Ctrl+Enter'` (Windows and Linux) or `'Cmd+Enter'` (Mac OS X).
 
-```{r, rstudio, echo = FALSE, out.width = '90%', fig.cap = 'Main window of `RStudio`. The red showws the code panel and the yellow shows the console output. Extracted from <https://www.rstudio.com/wp-content/uploads/2016/01/rstudio-IDE-cheatsheet.pdf>.', cache = TRUE}
+```{r, rstudio, echo = FALSE, out.width = '90%', fig.cap = 'Main window of `RStudio`. The red showws the code panel and the yellow shows the console output. Extracted from [here](https://www.rstudio.com/wp-content/uploads/2016/01/rstudio-IDE-cheatsheet.pdf).', cache = TRUE}
 knitr::include_graphics("images/images/RStudio.png")
 ```
 

@@ -141,8 +141,8 @@ These two results provide interesting insights on the effect of $h$:
 
 The animation in Figure \@ref(fig:movinghist) illustrates the previous points and gives insight on how the performance of \@ref(eq:movhist) varies smoothly with $h$.
 
-```{r, movinghist, echo = FALSE, fig.cap = 'Bias and variance for the moving histogram. The animation shows how for small bandwidths the bias of $\\hat f_N(x;h)$ on estimating $f(x)$ is small, but the variance is high, and how for large bandwidths the bias is large and the variance is small. The variance is represented by the asymptotic $95\\%$ confidence intervals for $\\hat f_N(x;h)$.', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
-knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/bias-var-movhist/', height = '950px')
+```{r, movinghist, echo = FALSE, fig.cap = 'Bias and variance for the moving histogram. The animation shows how for small bandwidths the bias of $\\hat f_N(x;h)$ on estimating $f(x)$ is small, but the variance is high, and how for large bandwidths the bias is large and the variance is small. The variance is represented by the asymptotic $95\\%$ confidence intervals for $\\hat f_N(x;h)$. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/bias-var-movhist/).', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/bias-var-movhist/', height = '900px')
 ```
 
 Estimator \@ref(eq:movhist) raises an important question: **Why giving the same weight to all $X_1,\ldots,X_n$ in $(x-h, x+h)$?** After all, we are estimating $f(x)=F'(x)$ by estimating $\frac{F(x+h)-F(x-h)}{2h}$ through the relative frequency of $X_1,\ldots,X_n$ in $(x-h,x+h)$. Should not be the data points closer to $x$ more important than the ones further away? The answer to this question shows that \@ref(eq:movhist) is indeed a particular case of a wider class of density estimators. 
@@ -166,8 +166,8 @@ A common notation is $K_h(z):=\frac{1}{h}K\left(\frac{z}{h}\right)$, so $\hat f(
 
 Several types of kernels are possible. The most popular is the *normal kernel* $K(z)=\phi(z)$, although the *Epanechnikov kernel*, $K(z)=\frac{3}{4}(1-z^2)1_{|z|<1}$, is slightly more efficient, as we will see later. The *rectangular kernel* $K(z)=\frac{1}{2}1_{\{|z|<1\}}$ yields the moving histogram as a particular case. The kde inherits the smoothness properties of the kernel. That means, for example, \@ref(eq:kde) with a normal kernel is infinitely differentiable. But with an Epanechnikov kernel, \@ref(eq:kde) is only first differentiable, and with a rectangular kernel is not even continuous. However, if a certain smoothness is guaranteed (continuity at least), the *choice of the kernel has little importance in practise* (at least compared with the choice of $h$). Figure \@ref(fig:kdeconst) illustrates the construction of the kde and the bandwidth and kernel effects.
 
-```{r, kdeconst, echo = FALSE, fig.cap = 'Construction of the kernel density estimator. The animation shows how the bandwidth and kernel affect the density estimate, and how the kernels are rescaled densities with modes at the data points.', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
-knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/', height = '950px')
+```{r, kdeconst, echo = FALSE, fig.cap = 'Construction of the kernel density estimator. The animation shows how the bandwidth and kernel affect the density estimate, and how the kernels are rescaled densities with modes at the data points. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/).', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/', height = '1000px')
 ```
 
 Implementation of kde in `R` is built-in through the `density` function. The function automatically chooses the bandwidth $h$ using a *bandwith selector* which will be studied in detail in Section \@ref(dens-bwd).
@@ -778,7 +778,7 @@ lines(MW.nm10) # Also possible
 
 Figure \@ref(fig:kdebwd) presents a visualization of the performance of the kde with different bandwidth selectors, carried out in the family of mixtures of @Marron1992.
 
-```{r, kdebwd, echo = FALSE, fig.cap = 'Performance comparison of bandwidth selectors. The RT, DPI, LSCV, and BCV are computed for each sample for a normal mixture density. For each sample, computes the ISEs of the selectors and sorts them from best to worst. Changing the scenarios gives insight on the adequacy of each selector to hard- and simple-to-estimate densities.', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
+```{r, kdebwd, echo = FALSE, fig.cap = 'Performance comparison of bandwidth selectors. The RT, DPI, LSCV, and BCV are computed for each sample for a normal mixture density. For each sample, computes the ISEs of the selectors and sorts them from best to worst. Changing the scenarios gives insight on the adequacy of each selector to hard- and simple-to-estimate densities. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-bwd/).', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-bwd/', height = '950px')
 ```
 
@@ -1028,7 +1028,7 @@ rug(samp)
 
 <!-- App transformation -->
 
-<!-- ```{r, kdetransf, echo = FALSE, fig.cap = '.', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'} -->
+<!-- ```{r, kdetransf, echo = FALSE, fig.cap = '.Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/).', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'} -->
 <!-- knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/', height = '900px') -->
 <!-- ``` -->
 
