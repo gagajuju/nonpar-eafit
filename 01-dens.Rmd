@@ -967,20 +967,20 @@ We discuss in this section several practical issues for kernel density estimatio
 
 ### Boundary issues and transformations {#dens-transf}
 
-In Section \@ref(dens-kdeasymp) we assumed certain regularity conditions for $f$. Assumption **A1** stated that $f$ should be twice continuously differentiable (on $\mathbb{R}$). It is simple to think a counterexample for that: take any density with bounded support, for example an $\mathrm{Exp}(1)$ in $(0,\infty)$, as seen below.
+In Section \@ref(dens-kdeasymp) we assumed certain regularity conditions for $f$. Assumption **A1** stated that $f$ should be twice continuously differentiable (on $\mathbb{R}$). It is simple to think a counterexample for that: take any density with bounded support, for example a $\mathcal{LN}(0,1)$ in $(0,\infty)$, as seen below.
 
 ```{r, echo = TRUE, eval = FALSE, collapse = TRUE, cache = TRUE}
-# Sample from an Exp(1)
-set.seed(1234567)
-samp <- rexp(n = 500)
+# Sample from an LN(0, 1)
+set.seed(123456)
+samp <- rlnorm(n = 500)
 
 # kde and density
 plot(density(samp), ylim = c(0, 1))
-curve(dexp(x), from = -2, to = 10, col = 2, add = TRUE)
+curve(dlnorm(x), from = -2, to = 10, col = 2, add = TRUE)
 rug(samp)
 ```
 
-What is happening is clear: the kde is spreading probability mass outside the support of $\mathrm{Exp}(1)$, because the kernels are functions defined in $\mathbb{R}$. Since the kde places probability mass at negative values, it takes it from the positive side, resulting in a severe negative bias around $0$. As a consequence, the kde does not integrate one in the support of the data. No matter what is the sample size considered, the kde will always have a **negative bias of $O(h)$ at the boundary**, instead of the standard $O(h^2)$.
+What is happening is clear: the kde is spreading probability mass outside the support of $\mathcal{LN}(0,1)$, because the kernels are functions defined in $\mathbb{R}$. Since the kde places probability mass at negative values, it takes it from the positive side, resulting in a severe negative bias around $0$. As a consequence, the kde does not integrate one in the support of the data. No matter what is the sample size considered, the kde will always have a **negative bias of $O(h)$ at the boundary**, instead of the standard $O(h^2)$.
 
 A simple approach to deal with the *boundary bis* is to map a compactly-supported density $f$ into a real-supported density $g$, that is simpler to estimate, by means of a transformation $t$:
 $$
@@ -996,13 +996,13 @@ Note that $h$ is in the scale of $t(X_i)$, not $X_i$. Hence another plus of this
 |:--------------:|:------------------:|:----------:|:-------------:|
 | Log | Data in $(a,\infty)$, $a\in\mathbb{R}$   | $\log(x-a)$  | $\frac{1}{x-a}$ |
 | Probit | Data in $(a,b)$   | $\Phi\left(\frac{x-a}{b-a}\right)$  | $\frac{1}{b-a}\phi\left(\frac{x-a}{b-a}\right)$ |
-| Shifted power | Heavily skewed data in $\mathbb{R}$ and above $-\lambda_1$  | $\begin{cases}(x+\lambda_1)^{\lambda_2}\mathrm{sign}(\lambda_2),&\lambda_2\neq0,\\\log(x+\lambda_1),&\lambda_2=0.\end{cases}$ | $\begin{cases}\lambda_2(x+\lambda_1)^{\lambda_2-1}\mathrm{sign}(\lambda_2),&\lambda_2\neq0,\\\frac{1}{x+\lambda_1},&\lambda_2=0.\end{cases}$ |
+| Shifted power | Heavily skewed data in $\mathbb{R}$ and above $-\lambda_1$  | $(x+\lambda_1)^{\lambda_2}\mathrm{sign}(\lambda_2)$ if $\lambda_2\neq0$ and $\log(x+\lambda_1)$ if $\lambda_2=0$ | $\lambda_2(x+\lambda_1)^{\lambda_2-1}\mathrm{sign}(\lambda_2)$ if $\lambda_2\neq0$ and $\frac{1}{x+\lambda_1}$ if $\lambda_2=0$ |
 
 The code below illustrates how to compute a transformation kde in practise.
 
 ```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
-# Sample from an Exp(1)
-set.seed(1234567)
+# Sample from an LN(0, 1)
+set.seed(123456)
 samp <- rlnorm(n = 500)
 
 # kde with log-transformed data
@@ -1021,16 +1021,18 @@ kdeTransf$x <- exp(kdeTransf$x)
 kdeTransf$y <- kdeTransf$y * 1 / kdeTransf$x
 
 # Transformed kde
-plot(kdeTransf, main = "Transformed kde", xlim = c(0, 3))
+plot(kdeTransf, main = "Transformed kde")
 curve(dlnorm(x), col = 2, add = TRUE)
 rug(samp)
 ```
 
-<!-- App transformation -->
+<!-- 
+App transformation
 
-<!-- ```{r, kdetransf, echo = FALSE, fig.cap = '.Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/).', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'} -->
-<!-- knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/', height = '900px') -->
-<!-- ``` -->
+```{r, kdetransf, echo = FALSE, fig.cap = '.Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/).', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/', height = '900px')
+``` 
+-->
 
 ### Sampling {#dens-sampling}
 
@@ -1078,23 +1080,7 @@ sampKde <- rnorm(1e6, mean = samp[i], sd = h)
 lines(density(sampKde), col = 3)
 
 ```
-
-<!-- ## Multivariate extension {#dens-mult} -->
-
-<!-- Setting and estimator.  -->
-
-<!-- Product Kernels.  -->
-
-<!-- Assumptions. Bias and variance. Asymptotic normality. No Taylor -->
-
-<!-- Bandwidth selectors. Normal. UCV. BCV. PI. -->
-
-<!-- Implementation. -->
-
-<!-- ```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE} -->
-<!-- #  -->
-<!-- ``` -->
-
+ 
 ## Exercises {#dens-exercises}
 
 This is the list of evaluable exercises for Chapter \@ref(dens). The number of stars represents an estimate of their difficulty: easy ($\star$), medium ($\star\star$), and hard ($\star\star\star$).
