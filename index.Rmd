@@ -2,7 +2,7 @@
 title: "A short course on nonparametric curve estimation"
 subtitle: "MSc in Applied Mathematics at EAFIT University (Colombia)"
 author: "Eduardo García Portugués"
-date: "`r Sys.Date()`, v1.0"
+date: "`r Sys.Date()`, v1.2"
 knit: "bookdown::render_book"
 documentclass: book
 bibliography: nonpar-eafit.bib
@@ -52,21 +52,21 @@ Each topic of this contains a mix of theoretical and practical exercises for **g
 $$
 \frac{1}{3}\sum_{i=1}^n\frac{\mathrm{Score}_i}{5}(2.25+0.75\star_i),
 $$
-where $\mathrm{Score}_i$ is the score ($0-5$) for the $i$-th exercise and $\star_i$ represents its number of stars ($1-3$).
+where $\mathrm{Score}_i$ is the score ($0-5$) for the $i$-th exercise and $\star_i$ represents its number of stars ($1-3$). Deadline for submission is 2017-09-10.
 
-## Background and notation {#intro-nota}
+## Background and notation {#intro-background}
 
 We begin by reviewing some elementary results that will be employed during the course, which will also serve to introduce notation.
 
 ### Basic probability review {#intro-prob}
 
-A tripe $(\Omega,\mathcal{A},\mathbb{P})$ is called a *probability space*. $\Omega$ represents the *sample space*, the set of all possible individual outcomes of a random experiment. $\mathcal{A}$ is a *$\sigma$-field*, a class of subsets of $\Omega$ that is closed under complementation and infinite unions, and such that $\Omega\in\mathcal{A}$. $\mathcal{A}$ represents the collection of possible *events* (combinations of individual outcomes) that are assigned a probability by the *probability measure* $\mathbb{P}$. A *random variable* is a map $X:\Omega\longrightarrow\mathbb{R}$ such that $\{\omega\in\Omega:X(\omega)\leq x\}\in\mathcal{A}$ (the set is *measurable*).
+A triple $(\Omega,\mathcal{A},\mathbb{P})$ is called a *probability space*. $\Omega$ represents the *sample space*, the set of all possible individual outcomes of a random experiment. $\mathcal{A}$ is a *$\sigma$-field*, a class of subsets of $\Omega$ that is closed under complementation and numerable unions, and such that $\Omega\in\mathcal{A}$. $\mathcal{A}$ represents the collection of possible *events* (combinations of individual outcomes) that are assigned a probability by the *probability measure* $\mathbb{P}$. A *random variable* is a map $X:\Omega\longrightarrow\mathbb{R}$ such that $\{\omega\in\Omega:X(\omega)\leq x\}\in\mathcal{A}$ (the set is *measurable*).
 
 The *cumulative distribution function* (cdf) of a random variable $X$ is $F(x):=\mathbb{P}[X\leq x]$. When an *independent and identically distributed* (iid) sample $X_1,\ldots,X_n$ is given, the cdf can be estimated by the *empirical distribution function* (ecdf)
 \begin{align}
 F_n(x)=\frac{1}{n}\sum_{i=1}^n\mathbb{1}_{\{X_i\leq x\}}, (\#eq:ecdf)
 \end{align}
-where $1_{\{x\in A\}}:=1_A(x):=\begin{cases}1,&x\in A,\\0,&x\notin A\end{cases}$ is an *indicator function*. Continuous random variables are either characterized by the cdf $F$ or the *probability distribution function* (pdf) $f=F'$, which represents the *infinitesimal relative probability* of $X$ per unit of length. We write $X\sim F$ (or $X\sim f$) to denote that $X$ has a a cdf $F$ (or a pdf $f$). If two random variables $X$ and $Y$ have the same distribution, we write $X\stackrel{d}{=}Y$.
+where $1_A:=\begin{cases}1,&A\text{ is true},\\0,&A\text{ is false}\end{cases}$ is an *indicator function*. Continuous random variables are either characterized by the cdf $F$ or the *probability distribution function* (pdf) $f=F'$, which represents the *infinitesimal relative probability* of $X$ per unit of length. We write $X\sim F$ (or $X\sim f$) to denote that $X$ has a a cdf $F$ (or a pdf $f$). If two random variables $X$ and $Y$ have the same distribution, we write $X\stackrel{d}{=}Y$.
 
 The *expectation* operator is constructed using the Lebesgue-Stieljes "$\mathrm{d}F(x)$" integral. Hence, for $X\sim F$, the expectation of $g(X)$ is
 \begin{align*}
@@ -78,7 +78,7 @@ The *expectation* operator is constructed using the Lebesgue-Stieljes "$\mathrm{
 \end{align*}
 Unless otherwise stated, the integration limits of any integral are $\mathbb{R}$ or $\mathbb{R}^p$. The variance operator is defined as $\mathbb{V}\mathrm{ar}[X]:=\mathbb{E}[(X-\mathbb{E}[X])^2]$.
 
-We employ bold faces to denote vectors and matrices. A $p$-*random vector* is a map $\mathbf{X}:\Omega\longrightarrow\mathbb{R}^p$, $\mathbf{X}(\omega):=(X_1(\omega),\ldots,X_p(\omega))$, such that each $X_i$ is a random variable. The (joint) cdf of $\mathbf{X}$ is $F(\mathbf{x}):=\mathbb{P}[\mathbf{X}\leq \mathbf{x}]:=\mathbb{P}[X_1\leq x_1,\ldots,X_p\leq x_p]$ and, if $\mathbf{X}$ is continuous, its (joint) pdf is $f:=\frac{\partial^p}{\partial x_1\cdots\partial x_p}F$. The *marginals* of $F$ and $f$ are the cdf and pdf of $X_i$, $i=1,\ldots,p$, respectively. They are defined as:
+We employ bold faces to denote vectors (assumed to be column matrices) and matrices. A $p$-*random vector* is a map $\mathbf{X}:\Omega\longrightarrow\mathbb{R}^p$, $\mathbf{X}(\omega):=(X_1(\omega),\ldots,X_p(\omega))$, such that each $X_i$ is a random variable. The (joint) cdf of $\mathbf{X}$ is $F(\mathbf{x}):=\mathbb{P}[\mathbf{X}\leq \mathbf{x}]:=\mathbb{P}[X_1\leq x_1,\ldots,X_p\leq x_p]$ and, if $\mathbf{X}$ is continuous, its (joint) pdf is $f:=\frac{\partial^p}{\partial x_1\cdots\partial x_p}F$. The *marginals* of $F$ and $f$ are the cdf and pdf of $X_i$, $i=1,\ldots,p$, respectively. They are defined as:
 \begin{align*}
 F_{X_i}(x_i)&:=\mathbb{P}[X_i\leq x]=\int_{\mathbb{R}^{p-1}} F(\mathbf{x})\mathrm{d}\mathbf{x}_{-i},\\
 f_{X_i}(x_i)&:=\frac{\partial}{\partial x_i}F_{X_i}(x_i)=\int_{\mathbb{R}^{p-1}} f(\mathbf{x})\mathrm{d}\mathbf{x}_{-i},
@@ -88,7 +88,7 @@ where $\mathbf{x}_{-i}:=(x_1,\ldots,x_{i-1},x_{i+1},x_p)$. The definitions can b
 The *conditional* cdf and pdf of $X_1\vert(X_2,\ldots,X_p)$ are defined, respectively, as
 \begin{align*}
 F_{X_1\vert \mathbf{X}_{-1}=\mathbf{x}_{-1}}(x_1)&:=\mathbb{P}[X_1\leq x_1\vert \mathbf{X}_{-1}=\mathbf{x}_{-1}],\\
-f_{X_1\vert \mathbf{X}_{-1}=\mathbf{x}_{-1}}(x_1)&:=\frac{f(\mathbf{x})}{f_{2,\ldots,p}(\mathbf{x}_{-1})}.
+f_{X_1\vert \mathbf{X}_{-1}=\mathbf{x}_{-1}}(x_1)&:=\frac{f(\mathbf{x})}{f_{\mathbf{X}_{-1}}(\mathbf{x}_{-1})}.
 \end{align*}
 The *conditional expectation* of $Y\vert X$ is the following random variable^[Recall that the $X$-part is random!]
 $$
@@ -128,7 +128,7 @@ $$
 ```
 
 ```{exercise}
-Prove Markov's inequality using $X=X1_{X>t}+X1_{X\leq t}$. Then prove Chebyshev's inequality using Markov's. *Hint*: use the random variable $(X-\mathbb{E}[X])^2$.
+Prove Markov's inequality using $X=X1_{\{X>t\}}+X1_{\{X\leq t\}}$. Then prove Chebyshev's inequality using Markov's. *Hint*: use the random variable $(X-\mathbb{E}[X])^2$.
 ```
 
 ```{proposition, name = "Cauchy-Schwartz inequality"}
@@ -144,7 +144,7 @@ Jensen's inequality has interesting derivations. For example:
 
 - Take $h=-g$. Then $h$ is a concave function and we have that $h(\mathbb{E}[X])\geq\mathbb{E}[h(X)]$.
 - Take $g(x)=x^r$ for $r\geq 1$. Then $\mathbb{E}[X]^r\leq \mathbb{E}[X^r]$. If $0<r<1$, then $\mathbb{E}[X]^r\geq \mathbb{E}[X^r]$.
-- Consider $0\leq r\leq s$. Then $g(x)=x^{r/s}$ is convex and $g(\mathbb{E}[|X|^s])\leq \mathbb{E}[g(|X|^s)]<\mathbb{E}[|X|^r]$. As a consequence $\mathbb{E}[|X|^r]<\infty\implies\mathbb{E}[|X|^s]<\infty$ for $0\leq r\leq s$.
+- Consider $0\leq r\leq s$. Then $g(x)=x^{r/s}$ is convex and $g(\mathbb{E}[|X|^s])\leq \mathbb{E}[g(|X|^s)]=\mathbb{E}[|X|^r]$. As a consequence $\mathbb{E}[|X|^r]<\infty\implies\mathbb{E}[|X|^s]<\infty$ for $0\leq r\leq s$. Finite moments of higher order implies finite moments of lower order.
 
 ```
 
@@ -152,20 +152,20 @@ Jensen's inequality has interesting derivations. For example:
 
 We will make use of several parametric distributions. Some notation and facts are introduced as follows:
 
-- $\mathcal{N}(\mu,\sigma^2)$ stands for the *normal distribution* with mean $\mu$ and variance $\sigma^2$. Its pdf is $\phi_\sigma(x-\mu):=\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x-\mu)^2}{2\sigma^2}}$, $x\in\mathbb{R}$, and satisfies that $\phi_\sigma(x-\mu)=\frac{1}{\sigma}\phi_1\left(\frac{x-\mu}{\sigma}\right)$. Its cdf is denoted as $\Phi_\sigma(x-\mu)$. $z_\alpha$ denotes the upper $\alpha$-quantile of a $\mathcal{N}(0,1)$, *i.e.*, $z_\alpha=\Phi_1^{-1}(1-\alpha)$. Some uncentered moments of $X\sim\mathcal{N}(\mu,\sigma^2)$ are
+- $\mathcal{N}(\mu,\sigma^2)$ stands for the *normal distribution* with mean $\mu$ and variance $\sigma^2$. Its pdf is $\phi_\sigma(x-\mu):=\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x-\mu)^2}{2\sigma^2}}$, $x\in\mathbb{R}$, and satisfies that $\phi_\sigma(x-\mu)=\frac{1}{\sigma}\phi\left(\frac{x-\mu}{\sigma}\right)$ (if $\sigma=1$ the dependence is omitted). Its cdf is denoted as $\Phi_\sigma(x-\mu)$. $z_\alpha$ denotes the upper $\alpha$-quantile of a $\mathcal{N}(0,1)$, *i.e.*, $z_\alpha=\Phi^{-1}(1-\alpha)$. Some uncentered moments of $X\sim\mathcal{N}(\mu,\sigma^2)$ are
 \begin{align*}
 \mathbb{E}[X]&=\mu,\\
 \mathbb{E}[X^2]&=\mu^2+\sigma^2,\\ \mathbb{E}[X^3]&=\mu^3+3\mu\sigma^2,\\ \mathbb{E}[X^4]&=\mu^4+6\mu^2\sigma^2+3\sigma^4.
 \end{align*}
-The multivariate normal is represented by $\mathcal{N}(\boldsymbol{\mu},\boldsymbol{\Sigma})$, where $\boldsymbol{\mu}$ is a $p$-vector and $\boldsymbol{\Sigma}$ is a $p\times p$ symmetric and positive matrix. The pdf of a $\mathcal{N}(\boldsymbol{\mu},\boldsymbol{\Sigma})$ is $\phi_{\boldsymbol{\Sigma}}(\mathbf{x}-\boldsymbol{\mu}):=\frac{1}{(2\pi)^{p/2}|\boldsymbol{\Sigma}|^{1/2}}e^{-\frac{1}{2}(\mathbf{x}-\boldsymbol{\mu})'\boldsymbol{\Sigma}^{-1}(\mathbf{x}-\boldsymbol{\mu})}$, and satisfies that $\phi_{\boldsymbol{\Sigma}}(\mathbf{x}-\boldsymbol{\mu})=|\boldsymbol{\Sigma}|^{-1/2}\phi_{\mathbf{I}}\left(\boldsymbol{\Sigma}^{-1/2}(\mathbf{x}-\boldsymbol{\mu})\right)$.
-- The *lognormal distribution* is denoted by $\mathcal{LN}(\mu,\sigma^2)$ and is such that $\mathcal{LN}(\mu,\sigma^2)\stackrel{d}{=}\exp(\mathcal{N}(\mu,\sigma^2))$. Its pdf is $f(x;\mu,\sigma):=\frac{1}{\sqrt{2\pi}\sigma x}e^{-\frac{(\log x-\log\mu)^2}{2\sigma^2}}$, $x>0$.
+The multivariate normal is represented by $\mathcal{N}_p(\boldsymbol{\mu},\boldsymbol{\Sigma})$, where $\boldsymbol{\mu}$ is a $p$-vector and $\boldsymbol{\Sigma}$ is a $p\times p$ symmetric and positive matrix. The pdf of a $\mathcal{N}(\boldsymbol{\mu},\boldsymbol{\Sigma})$ is $\phi_{\boldsymbol{\Sigma}}(\mathbf{x}-\boldsymbol{\mu}):=\frac{1}{(2\pi)^{p/2}|\boldsymbol{\Sigma}|^{1/2}}e^{-\frac{1}{2}(\mathbf{x}-\boldsymbol{\mu})'\boldsymbol{\Sigma}^{-1}(\mathbf{x}-\boldsymbol{\mu})}$, and satisfies that $\phi_{\boldsymbol{\Sigma}}(\mathbf{x}-\boldsymbol{\mu})=|\boldsymbol{\Sigma}|^{-1/2}\phi\left(\boldsymbol{\Sigma}^{-1/2}(\mathbf{x}-\boldsymbol{\mu})\right)$ (if $\boldsymbol{\Sigma}=\mathbf{I}$ the depence is omitted).
+- The *lognormal distribution* is denoted by $\mathcal{LN}(\mu,\sigma^2)$ and is such that $\mathcal{LN}(\mu,\sigma^2)\stackrel{d}{=}\exp(\mathcal{N}(\mu,\sigma^2))$. Its pdf is $f(x;\mu,\sigma):=\frac{1}{\sqrt{2\pi}\sigma x}e^{-\frac{(\log x-\log\mu)^2}{2\sigma^2}}$, $x>0$. Note that $\mathbb{E}[\mathcal{LN}(\mu,\sigma^2)]=e^{\mu+\frac{\sigma^2}{2}}$
 - The *exponential distribution* is denoted as $\mathrm{Exp}(\lambda)$ and has pdf $f(x;\lambda)=\lambda e^{-\lambda x}$, $\lambda,x>0$.
 - The *gamma distribution* is denoted as $\Gamma(a,p)$ and has pdf $f(x;a,p)=\frac{a^p}{\Gamma(p)} x^{p-1}e^{-a x}$, $a,p,x>0$, where $\Gamma(p)=\int_0^\infty x^{p-1}e^{-ax}\mathrm{d}x$. It is known that $\mathbb{E}[\Gamma(a,p)]=\frac{p}{a}$ and $\mathbb{V}\mathrm{ar}[\Gamma(a,p)]=\frac{p}{a^2}$.
 - The *inverse gamma distribution*, $\mathrm{IG}(a,p)\stackrel{d}{=}\Gamma(a,p)^{-1}$, has pdf
 $f(x;a,p)=\frac{a^p}{\Gamma(p)} x^{-p-1}e^{-\frac{a}{x}}$, $a,p,x>0$. It is known that
 $\mathbb{E}[\mathrm{IG}(a,p)]=\frac{a}{p-1}$ and $\mathbb{V}\mathrm{ar}[\mathrm{IG}(a,p)]=\frac{a^2}{(p-1)^2(p-2)}$.
 - The *binomial distribution* is denoted as $\mathrm{B}(n,p)$. Recall that $\mathbb{E}[\mathrm{B}(n,p)]=np$ and $\mathbb{V}\mathrm{ar}[\mathrm{B}(n,p)]=np(1-p)$.
-- The *beta distribution* is denoted as $\beta(a,b)$ and its pdf is $f(x;a,b)=\frac{1}{\beta(a,b)}x^{a-1}(1-x)^{1-b}$, where $\beta(a,b)=\frac{\Gamma(a)\Gamma(b)}{\Gamma(a+b)}$. When $a=b=1$, the *uniform distribution* $\mathcal{U}(0,1)$ arises.
+- The *beta distribution* is denoted as $\beta(a,b)$ and its pdf is $f(x;a,b)=\frac{1}{\beta(a,b)}x^{a-1}(1-x)^{1-b}$, $0<x<1$, where $\beta(a,b)=\frac{\Gamma(a)\Gamma(b)}{\Gamma(a+b)}$. When $a=b=1$, the *uniform distribution* $\mathcal{U}(0,1)$ arises.
 
 ### Basic stochastic convergence review {#intro-stoch}
 
@@ -191,11 +191,11 @@ $X_n$ *converges in $r$-mean* to $X$, written $X_n\stackrel{r}{\longrightarrow}X
 The previous definitions can be extended to a sequence of $p$-random vectors $\mathbf{X}_n$. For Definitions \@ref(def:prob) and \@ref(def:rmean), replace $|\cdot|$ by the Euclidean norm $||\cdot||$. Alternatively, Definition \@ref(def:prob) can be extended *marginally*: $\mathbf{X_n}\stackrel{\mathbb{P}}{\longrightarrow}\mathbf{X}:\iff X_{j,n}\stackrel{\mathbb{P}}{\longrightarrow}X_j$, $\forall j=1,\ldots,p$. For Definition \@ref(def:dist), replace $F_n$ and $F$ by the joint cdfs of $\mathbf{X}_n$ and $\mathbf{X}$, respectively. Definition \@ref(def:as) extends marginally as well.
 ```
 
-The $2$-mean convergence plays a remarkable role in defining a consistent estimator $\hat\theta_n=T(X_1,\ldots,X_n)$ of a parameter $\theta$. We say that the *estimator is consistent* if its *mean squared error* (MSE),
+The $2$-mean convergence plays a remarkable role in defining a consistent estimator $\hat\theta=T(X_1,\ldots,X_n)$ of a parameter $\theta$. We say that the *estimator is consistent* if its *mean squared error* (MSE),
 \begin{align*}
-\mathrm{MSE}[\hat\theta_n]:=&\,\mathbb{E}[(\hat\theta_n-\theta)^2]\\
-=&\,(\mathbb{E}[\hat\theta_n]-\theta)^2+\mathbb{V}\mathrm{ar}[\hat\theta_n]\\
-=:&\,\mathrm{Bias}[\hat\theta_n]^2+\mathbb{V}\mathrm{ar}[\hat\theta_n],
+\mathrm{MSE}[\hat\theta]:=&\,\mathbb{E}[(\hat\theta-\theta)^2]\\
+=&\,(\mathbb{E}[\hat\theta]-\theta)^2+\mathbb{V}\mathrm{ar}[\hat\theta]\\
+=:&\mathrm{Bias}[\hat\theta]^2+\mathbb{V}\mathrm{ar}[\hat\theta],
 \end{align*}
 goes to zero as $n\to\infty$. Equivalently, if $\hat\theta_n\stackrel{2}{\longrightarrow}\theta$.
 
@@ -222,7 +222,7 @@ iv. If $S_n=\sum_{i=1}^nX_i$ with $X_1,\ldots,X_n$ iid, then $S_n\stackrel{r}{\l
 Also, if $s>r\geq 1$, then $X_n\stackrel{s}{\longrightarrow}X\implies X_n\stackrel{r}{\longrightarrow}X$.
 ```
 
-*The* corner stone limit result in probability is the central limit theorem (CLT). In its simpler version, it entails that:
+*The* corner stone limit result in probability is the *central limit theorem* (CLT). In its simpler version, it entails that:
 
 ```{theorem, name = "CLT", label = "clt"}
 Let $X_n$ be a sequence of iid random variables with $\mathbb{E}[X_n]=\mu$ and $\mathbb{V}\mathrm{ar}[X_n]=\sigma^2<\infty$, $i\in\mathbb{N}$. Then:
@@ -244,7 +244,7 @@ $$
 $$
 ```
 
-Finally, the next results will be of usefulness.
+Finally, the next results will be of usefulness ($'$ denotes transposition).
 
 ```{theorem, name = "Cramér-Wold device"}
 Let $\mathbf{X}_n$ be a sequence of $p$-dimensional random vectors. Then:
@@ -283,7 +283,7 @@ If $\sqrt{n}(X_n-\mu)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma^2)$, then
 ```
 
 ```{example, label = "ml"}
-It is well known that, given a parametric density $f_\theta$, with parameter $\theta\in\Theta$, and iid $X_1,\ldots,X_n\sim f_\theta$, then the *maximum likelihood* estimator $\hat\theta_{\mathrm{ML}}:=\arg\max_{\theta\in\Theta}\sum_{i=1}^n\log f_\theta(X_i)$ converges to a normal under certain regularity conditions:
+It is well known that, given a parametric density $f_\theta$, with parameter $\theta\in\Theta$, and iid $X_1,\ldots,X_n\sim f_\theta$, then the *maximum likelihood* (ML) estimator $\hat\theta_{\mathrm{ML}}:=\arg\max_{\theta\in\Theta}\sum_{i=1}^n\log f_\theta(X_i)$ (the parameter that maximizes the *probability of the data based on the model*) converges to a normal under certain regularity conditions:
 $$
 \sqrt{n}(\hat\theta_{\mathrm{ML}}-\theta)\stackrel{d}{\longrightarrow}\mathcal{N}\left(0,I(\theta)^{-1}\right),
 $$
@@ -297,7 +297,7 @@ $$
 Let $X_n$ be a iid sequence with $\mathbb{E}[X_i]=\mu$, $i\geq1$. Then: $\frac{1}{n}\sum_{i=1}^nX_i\stackrel{\mathbb{P},\,\mathrm{as}}{\longrightarrow}\mu$.
 ```
 
-### Review on $O_\mathbb{P}$ and $o_\mathbb{P}$ notation {#intro-ohs}
+### $O_\mathbb{P}$ and $o_\mathbb{P}$ notation {#intro-ohs}
 
 In computer science the $O$ notation used to measure the complexity of algorithms. For example, when an algorithm is $O(n^2)$, it is said that it is *quadratic* in time and we know that is going to take *on the order of* $n^2$ operations to process an input of size $n$. We do not care about the specific amount of computations, but focus on the *big picture* by looking for an upper bound for the sequence of computation times in terms of $n$. This upper bound disregards constants. For example, the dot product between two vectors of size $n$ is an $O(n)$ operation, albeit it takes $n$ multiplications and $n-1$ sums, hence $2n-1$ operations.
 
@@ -429,6 +429,11 @@ vii. $(1+o_\mathbb{P}(1))^{-1}=O_\mathbb{P}(1)$.
 
 We will make use of the following well-known analytical results.
 
+```{theorem, name = "Mean value theorem"}
+Let $f:[a,b]\longrightarrow\mathbb{R}$ be a continuous function and differentiable in $(a,b)$. Then there exists $c\in(a,b)$ such that
+$f(b)-f(a)=f'(c)(b-a)$.
+```
+
 ```{theorem, name = "Integral mean value theorem"}
 Let $f:[a,b]\longrightarrow\mathbb{R}$ be a continuous function over $(a,b)$. Then there exists $c\in(a,b)$ such that
 $\int_a^b f(x)\mathrm{d}x=f(c)(b-a)$.
@@ -446,7 +451,7 @@ The remaider $R_n$ *depends on* $x\in\mathbb{R}$. Explicit control of $R_n$ is p
 ```
 
 ```{theorem, name = "Dominated convergence theorem", label = "dct"}
-Let $\{f_n:S\subset\mathbb{R}\longrightarrow\mathbb{R}\}$ be a sequence of Lebesgue measurable functions such that $\lim_{n\to\infty}f_n(x)=f(x)$ and $|f_n(x)|\leq g(x)$, $\forall x\in S$ and $\forall n\in\mathbb{N}$, where $\int_S |g(x)|\mathrm{d}x<\infty$. Then
+Let $f_n:S\subset\mathbb{R}\longrightarrow\mathbb{R}$ be a sequence of Lebesgue measurable functions such that $\lim_{n\to\infty}f_n(x)=f(x)$ and $|f_n(x)|\leq g(x)$, $\forall x\in S$ and $\forall n\in\mathbb{N}$, where $\int_S |g(x)|\mathrm{d}x<\infty$. Then
 $$
 \lim_{n\to\infty}\int_S f_n(x)\mathrm{d}x=\int_S f(x)\mathrm{d}x<\infty.
 $$
@@ -495,14 +500,14 @@ knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/di
 
 Several great reference books have been used for preparing these notes. The following list details the sections in which each of them has been consulted:
 
-- @Fan1996 (Sections \@ref(reg-kre), \@ref(reg-kreasymp), \@ref(reg-rob), \@ref(reg-pen)).
+- @Fan1996 (Sections \@ref(reg-kre), \@ref(reg-asymp), \@ref(reg-rob), \@ref(reg-pen)).
 - @DasGupta2008 (Sections \@ref(intro-prob), \@ref(intro-stoch), \@ref(intro-ohs)).
 - @Scott2015 (Sections \@ref(dens-hist), \@ref(dens-bwd), \@ref(dens-kde)--\@ref(dens-bwd))).
 - @Silverman1986 (Sections \@ref(dens-kde), \@ref(dens-bwd)).
 - @Vaart1998 (Sections \@ref(intro-stoch), \@ref(intro-ohs)).
-- @Wand1995 (Sections \@ref(dens-kde), \@ref(dens-bwd), \@ref(dens-bwd), \@ref(dens-prac)).
+- @Wand1995 (Sections \@ref(dens-kde), \@ref(dens-bwd), \@ref(dens-prac), \@ref(dens-mult)).
 - @Wasserman2004 (Sections \@ref(intro-stoch), \@ref(reg-param)).
-- @Wasserman2006 (Sections \@ref(intro-prob), \@ref(reg-loclik), \@ref(reg-pen), \@ref(dens-ci), \@ref(reg-ci), \@ref(reg-pen)).
+- @Wasserman2006 (Sections \@ref(intro-prob), \@ref(reg-loclik), \@ref(reg-pen), \@ref(dens-ci), \@ref(reg-ci)).
 
 In addition, these notes are possible due to the existence of the incredible pieces of software @R-bookdown, @R-knitr, @R-rmarkdown, and @R-base.
 
