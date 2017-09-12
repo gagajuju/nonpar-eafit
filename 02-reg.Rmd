@@ -1,0 +1,349 @@
+# Regression estimation {#reg}
+
+The relation of two random variables $X$ and $Y$ can be completely characterized by their joint cdf $F$, or equivalently, by the joint pdf $f$ if $(X,Y)$ is continuous, the case we will address. In the regression setting, we are interested in predicting/explaining the *response* $Y$ by means of the *predictor* $X$. The role of the variables is not symmetric: $X$ is *used* to predict/explain $Y$. 
+
+The complete knowledge of $Y$ when $X=x$ is given by the conditional pdf: $f_{Y\vert X=x}(y)=\frac{f(x,y)}{f_X(x)}$. While this pdf provides full knowledge, it is also a challenging task: for each $x$ we have to estimate a *curve*! A simpler approach, yet still challenging, is to estimate the conditional mean (a scalar) for each $x$. This is the so-called *regression function*^[Recall that we assume that $(X,Y)$ is continuous.]
+$$
+m(x):=\mathbb{E}[Y\vert X=x]=\int y\mathrm{d}F_{Y\vert X=x}(y)=\int yf_{Y\vert X=x}(y)\mathrm{d}y.
+$$
+Thus we aim to provide information about $Y$'s expectation, not distribution, by $X$.
+
+## Review on parametric regression {#reg-param}
+
+We review now a couple of useful parametric regression models that will be used in the construction of nonparametric regression models.
+
+### Linear regression {#reg-lin}
+
+#### Model formulation and least squares {-}
+
+The multiple linear regression considers employs *multiple* predictors $X_1,\ldots,X_p$^[Not to confuse with a sample!] for explaining a single response $Y$ by *assuming* a linear relation of the form
+\begin{align}
+Y=\beta_0+\beta_1 X_1+\ldots+\beta_p X_p+\varepsilon (\#eq:lm)
+\end{align}
+holds between the predictors $X_1,\ldots,X_p$ and the response $Y$. In \@ref(eq:lm), $\beta_0$ is the *intercept* and $\beta_1,\ldots,\beta_p$ are the *slopes*, respectively. $\varepsilon$ is a random variable with mean zero and independent from $X_1,\ldots,X_p$. Another way of looking at \@ref(eq:lm) is
+\begin{align}
+\mathbb{E}[Y|X_1=x_1,\ldots,X_p=x_p]=\beta_0+\beta_1x_1+\ldots+\beta_px_p, (\#eq:lmexp)
+\end{align}
+since $\mathbb{E}[\varepsilon|X_1=x_1,\ldots,X_p=x_p]=0$. Therefore, the mean of $Y$ is changing in a *linear* fashion with respect to the values of $X_1,\ldots,X_p$. Hence the interpretation of the coefficients:
+
+- $\beta_0$: is the mean of $Y$ when $X_1=\ldots=X_p=0$.
+- $\beta_j$, $1\leq j\leq p$: is the increment in mean of $Y$ for an increment of one unit in $X_j=x_j$, provided that the remaining variables *do not change*.
+
+Figure \@ref(fig:leastsquares2) illustrates the geometrical interpretation of a multiple linear model: a plane in the $(p+1)$-dimensional space. If $p=1$, the plane is the regression line for simple linear regression. If $p=2$, then the plane can be visualized in a three-dimensional plot.
+
+```{r, leastsquares2, echo = FALSE, fig.cap = 'The least squares regression plane $y=\\hat\\beta_0+\\hat\\beta_1x_1+\\hat\\beta_2x_2$ and its dependence on the kind of squared distance considered.', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/least-squares-3D/', height = '700px')
+```
+
+The estimation of $\beta_0,\beta_1,\ldots,\beta_p$ is done by minimizing the so-called *residual sum of squares* (RSS). First we need to introduce some helpful matrix notation:
+
+- A sample of $(X_1,\ldots,X_p,Y)$ is $(X_{11},\ldots,X_{1p},Y_1),\ldots,(X_{n1},\ldots,X_{np},Y_n)$, where $X_{ij}$ denotes the $i$-th observation of the $j$-th predictor $X_j$. We denote with $\mathbf{X}_i=(X_{i1},\ldots,X_{ip})$ to the $i$-th observation of $(X_1,\ldots,X_p)$, so the sample simplifies to $(\mathbf{X}_{1},Y_1),\ldots,(\mathbf{X}_{n},Y_n)$
+
+- The *design matrix* contains all the information of the predictors and a column of ones
+$$
+\mathbf{X}=\begin{pmatrix}
+1 & X_{11} & \cdots & X_{1p}\\
+\vdots & \vdots & \ddots & \vdots\\
+1 & X_{n1} & \cdots & X_{np}
+\end{pmatrix}_{n\times(p+1)}
+$$
+
+- The *vector of responses* $\mathbf{Y}$, the *vector of coefficients* $\boldsymbol\beta$ and the *vector of errors* are, respectively^[The vectors are regarded as column matrices.],
+$$
+\mathbf{Y}=\begin{pmatrix}
+Y_1 \\
+\vdots \\
+Y_n
+\end{pmatrix}_{n\times 1},\quad\boldsymbol\beta=\begin{pmatrix}
+\beta_0 \\
+\beta_1 \\
+\vdots \\
+\beta_p
+\end{pmatrix}_{(p+1)\times 1},\text{ and }
+\boldsymbol\varepsilon=\begin{pmatrix}
+\varepsilon_1 \\
+\vdots \\
+\varepsilon_n
+\end{pmatrix}_{n\times 1}.
+$$
+Thanks to the matrix notation, we can turn the sample version of the multiple linear model, namely
+\begin{align*}
+Y_i&=\beta_0 + \beta_1 X_{i1} + \ldots +\beta_p X_{ik} + \varepsilon_i,\quad i=1,\ldots,n,
+\end{align*}
+into something as compact as
+\begin{align*}
+\mathbf{Y}=\mathbf{X}\boldsymbol\beta+\boldsymbol\varepsilon.
+\end{align*}
+
+The RSS for the multiple linear regression is
+\begin{align}
+\text{RSS}(\boldsymbol\beta):=&\,\sum_{i=1}^n(Y_i-\beta_0-\beta_1X_{i1}-\ldots-\beta_pX_{ik})^2\nonumber\\
+=&\,(\mathbf{Y}-\mathbf{X}\boldsymbol{\beta})'(\mathbf{Y}-\mathbf{X}\boldsymbol{\beta}).(\#eq:rss)
+\end{align}
+The RSS aggregates the *squared vertical distances* from the data to a regression plane given by $\boldsymbol\beta$. Note that the *vertical distances* are considered because we want to minimize the error in the *prediction* of $Y$^[The treatment of the variables is *not symmetrical*. If that was the case, we will consider perpendicular distances, which yield to Principal Component Analysis (PCA).]. The least squares estimators are *the*^[They are unique and always exist.] minimizers of the RSS:
+\begin{align*}
+\hat{\boldsymbol{\beta}}:=\arg\min_{\boldsymbol{\beta}\in\mathbb{R}^{p+1}} \text{RSS}(\boldsymbol{\beta}).
+\end{align*}
+Luckily, thanks to the matrix form of \@ref(eq:rss), it is simple to compute a closed-form expression for the least squares estimates:
+\begin{align}
+\hat{\boldsymbol{\beta}}=(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}.(\#eq:ls)
+\end{align}
+
+```{exercise, label = "ls"}
+$\hat{\boldsymbol{\beta}}$ can be obteined differentiating \@ref(eq:rss). Prove that using that $\frac{\partial \mathbf{A}\mathbf{x}}{\partial \mathbf{x}}=\mathbf{A}$ and $\frac{\partial f(\mathbf{x})'g(\mathbf{x})}{\partial \mathbf{x}}=f(\mathbf{x})'\frac{\partial g(\mathbf{x})}{\partial \mathbf{x}}+g(\mathbf{x})'\frac{\partial}{\partial f(\mathbf{x})}$ for two vector-valued functions $f$ and $g$.
+```
+
+Let's check that indeed the coefficients given by `R`'s `lm` are the ones given by \@ref(eq:ls) in a toy linear model.
+```{r, echo = TRUE, collapse = TRUE, cache = TRUE}
+# Create the data employed in Figure 3.1
+
+# Generates 50 points from a N(0, 1): predictors and error
+set.seed(34567)
+x1 <- rnorm(50)
+x2 <- rnorm(50)
+x3 <- x1 + rnorm(50, sd = 0.05) # Make variables dependent
+eps <- rnorm(50)
+
+# Responses
+yLin <- -0.5 + 0.5 * x1 + 0.5 * x2 + eps
+yQua <- -0.5 + x1^2 + 0.5 * x2 + eps
+yExp <- -0.5 + 0.5 * exp(x2) + x3 + eps
+
+# Data
+dataAnimation <- data.frame(x1 = x1, x2 = x2, yLin = yLin,
+                            yQua = yQua, yExp = yExp)
+
+# Call lm
+
+# lm employs formula = response ~ predictor1 + predictor2 + ... 
+# (names according to the data frame names) for denoting the regression 
+# to be done
+mod <- lm(yLin ~ x1 + x2, data = dataAnimation)
+summary(mod)
+
+# mod is a list with a lot of information
+# str(mod) # Long output
+
+# Coefficients
+mod$coefficients
+
+# Application of formula (3.4)
+
+# Matrix X
+X <- cbind(1, x1, x2)
+
+# Vector Y
+Y <- yLin
+
+# Coefficients
+beta <- solve(t(X) %*% X) %*% t(X) %*% Y
+beta
+```
+
+```{exercise}
+Compute $\boldsymbol{\beta}$ for the regressions `yLin ~ x1 + x2`, `yQua ~ x1 + x2` and `yExp ~ x2 + x3` using equation \@ref(eq:ls) and the function `lm`. Check that the fitted plane and the coefficient estimates are coherent.
+```
+
+Once we have the least squares estimates $\hat{\boldsymbol{\beta}}$, we can define the next two concepts:
+
+- The *fitted values* $\hat Y_1,\ldots,\hat Y_n$, where
+\begin{align*}
+\hat Y_i:=\hat\beta_0+\hat\beta_1X_{i1}+\cdots+\hat\beta_pX_{ik},\quad i=1,\ldots,n.
+\end{align*}
+They are the vertical projections of $Y_1,\ldots,Y_n$ into the fitted line (see Figure \@ref(fig:leastsquares2)). In a matrix form, inputting \@ref(eq:rss)
+$$
+\hat{\mathbf{Y}}=\mathbf{X}\hat{\boldsymbol{\beta}}=\mathbf{X}(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}=\mathbf{H}\mathbf{Y},
+$$
+where $\mathbf{H}:=\mathbf{X}(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'$ is called the *hat matrix* because it "puts the hat into $\mathbf{Y}$". What it does is to project $\mathbf{Y}$ into the regression plane (see Figure \@ref(fig:leastsquares2)).
+
+- The *estimated residuals* $\hat \varepsilon_1,\ldots,\hat \varepsilon_n$, where
+\begin{align*}
+\hat\varepsilon_i:=Y_i-\hat Y_i,\quad i=1,\ldots,n.
+\end{align*}
+They are the vertical distances between actual data and fitted data.
+
+#### Model assumptions {-}
+
+Up to know we have not made any probabilistic assumption on the data. $\hat{\boldsymbol{\beta}}$ was derived from geometrical arguments, not probabilistic ones. However, some probabilistic assumptions are required for inferring the *unknown* population coefficients $\boldsymbol{\beta}$ from the sample $(\mathbf{X}_1, Y_1),\ldots,(\mathbf{X}_n, Y_n)$.
+
+```{r, linearmodel2, echo = FALSE, out.width = '90%', fig.cap = 'The key concepts of the simple linear model. The blue densities denote the conditional density of $Y$ for each cut in the $X$ axis. The yellow band denotes where the $95\\%$ of the data is, according to the model. The red points represent data following the model.', cache = TRUE}
+knitr::include_graphics("images/R/linearmodel.png")
+```
+
+The assumptions of the multiple linear model are:
+
+i. **Linearity**: $\mathbb{E}[Y|X_1=x_1,\ldots,X_p=x_p]=\beta_0+\beta_1x_1+\ldots+\beta_px_p$.
+ii. **Homoscedasticity**: $\mathbb{V}\text{ar}[\varepsilon_i]=\sigma^2$, with $\sigma^2$ constant for $i=1,\ldots,n$.
+iii. **Normality**: $\varepsilon_i\sim\mathcal{N}(0,\sigma^2)$ for $i=1,\ldots,n$.
+iv. **Independence of the errors**: $\varepsilon_1,\ldots,\varepsilon_n$ are independent (or uncorrelated, $\mathbb{E}[\varepsilon_i\varepsilon_j]=0$, $i\neq j$, since they are assumed to be normal).
+
+A good one-line summary of the linear model is the following (independence is assumed)
+\begin{align*}
+Y|(X_1=x_1,\ldots,X_p=x_p)\sim \mathcal{N}(\beta_0+\beta_1x_1+\ldots+\beta_px_p,\sigma^2).
+\end{align*}
+The above summary is the *population version* of the linear model (it is expressed in terms of the random variables). The *sample version* that summarizes assumptions i--iv is
+$$
+\mathbf{Y}|\mathbf{X}\sim \mathcal{N}_n(\mathbf{X}\boldsymbol{\beta},\sigma^2\mathbf{I}).
+$$
+Using this result, it is easy obtain the log-likelihood function of $Y_1,\ldots,Y_n$ conditionally^[We assume that the randomness is on the response only.] on $X_1,\ldots,X_n$ as
+\begin{align}
+\ell(\boldsymbol{\beta})=\log\phi_{\sigma^2\mathbf{I}}(\mathbf{Y}-\mathbf{X}\boldsymbol{\beta})=\sum_{i=1}^n\log\phi_{\sigma}(Y_i-(\mathbf{X}\boldsymbol{\beta})_i).(\#eq:ell)
+\end{align}
+The last result justifies the consideration of the least squares estimate: it equals the maximum likelihood estimator derived under assumptions i--iv.
+
+```{theorem}
+Under assumptions i--iv, the maximum likelihood estimate of $\boldsymbol{\beta}$ is the least squares estimate \@ref(eq:ls):
+$$
+\hat{\boldsymbol{\beta}}_\mathrm{ML}=\arg\max_{\boldsymbol{\beta}\in\mathbb{R}^{p+1}}\ell(\boldsymbol{\beta})=(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}\mathbf{Y}.
+$$
+```
+```{proof}
+Expanding the first equality at \@ref(eq:ell) gives ($|\sigma^2\mathbf{I}|^{1/2}=\sigma^{n}$)
+$$
+\ell(\boldsymbol{\beta})=-\log((2\pi)^{n/2}\sigma^n)-\frac{1}{2\sigma^2}(\mathbf{Y}-\mathbf{X}\boldsymbol{\beta})'(\mathbf{Y}-\mathbf{X}\boldsymbol{\beta}).
+$$
+Optimizing $\ell$ does not require knowledge on $\sigma^2$, since differentiating with respect to $\boldsymbol{\beta}$ and equating to zero gives (see Exercise \@ref(exr:ls)) $\frac{1}{\sigma^2}(\mathbf{Y}-\mathbf{X}\boldsymbol{\beta})'\mathbf{X}=0$. The result follows from that.
+```
+
+### Logistic regression {#reg-log}
+
+#### Model formulation {-}
+
+When the response $Y$ can take only two values, codified for convenience as $1$ (success) and $0$ (failure), it is called a *binary* variable. A binary variable, known also as a *Bernoulli variable*, is a $\mathrm{B}(1, p)$. Recall that $\mathbb{\mathrm{B}(1, p)}=\mathbb{P}[\mathrm{B}(1, p)=1]=p$.
+
+If $Y$ is a binary variable and $X_1,\ldots,X_p$ are predictors associated to $Y$, the purpose in *logistic regression* is to estimate
+\begin{align}
+p(x_1,\ldots,x_p):=&\,\mathbb{P}[Y=1|X_1=x_1,\ldots,X_p=x_p]\nonumber\\
+=&\,\mathbb{E}[Y|X_1=x_1,\ldots,X_p=x_p],(\#eq:expp)
+\end{align}
+this is, how the probability of $Y=1$ is changing according to particular values, denoted by $x_1,\ldots,x_p$, of the predictors $X_1,\ldots,X_p$. A tempting possibility is to consider a linear model for \@ref(eq:expp), $p(x_1,\ldots,x_p)=\beta_0+\beta_1x_1+\ldots+\beta_px_p$. However, such a model will run into serious problems inevitably: negative probabilities and probabilities larger than one.
+
+The solution is to consider a function to encapsulate the value of $z=\beta_0+\beta_1x_1+\ldots+\beta_px_p$, in $\mathbb{R}$, and map it back to $[0,1]$. There are several alternatives to do so, based on distribution functions $F:\mathbb{R}\longrightarrow[0,1]$ that deliver $y=F(z)\in[0,1]$. Different choices of $F$ give rise to different models, the most common being the *logistic distribution function*:
+\begin{align*}
+\mathrm{logistic}(z):=\frac{e^z}{1+e^z}=\frac{1}{1+e^{-z}}.
+\end{align*}
+Its inverse, $F^{-1}:[0,1]\longrightarrow\mathbb{R}$, known as the *logit function*, is
+\begin{align*}
+\mathrm{logit}(p):=\mathrm{logistic}^{-1}(p)=\log\frac{p}{1-p}.
+\end{align*}
+This is a *link function*, this is, a function that maps a given space (in this case $[0,1]$) into $\mathbb{R}$. The term link function is employed in *generalized linear models*, which follow exactly the same philosophy of the logistic regression -- mapping the domain of $Y$ to $\mathbb{R}$ in order to apply there a linear model. We will concentrate here exclusively on the logit as a link function. Therefore, the *logistic model* is
+\begin{align}
+p(x_1,\ldots,x_p)&=\mathrm{logistic}(\beta_0+\beta_1x_1+\ldots+\beta_px_p)\nonumber\\
+&=\frac{1}{1+e^{-(\beta_0+\beta_1x_1+\ldots+\beta_px_p)}}.(\#eq:eq-log)
+\end{align}
+The linear form inside the exponent has a clear interpretation:
+
+- If $\beta_0+\beta_1x_1+\ldots+\beta_px_p=0$, then $p(x_1,\ldots,x_p)=\frac{1}{2}$ ($Y=1$ and $Y=0$ are equally likely).
+- If $\beta_0+\beta_1x_1+\ldots+\beta_px_p<0$, then $p(x_1,\ldots,x_p)<\frac{1}{2}$ ($Y=1$ less likely).
+- If $\beta_0+\beta_1x_1+\ldots+\beta_px_p>0$, then $p(x_1,\ldots,x_p)>\frac{1}{2}$ ($Y=1$ more likely).
+
+To be more precise on the interpretation of the coefficients $\beta_0,\ldots,\beta_p$ we need to introduce the *odds*. The **odds is an equivalent way of expressing the distribution of probabilities in a binary variable**. Since $\mathbb{P}[Y=1]=p$ and $\mathbb{P}[Y=0]=1-p$, both the success and failure probabilities can be inferred from $p$. Instead of using $p$ to characterize the distribution of $Y$, we can use
+\begin{align}
+\mathrm{odds}(Y)=\frac{p}{1-p}=\frac{\mathbb{P}[Y=1]}{\mathbb{P}[Y=0]}.(\#eq:eq-odds)
+\end{align}
+The odds is the *ratio between the probability of success and the probability of failure*. It is extensively used in betting^[Recall that the result of a bet is binary: you win or lose the bet.] due to its better interpretability. For example, if a horse $Y$ has a probability $p=2/3$ of winning a race ($Y=1$), then the odds of the horse is
+$$
+\text{odds}=\frac{p}{1-p}=\frac{2/3}{1/3}=2.
+$$
+This means that the horse has a *probability of winning that is twice larger than the probability of losing*. This is sometimes written as a $2:1$ or $2 \times 1$ (spelled "two-to-one"). Conversely, if the odds of $Y$ is given, we can easily know what is the probability of success $p$, using the inverse of \@ref(eq:eq-odds):
+$$
+p=\mathbb{P}[Y=1]=\frac{\text{odds}(Y)}{1+\text{odds}(Y)}.
+$$
+For example, if the odds of the horse were $5$, that would correspond to a probability of winning $p=5/6$.
+
+```{remark}
+Recall that the odds is a number in $[0,+\infty]$. The $0$ and $+\infty$ values are attained for $p=0$ and $p=1$, respectively. The log-odds (or logit) is a number in $[-\infty,+\infty]$.
+```
+We can rewrite \@ref(eq:eq-log) in terms of the odds \@ref(eq:eq-odds). If we do so, we have:
+\begin{align*}
+\mathrm{odds}(Y|&X_1=x_1,\ldots,X_p=x_p)\\
+&=\frac{p(x_1,\ldots,x_p)}{1-p(x_1,\ldots,x_p)}\\
+&=e^{\beta_0+\beta_1x_1+\ldots+\beta_px_p}\\
+&=e^{\beta_0}e^{\beta_1x_1}\ldots e^{\beta_px_p}.
+\end{align*}
+This provides the following interpretation of the coefficients:
+
+- $e^{\beta_0}$: is the odds when $X_1=\ldots=X_p=0$.
+- $e^{\beta_j}$, $1\leq j\leq k$: is the **multiplicative** increment of the odds for an increment of one unit in $X_j=x_j$, provided that the remaining variables *do not change*. If the increment in $X_j$ is of $r$ units, then the multiplicative increment in the odds is $(e^{\beta_j})^r$.
+
+#### Model assumptions and estimation {-}
+
+Some probabilistic assumptions are required for performing inference on the model parameters $\boldsymbol\beta$ from the sample $(\mathbf{X}_1, Y_1),\ldots,(\mathbf{X}_n, Y_n)$. These assumptions are somehow simpler than the ones for linear regression.
+
+```{r, logisticmodel, echo = FALSE, out.width = '90%', fig.cap = 'The key concepts of the logistic model. The blue bars represent the conditional distribution of probability of $Y$ for each cut in the $X$ axis. The red points represent data following the model.', cache = TRUE}
+knitr::include_graphics("images/R/logisticmodel.png")
+```
+
+The assumptions of the logistic model are the following:
+
+i. **Linearity in the logit**^[An equivalent way of stating this assumption is $p(\mathbf{x})=\mathrm{logistic}(\beta_0+\beta_1x_1+\ldots+\beta_px_p)$.]: $\mathrm{logit}(p(\mathbf{x}))=\log\frac{
+p(\mathbf{x})}{1-p(\mathbf{x})}=\beta_0+\beta_1x_1+\ldots+\beta_px_p$.
+ii. **Binariness**: $Y_1,\ldots,Y_n$ are binary variables.
+iii. **Independence**: $Y_1,\ldots,Y_n$ are independent.
+
+A good one-line summary of the logistic model is the following (independence is assumed)
+\begin{align*}
+Y|(X_1=x_1,\ldots,X_p=x_p)&\sim\mathrm{Ber}\left(\mathrm{logistic}(\beta_0+\beta_1x_1+\ldots+\beta_px_p)\right)\\
+&=\mathrm{Ber}\left(\frac{1}{1+e^{-(\beta_0+\beta_1x_1+\ldots+\beta_px_p)}}\right).
+\end{align*}
+
+Since $Y_i\sim \mathrm{Ber}(p(\mathbf{X}_i))$, $i=1,\ldots,n$, the log-likelihood of $\boldsymbol{\beta}$ is
+\begin{align*}
+\ell(\boldsymbol{\beta})=&\,\sum_{i=1}^n\log\left(p(\mathbf{X}_i)^{Y_i}(1-p(\mathbf{X}_i))^{1-Y_i}\right)\\
+=&\,\sum_{i=1}^n\left\{Y_i\log(p(\mathbf{X}_i))+(1-Y_i)\log(1-p(\mathbf{X}_i))\right\}.
+\end{align*}
+Unfortunately, due to the non-linearity of the optimization problem there are no explicit expressions for $\hat{\boldsymbol{\beta}}$. These have to be obtained numerically by means of an iterative procedure, which may run into problems in low sample situations with perfect classification.
+
+Figure \@ref(fig:maximumlikelihood) shows how the log-likelihood changes with respect to the values for $(\beta_0,\beta_1)$ in three data patterns.
+```{r, maximumlikelihood, echo = FALSE, fig.cap = 'The logistic regression fit and its dependence on $\\beta_0$ (horizontal displacement) and $\\beta_1$ (steepness of the curve). Recall the effect of the sign of $\\beta_1$ in the curve: if positive, the logistic curve has an \'s\' form; if negative, the form is a reflected \'s\'.', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/log-maximum-likelihood/', height = '900px')
+```
+
+The data of the illustration has been generated with the following code:
+
+Let's check that indeed the coefficients given by `R`'s `glm` are the ones that maximize the likelihood of the animation of Figure \@ref(fig:maximumlikelihood). We do so for `y ~ x1`.
+```{r, echo = TRUE, collapse = TRUE, cache = TRUE}
+# Create the data employed in Figure 3.4
+
+# Data
+set.seed(34567)
+x <- rnorm(50, sd = 1.5)
+y1 <- -0.5 + 3 * x
+y2 <- 0.5 - 2 * x
+y3 <- -2 + 5 * x
+y1 <- rbinom(50, size = 1, prob = 1 / (1 + exp(-y1)))
+y2 <- rbinom(50, size = 1, prob = 1 / (1 + exp(-y2)))
+y3 <- rbinom(50, size = 1, prob = 1 / (1 + exp(-y3)))
+
+# Data
+dataMle <- data.frame(x = x, y1 = y1, y2 = y2, y3 = y3)
+
+# Call glm
+
+# glm employs formula = response ~ predictor1 + predictor2 + ... 
+# (names according to the data frame names) for denoting the regression 
+# to be done. We need to specify family = "binomial" to make a
+# logistic regression
+mod <- glm(y1 ~ x, family = "binomial", data = dataMle)
+summary(mod)
+
+# mod is a list with a lot of information
+# str(mod) # Long output
+
+# Coefficients
+mod$coefficients
+
+# Plot the fitted regression curve
+xGrid <- seq(-5, 5, l = 200)
+yGrid <- 1 / (1 + exp(-(mod$coefficients[1] + mod$coefficients[2] * xGrid)))
+plot(xGrid, yGrid, type = "l", col = 2, xlab = "x", ylab = "y")
+points(x, y1)
+```
+
+```{exercise}
+For the regressions `y ~ x2` and `y ~ x3`, do the following:
+
+- Check that $\boldsymbol{\beta}$ is indeed maximizing the likelihood as compared with Figure \@ref(fig:maximumlikelihood).
+- Plot the fitted logistic curve and compare it with the one in Figure \@ref(fig:maximumlikelihood).
+
+```
