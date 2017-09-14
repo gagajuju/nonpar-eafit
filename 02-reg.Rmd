@@ -8,6 +8,12 @@ m(x):=\mathbb{E}[Y\vert X=x]=\int y\mathrm{d}F_{Y\vert X=x}(y)=\int yf_{Y\vert X
 $$
 Thus we aim to provide information about $Y$'s expectation, not distribution, by $X$.
 
+Finally, recall that $Y$ can expressed in terms of $m$ by means of the *location-scale model*:
+$$
+Y=m(X)+\sigma(X)\varepsilon,
+$$
+where $\sigma^2(x):=\mathbb{V}\mathrm{ar}[Y\vert X=x]$ and $\varepsilon$ is independent from $X$ and such that $\mathbb{E}[\varepsilon]=0$ and $\mathbb{V}\mathrm{ar}[\varepsilon]=0$.
+
 ## Review on parametric regression {#reg-param}
 
 We review now a couple of useful parametric regression models that will be used in the construction of nonparametric regression models.

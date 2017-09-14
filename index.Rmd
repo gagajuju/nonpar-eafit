@@ -2,7 +2,7 @@
 title: "A short course on nonparametric curve estimation"
 subtitle: "MSc in Applied Mathematics at EAFIT University (Colombia)"
 author: "Eduardo García Portugués"
-date: "`r Sys.Date()`, v1.2"
+date: "`r Sys.Date()`, v1.4"
 knit: "bookdown::render_book"
 documentclass: book
 bibliography: nonpar-eafit.bib
@@ -16,7 +16,7 @@ site: bookdown::bookdown_site
 <!--
 (Move up once decided what options)
 cover-image: no
-description: "A 12-hour module within the subject \"Robust and nonparametric statistical techniques\" of the MSc in Applied Mathematics at EAFIT University (Colombia)."
+description: "A module within the subject \"Robust and nonparametric statistical techniques\" of the MSc in Applied Mathematics at EAFIT University (Colombia)."
 github-repo: egarpor/nonpar-eafit
 apple-touch-icon: "touch-icon.png"
 apple-touch-icon-size: 120
@@ -34,7 +34,7 @@ The notes contain a substantial amount of snippets of code that are fully self-c
 The required packages for the course are:
 ```{r, echo = TRUE, cache = TRUE, warning = FALSE, message = FALSE, eval = FALSE}
 # Install packages
-install.packages(c("ks", "nor1mix", "KernSmooth", "sm", "rgl"))
+install.packages(c("ks", "nor1mix", "KernSmooth", "manipulate"))
 ```
 
 The codes in the notes may assume that the packages have been loaded, so it is better to do it now:
@@ -43,8 +43,7 @@ The codes in the notes may assume that the packages have been loaded, so it is b
 library(ks)
 library(nor1mix)
 library(KernSmooth)
-library(sm)
-library(rgl)
+library(manipulate)
 ```
 The **Shiny interactive apps** on the notes can be downloaded and run locally. This allows in particular to examine their codes. Check [this GitHub repository](https://github.com/egarpor/ShinyServer) for the sources.
 
@@ -180,7 +179,7 @@ $X_n$ *converges in probability* to $X$, written $X_n\stackrel{\mathbb{P}}{\long
 ```
 
 ```{definition, name = "Convergence almost surely", label = "as"}
-$X_n$ *converges almost surely* (as) to $X$, written $X_n\stackrel{\mathrm{as}}{\longrightarrow}X$, if $\mathbb{P}[\{\omega\in\Omega:\lim_{n\to\infty}X_n(s)=X(s)\}]=1$.
+$X_n$ *converges almost surely* (as) to $X$, written $X_n\stackrel{\mathrm{as}}{\longrightarrow}X$, if $\mathbb{P}[\{\omega\in\Omega:\lim_{n\to\infty}X_n(\omega)=X(\omega)\}]=1$.
 ```
 
 ```{definition, name = "Convergence in $r$-mean", label = "rmean"}
@@ -191,15 +190,15 @@ $X_n$ *converges in $r$-mean* to $X$, written $X_n\stackrel{r}{\longrightarrow}X
 The previous definitions can be extended to a sequence of $p$-random vectors $\mathbf{X}_n$. For Definitions \@ref(def:prob) and \@ref(def:rmean), replace $|\cdot|$ by the Euclidean norm $||\cdot||$. Alternatively, Definition \@ref(def:prob) can be extended *marginally*: $\mathbf{X_n}\stackrel{\mathbb{P}}{\longrightarrow}\mathbf{X}:\iff X_{j,n}\stackrel{\mathbb{P}}{\longrightarrow}X_j$, $\forall j=1,\ldots,p$. For Definition \@ref(def:dist), replace $F_n$ and $F$ by the joint cdfs of $\mathbf{X}_n$ and $\mathbf{X}$, respectively. Definition \@ref(def:as) extends marginally as well.
 ```
 
-The $2$-mean convergence plays a remarkable role in defining a consistent estimator $\hat\theta=T(X_1,\ldots,X_n)$ of a parameter $\theta$. We say that the *estimator is consistent* if its *mean squared error* (MSE),
+The $2$-mean convergence plays a remarkable role in defining a consistent estimator $\hat\theta_n=T(X_1,\ldots,X_n)$ of a parameter $\theta$. We say that the *estimator is consistent* if its *mean squared error* (MSE),
 \begin{align*}
-\mathrm{MSE}[\hat\theta]:=&\,\mathbb{E}[(\hat\theta-\theta)^2]\\
-=&\,(\mathbb{E}[\hat\theta]-\theta)^2+\mathbb{V}\mathrm{ar}[\hat\theta]\\
-=:&\mathrm{Bias}[\hat\theta]^2+\mathbb{V}\mathrm{ar}[\hat\theta],
+\mathrm{MSE}[\hat\theta]:=&\,\mathbb{E}[(\hat\theta_n-\theta)^2]\\
+=&\,(\mathbb{E}[\hat\theta_n]-\theta)^2+\mathbb{V}\mathrm{ar}[\hat\theta_n]\\
+=&:\mathrm{Bias}[\hat\theta_n]^2+\mathbb{V}\mathrm{ar}[\hat\theta_n],
 \end{align*}
 goes to zero as $n\to\infty$. Equivalently, if $\hat\theta_n\stackrel{2}{\longrightarrow}\theta$.
 
-If $X$ is a *degenerate* random variable such that $\mathbb{P}[X=c]=1$, $c\in\mathbb{R}$, then we write $X_n\stackrel{d,\mathbb{P},r,\mathrm{as}}{\longrightarrow} c$ (the list-notation means that the ceonvegence happens for the four types).
+If $X_n\stackrel{d,\mathbb{P},r,\mathrm{as}}{\longrightarrow} X$ and $X$ is a *degenerate* random variable such that $\mathbb{P}[X=c]=1$, $c\in\mathbb{R}$, then we write $X_n\stackrel{d,\mathbb{P},r,\mathrm{as}}{\longrightarrow} c$ (the list-notation is used to condensate four different convergence results in the same line).
 
 The relations between the types of convergences are conveniently summarized in the next proposition.
 
@@ -217,15 +216,15 @@ None of the converses hold in general. However, there are some notable exception
 i. If $X_n\stackrel{d}{\longrightarrow}c$, then $X_n\stackrel{\mathbb{P}}{\longrightarrow}c$.
 ii. If $\forall\varepsilon>0$, $\lim_{n\to\infty}\sum_n\mathbb{P}[|X_n-X|>\varepsilon]<\infty$ (implies^[Intuitively: if convergence in probability is fast enought, then we have almost surely convergence.] $X_n\stackrel{\mathbb{P}}{\longrightarrow}X$), then $X_n\stackrel{\mathrm{as}}{\longrightarrow}X$.
 iii. If $X_n\stackrel{\mathbb{P}}{\longrightarrow}X$ and $\mathbb{P}[|X_n|\leq M]=1$, $\forall n\in\mathbb{N}$ and $M>0$, then $X_n\stackrel{r}{\longrightarrow}X$ for $r\geq1$.
-iv. If $S_n=\sum_{i=1}^nX_i$ with $X_1,\ldots,X_n$ iid, then $S_n\stackrel{r}{\longrightarrow}S\iff S_n\stackrel{\mathrm{as}}{\longrightarrow}S$.
+iv. If $S_n=\sum_{i=1}^nX_i$ with $X_1,\ldots,X_n$ iid, then $S_n\stackrel{\mathbb{P}}{\longrightarrow}S\iff S_n\stackrel{\mathrm{as}}{\longrightarrow}S$.
 
-Also, if $s>r\geq 1$, then $X_n\stackrel{s}{\longrightarrow}X\implies X_n\stackrel{r}{\longrightarrow}X$.
+Also, if $s\geq r\geq 1$, then $X_n\stackrel{s}{\longrightarrow}X\implies X_n\stackrel{r}{\longrightarrow}X$.
 ```
 
 *The* corner stone limit result in probability is the *central limit theorem* (CLT). In its simpler version, it entails that:
 
 ```{theorem, name = "CLT", label = "clt"}
-Let $X_n$ be a sequence of iid random variables with $\mathbb{E}[X_n]=\mu$ and $\mathbb{V}\mathrm{ar}[X_n]=\sigma^2<\infty$, $i\in\mathbb{N}$. Then:
+Let $X_n$ be a sequence of iid random variables with $\mathbb{E}[X_i]=\mu$ and $\mathbb{V}\mathrm{ar}[X_i]=\sigma^2<\infty$, $i\in\mathbb{N}$. Then:
 $$
 \frac{\sqrt{n}(\bar{X}-\mu)}{\sigma}\stackrel{d}{\longrightarrow}\mathcal{N}(0,1).
 $$
@@ -291,6 +290,10 @@ where $I(\theta):=-\mathbb{E}_\theta\left[\frac{\partial^2\log f_\theta(x)}{\par
 $$
 \sqrt{n}(g(\hat\theta_{\mathrm{ML}})-g(\theta))\stackrel{d}{\longrightarrow}\mathcal{N}\left(0,(g'(\theta))^2I(\theta)^{-1}\right).
 $$
+If we apply the continuous mapping theorem for $g$, we would have obtained that
+$$
+g(\sqrt{n}(\hat\theta_{\mathrm{ML}}-\theta))\stackrel{d}{\longrightarrow}g\left(\mathcal{N}\left(0,I(\theta)^{-1}\right)\right),
+$$
 ```
 
 ```{theorem, name = "Weak and strong laws of large numbers"}
@@ -329,7 +332,7 @@ Obviously, **little-$o$ implies big-$O$**. Playing with limits we can get a list
 ```{proposition, label = "ohs"}
 Consider three sequences $a_n,b_n,c_n\to0$. The following properties hold:
 
-i. $O(ka_n)=O(a_n)$, $o(ka_n)=o(a_n)$, $k\in\mathbb{R}$.
+i. $kO(a_n)=O(a_n)$, $ko(a_n)=o(a_n)$, $k\in\mathbb{R}$.
 ii. $o(a_n)+o(b_n)=o(a_n+b_n)$, $O(a_n)+O(b_n)=O(a_n+b_n)$.
 iii. $o(a_n)+O(b_n)=O(a_n+b_n)$, $o(a_n)o(b_n)=o(a_nb_n)$.
 iv. $O(a_n)O(b_n)=O(a_nb_n)$, $o(a_n)O(b_n)=o(a_nb_n)$.
@@ -362,7 +365,7 @@ Given a strictly positive sequence $a_n$ and a sequence of random variables $X_n
 X_n=o_\mathbb{P}(a_n):\iff& \frac{|X_n|}{a_n}\stackrel{\mathbb{P}}{\longrightarrow}0 \\
 \iff& \lim_{n\to\infty}\mathbb{P}\left[\frac{|X_n|}{a_n}>\varepsilon\right]=0,\;\forall\varepsilon>0.
 \end{align*}
-If $X_n=o_\mathbb{P}(a_n)$, then we say that *$X_n$ is little-$o_\mathbb{P}$ of $a_n$*.
+If $X_n=o_\mathbb{P}(a_n)$, then we say that *$X_n$ is little-$o_\mathbb{P}$ of $a_n$*. To indicate that $X_n\stackrel{\mathbb{P}}{\longrightarrow}0$, we write $X_n=o_\mathbb{P}(1)$.
 ```
 
 Therefore, little-$o_\mathbb{P}$ allows to quantify easily the speed at which a sequence of random variables converges to zero in probability.
@@ -379,7 +382,7 @@ $\mathbb{P}\left[Z_n\in(-n^{-1}\varepsilon,n^{-1}\varepsilon)\right]<1-\delta$, 
 ```{definition, name = "Big $O_\\mathbb{P}$"}
 Given a strictly positive sequence $a_n$ and a sequence of random variables $X_n$,
 \begin{align*}
-X_n=O_\mathbb{P}(a_n):\iff&\forall\varepsilon>0,\,\exists\,C=C(\varepsilon)>0,\,n_0=n_0(\varepsilon):\\
+X_n=O_\mathbb{P}(a_n):\iff&\forall\varepsilon>0,\,\exists\,C=C_\varepsilon>0,\,n_0=n_0(\varepsilon):\\
 &\forall n\geq n_0,\, \mathbb{P}\left[\frac{|X_n|}{a_n}>C_\varepsilon\right]<\varepsilon\\
 \iff& \lim_{C\to\infty}\lim_{n\to\infty}\mathbb{P}\left[\frac{|X_n|}{a_n}>C\right]=0.
 \end{align*}

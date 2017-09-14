@@ -120,7 +120,7 @@ f(x)&=F'(x)\\
 \end{align*}
 Recall the differences with the histogram: the intervals depend on the evaluation point $x$ and are centered around it. That allows to directly estimate $f(x)$ (without the proxy $f(x_0)$) by an estimate of the symmetric derivative. 
 
-More precisely, given a bandwidth $h>0$, the naive density estimator builds a piecewise constant function by considering the relative frequency of$X_1,\ldots,X_n$ inside $(x-h,x+h)$:
+More precisely, given a bandwidth $h>0$, the naive density estimator builds a piecewise constant function by considering the relative frequency of $X_1,\ldots,X_n$ inside $(x-h,x+h)$:
 \begin{align}
 \hat f_N(x;h):=\frac{1}{2nh}\sum_{i=1}^n1_{\{x-h<X_i<x+h\}}. (\#eq:movhist)
 \end{align}
@@ -135,8 +135,8 @@ Similarly to the histogram, the analysis of $\hat f_N(x;h)$ as a random variable
 These two results provide interesting insights on the effect of $h$:
 
 1. If $h\to0$, then $\mathbb{E}[\hat f_N(x;h)]\to f(x)$ and \@ref(eq:movhist) is an asymptotically unbiased estimator of $f(x)$. But also $\mathbb{V}\mathrm{ar}[\hat f_N(x;h)]\approx \frac{f(x)}{2nh}-\frac{f(x)^2}{n}\to\infty$.
-2. If $h\to\infty$, then $\mathbb{E}[\hat f_N(x;h)]\to \infty$ and $\mathbb{V}\mathrm{ar}[\hat f_N(x;h)]\to0$.
-3. The variance shrinks to zero if $nh\to\infty$ (or, in other words, if $h^{-1}=o(n)$). So both the bias and the variance can be shrink to zero reduced if $n\to\infty$, $h\to0$ and $nh\to\infty$.
+2. If $h\to\infty$, then $\mathbb{E}[\hat f_N(x;h)]\to 0$ and $\mathbb{V}\mathrm{ar}[\hat f_N(x;h)]\to0$.
+3. The variance shrinks to zero if $nh\to\infty$ (or, in other words, if $h^{-1}=o(n)$, *i.e.* if $h^{-1}$ grows slower than $n$). So both the bias and the variance can be reduced if $n\to\infty$, $h\to0$, and $nh\to\infty$, simultaneously.
 4. The variance is (almost) proportional to $f(x)$.
 
 The animation in Figure \@ref(fig:movinghist) illustrates the previous points and gives insight on how the performance of \@ref(eq:movhist) varies smoothly with $h$.
@@ -151,20 +151,22 @@ Estimator \@ref(eq:movhist) raises an important question: **Why giving the same 
 
 The moving histogram \@ref(eq:movhist) can be equivalently written as
 \begin{align}
-\hat f_N(x;h)&=\frac{1}{nh}\sum_{i=1}^n\frac{1}{2}1_{\{-h<x-X_i<h\}}\nonumber\\
+\hat f_N(x;h)&=\frac{1}{nh}\sum_{i=1}^n\frac{1}{2}1_{\left\{-1<\frac{x-X_i}{h}<1\right\}}\nonumber\\
 &=\frac{1}{nh}\sum_{i=1}^nK\left(\frac{x-X_i}{h}\right), (\#eq:movhist2)
 \end{align}
 with $K(z)=\frac{1}{2}1_{\{-1<z<1\}}$. Interestingly, $K$ is a uniform *density* in $(-1,1)$. This means that, when approximating
 \begin{align*}
 \mathbb{P}[x-h<X<x+h]=\mathbb{P}\left[-1<\frac{x-X}{h}<1\right]
 \end{align*}
-by \@ref(eq:movhist2), we give equal weight to all the . The generalization of \@ref(eq:movhist2) is now obvious: replace $K$ by an arbitrary density. Then $K$ is known as a *kernel*, a density that is typically symmetric and unimodal at $0$. This generalization provides the definition of **kernel density estimator** (kde):
+by \@ref(eq:movhist2), we give equal weight to all the points $X_1,\ldots,X_n$. The generalization of \@ref(eq:movhist2) is now obvious: replace $K$ by an arbitrary density. Then $K$ is known as a *kernel*, a density that is typically symmetric and unimodal at $0$. This generalization provides the definition of **kernel density estimator** (kde)^[Also known as the *Parzen-Rosemblatt estimator* to hounour the proposals by @Parzen1962 and @Rosenblatt1956.]:
 \begin{align}
 \hat f(x;h):=\frac{1}{nh}\sum_{i=1}^nK\left(\frac{x-X_i}{h}\right). (\#eq:kde)
 \end{align}
 A common notation is $K_h(z):=\frac{1}{h}K\left(\frac{z}{h}\right)$, so $\hat f(x;h)=\frac{1}{n}\sum_{i=1}^nK_h(x-X_i)$.
 
-Several types of kernels are possible. The most popular is the *normal kernel* $K(z)=\phi(z)$, although the *Epanechnikov kernel*, $K(z)=\frac{3}{4}(1-z^2)1_{|z|<1}$, is slightly more efficient, as we will see later. The *rectangular kernel* $K(z)=\frac{1}{2}1_{\{|z|<1\}}$ yields the moving histogram as a particular case. The kde inherits the smoothness properties of the kernel. That means, for example, \@ref(eq:kde) with a normal kernel is infinitely differentiable. But with an Epanechnikov kernel, \@ref(eq:kde) is only first differentiable, and with a rectangular kernel is not even continuous. However, if a certain smoothness is guaranteed (continuity at least), the *choice of the kernel has little importance in practise* (at least compared with the choice of $h$). Figure \@ref(fig:kdeconst) illustrates the construction of the kde and the bandwidth and kernel effects.
+Several types of kernels are possible. The most popular is the *normal kernel* $K(z)=\phi(z)$, although the *Epanechnikov kernel*, $K(z)=\frac{3}{4}(1-z^2)1_{\{|z|<1\}}$, is the most efficient. The *rectangular kernel* $K(z)=\frac{1}{2}1_{\{|z|<1\}}$ yields the moving histogram as a particular case. The kde inherits the smoothness properties of the kernel. That means, for example, \@ref(eq:kde) with a normal kernel is infinitely differentiable. But with an Epanechnikov kernel, \@ref(eq:kde) is not differentiable, and with a rectangular kernel is not even continuous. However, if a certain smoothness is guaranteed (continuity at least), the *choice of the kernel has little importance in practise* (at least compared with the choice of $h$). Figure \@ref(fig:kdeconst) illustrates the construction of the kde, and the bandwidth and kernel effects.
+
+It is useful to recall the kde with the normal kernel. If that is the case, then $K_h(x-X_i)=\phi_h(x-X_i)$ and the kernel is a the density of a $\mathcal{N}(X_i,h^2)$. Thus the bandwidth $h$ can be thought as the standard deviation of the normal densities that have mean zero.
 
 ```{r, kdeconst, echo = FALSE, fig.cap = 'Construction of the kernel density estimator. The animation shows how the bandwidth and kernel affect the density estimate, and how the kernels are rescaled densities with modes at the data points. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/).', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/', height = '1000px')
@@ -232,7 +234,7 @@ Similarly, the variance is obtained as
 \begin{align}
 \mathbb{V}\mathrm{ar}[\hat f(x;h)]&=\frac{1}{n}((K_h^2*f)(x)-(K_h*f)^2(x)).(\#eq:kdekhvar)
 \end{align}
-These two expressions are exact, but they are hard to interpret. Equation \@ref(eq:kdekhbias) indicates that the estimator is *biased*, but it does not differentiate explicitly the effects of kernel, bandwidth and density on the bias. The same happens with \@ref(eq:kdekhvar), yet more emphasized. That is why the following *asymptotic* expressions are preferred.
+These two expressions are exact, but they are hard to interpret. Equation \@ref(eq:kdekhbias) indicates that the estimator is *biased* (we will see an example of that bias in Section \@ref(dens-ci)), but it does not differentiate explicitly the effects of kernel, bandwidth and density on the bias. The same happens with \@ref(eq:kdekhvar), yet more emphasized. That is why the following *asymptotic* expressions are preferred.
 ```{theorem, label = "kdebiasvar"}
 Under **A1**--**A3**, the bias and variance of the kde at $x$ are
 \begin{align}
@@ -248,17 +250,17 @@ For the *bias* we consider the change of variables $z=\frac{x-y}{h}$, $y=x-hz$, 
 \mathbb{E}[\hat f(x;h)]&=\int K_h(x-y)f(y)\mathrm{d}y\nonumber\\
 &=\int K(z)f(x-hz)\mathrm{d}z.(\#eq:kdebias1)
 \end{align}
-Since $h\to0$, an applycation of Taylor's theorem gives
+Since $h\to0$, an applycation of a scond-order Taylor expansion gives
 \begin{align}
-f(x-hz)=&\,f(x)+hzf'(x)+\frac{1}{2}h^2z^2f''(x)\\
+f(x-hz)=&\,f(x)+f'(x)hz+\frac{f''(x)}{2}h^2z^2\\
 &+o(h^2z^2). (\#eq:kdebias2)
 \end{align}
 Substituting \@ref(eq:kdebias2) in \@ref(eq:kdebias1), and bearing in mind that $K$ is a symmetric density around $0$, we have
 \begin{align*}
-\int &K(z)f(x-hz)\mathrm{d}z\\
-=&\,\int K(z)\big\{f(x)+hzf'(x)+\frac{1}{2}h^2z^2f''(x)
-&+o(h^2z^2)\big\}\mathrm{d}z\\
-=&\,f(x)+\frac{1}{2}h^2\mu_2(K)f''(x)+o(h^2)
+\int K(z)&f(x-hz)\mathrm{d}z\\
+=&\,\int K(z)\Big\{f(x)+f'(x)hz+\frac{f''(x)}{2}h^2z^2\\
+&+o(h^2z^2)\Big\}\mathrm{d}z\\
+=&\,f(x)+\frac{\mu_2(K)}{2}f''(x)h^2+o(h^2),
 \end{align*}
 which provides \@ref(eq:kdebias). 
 
@@ -267,7 +269,7 @@ For the *variance*, first note that
 \mathbb{V}\mathrm{ar}[\hat f(x;h)]&=\frac{1}{n^2}\sum_{i=1}^n\mathbb{V}\mathrm{ar}[K_h(x-X_i)]\nonumber\\
 &=\frac{1}{n}\left\{\mathbb{E}[K_h^2(x-X)]-\mathbb{E}[K_h(x-X)]^2\right\}. (\#eq:kdevar1)
 \end{align}
-The second term of \@ref(eq:kdevar1) is already computed, so we focus on the first. Using the previous change of variables, we have:
+The second term of \@ref(eq:kdevar1) is already computed, so we focus on the first. Using the previous change of variables and a first-order Taylor expansion, we have:
 \begin{align}
 \mathbb{E}[K_h^2(x-X)]&=\frac{1}{h}\int K^2(z)f(x-hz)\mathrm{d}z\nonumber\\
 &=\frac{1}{h}\int K^2(z)\left\{f(x)+O(hz)\right\}\mathrm{d}z\nonumber\\
@@ -276,13 +278,14 @@ The second term of \@ref(eq:kdevar1) is already computed, so we focus on the fir
 Plugging-in \@ref(eq:kdevar1) into \@ref(eq:kdevar2) gives
 \begin{align*}
 \mathbb{V}\mathrm{ar}[\hat f(x;h)]&=\frac{1}{n}\left\{\frac{R(K)}{h}f(x)+O(1)-O(1)\right\}\\
+&=\frac{R(K)}{nh}f(x)+O(n^{-1})\\
 &=\frac{R(K)}{nh}f(x)+o((nh)^{-1}),
 \end{align*}
 since $n^{-1}=o((nh)^{-1})$.
 ```
 
 ```{remark}
-Integrating little-$o$'s is a delicate issue. In general, integrating a $o^x(1)$ quantity, possibly dependent on $x$, does not provide an $o(1)$. In other words: $\int o^x(1)\mathrm{d}x\neq o(1)$. If the previous hold with equality, then the limits and integral will be interchangeable. But this is not always true -- only if certains conditions are met; recall the dominated convergence Theorem (Theorem \@ref(thm:dct)). If one wants to be completely rigorous on the two implicit commutations of integrals and limits that took place in the proof, it is necessary to have explicit control of the remainder via Taylor's theorem (Theorem \@ref(thm:tay)) and then apply the dominated convergence Theorem. For simplicity in the exposition, we avoid this.
+Integrating little-$o$'s is a tricky issue. In general, integrating a $o^x(1)$ quantity, possibly dependent on $x$, does not provide an $o(1)$. In other words: $\int o^x(1)\mathrm{d}x\neq o(1)$. If the previous hold with equality, then the limits and integral will be interchangeable. But this is not always true -- only if certains conditions are met; recall the dominated convergence theorem (Theorem \@ref(thm:dct)). If one wants to be completely rigorous on the two implicit commutations of integrals and limits that took place in the proof, it is necessary to have explicit control of the remainder via Taylor's theorem (Theorem \@ref(thm:tay)) and then apply the dominated convergence theorem. For simplicity in the exposition, we avoid this.
 ```
 
 The bias and variance expressions \@ref(eq:kdebias) and \@ref(eq:kdevar) yield interesting insights (see Figure \@ref(fig:movinghist) for their visualization):
@@ -293,14 +296,37 @@ The bias and variance expressions \@ref(eq:kdebias) and \@ref(eq:kdevar) yield i
     - Conversely, the bias is positive in convex regions, *i.e.* $\{x\in\mathbb{R}:f(x)''>0\}$. These regions correspod to *valleys and tails of $f$*, where the kde *overestimates* $f$ (tends to be above $f$).
     - **The wilder the curvature $f''$, the harder to estimate $f$**. Flat density regions are easier to estimate than wiggling regions with high curvature (several modes).
 
-- The variance depends directly on $f(x)$. **The higher the density, the more variable is the kde.** Interestingly, the variance decreases as a factor of $(nh)^{-1}$, a consequence of $nh$ playing the role of the *effective sample size* for estimating $f(x)$. The density at $x$ is not estimated using all the sample points, but only the fraction $nh$ in a neighborhood of $x$.
+- The variance depends directly on $f(x)$. **The higher the density, the more variable is the kde.** Interestingly, the variance decreases as a factor of $(nh)^{-1}$, a consequence of $nh$ playing the role of the *effective sample size* for estimating $f(x)$. The density at $x$ is not estimated using all the sample points, but only a fraction proportional to $nh$ in a neighborhood of $x$.
+
+```{r, effective, echo = FALSE, fig.cap = 'Illustration of the effective sample size for estimating $f(x)$ at $x=2$. In blue, the kernels with contribution larger than $0.01$ to the kde. In grey, rest of the kernels.', dev = 'png', cache = TRUE, out.width = '90%'}
+n <- 25
+h <- 0.2
+set.seed(1234567)
+samp <- rnorMix(n = 20, obj = MW.nm7)
+x <- seq(-4, 4, l = 500)
+plot(x, dnorMix(x = x, obj = MW.nm7), type = "l", ylab = "f(x)")
+lines(density(x = samp, bw = h, from = -5, to = 5), col = 2)
+rug(samp)
+abline(v = 2, col = 3)
+
+col <- dnorm(2, mean = samp, sd = h) / 50 > 0.01
+col[col == FALSE] <- "gray"
+col[col == TRUE] <- "blue"
+
+for (s in seq_along(samp)) {
+  lines(x, dnorm(x, mean = samp[s], sd = h) / 50, col = col[s])
+}
+rug(samp, col = col, lwd = 2)
+legend("topleft", legend = expression(f(x), hat(f)(x * ";" * h)), 
+       col = 1:2, lwd = 2)
+```
 
 The MSE of the kde is trivial to obtain from the bias and variance:
 
 ```{corollary}
 Under **A1**--**A3**, the MSE of the kde at $x$ is
 \begin{align}
-\mathrm{MSE}[\hat f(x;h)]=\,&\frac{1}{4}\mu^2_2(K)(f''(x))^2+\frac{R(K)}{nh}f(x)\nonumber\\
+\mathrm{MSE}[\hat f(x;h)]=\,&\frac{\mu^2_2(K)}{4}(f''(x))^2h^4+\frac{R(K)}{nh}f(x)\nonumber\\
 &+o(h^4+(nh)^{-1}).(\#eq:kdemse)
 \end{align}
 Therefore, the kde is pointwise consistent in MSE, *i.e.*, $\hat f(x;h)\stackrel{2}{\longrightarrow}f(x)$.
@@ -309,10 +335,10 @@ Therefore, the kde is pointwise consistent in MSE, *i.e.*, $\hat f(x;h)\stackrel
 We apply that $\mathrm{MSE}[\hat f(x;h)]=(\mathbb{E}[\hat f(x;h)]-f(x))^2+\mathbb{V}\mathrm{ar}[\hat f(x;h)]$ and that $(O(h^2)+o(h^2))^2=O(h^4)+o(h^4)$. Since $\mathrm{MSE}[\hat f(x;h)]\to0$ when $n\to\infty$, consistency follows.
 ```
 
-Finally, we prove the asymptotic pointwise normality of the estimator.
+Note that, due to the consistency, $\hat f(x;h)\stackrel{2}{\longrightarrow}f(x)\implies\hat f(x;h)\stackrel{\mathbb{P}}{\longrightarrow}f(x)\implies\hat f(x;h)\stackrel{d}{\longrightarrow}f(x)$ under **A1**--**A2**. However, these results are not useful for quantifying the randomness of $\hat f(x;h)$: the convergence is towards the degenerate random variable $f(x)$, for a given $x\in\mathbb{R}$. For that reason, we focus now on the asymptotic normality of the estimator.
 
 ```{theorem, label = "point"}
-Under **A1**--**A3**,
+Assume that $\int K^{2+\delta}(z)\mathrm{d}z<\infty$^[This is satisfied, for example, if the kernel decreases exponentially, *i.e.*, if $\exists\, \alpha,\,M>0: K(z)\leq e^{-\alpha|z|},\,\forall|z|>M$.] for $\delta>0$. Then, under **A1**--**A3**,
 \begin{align}
 &\sqrt{nh}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])\stackrel{d}{\longrightarrow}\mathcal{N}(0,R(K)f(x)),(\#eq:kdenorm1)\\
 &\sqrt{nh}\left(\hat f(x;h)-f(x)-\frac{\mu_2(K)}{2}f''(x)h^2\right)\stackrel{d}{\longrightarrow}\mathcal{N}(0,R(K)f(x)).(\#eq:kdenorm2)
@@ -320,7 +346,7 @@ Under **A1**--**A3**,
 
 ```
 ```{proof}
-First note that $K_h(x-X_n)$ is a sequence of independendent but *not* identically distributed random variables: $h$ depends on $n$. Therefore, we look forward to apply Theorem \@ref(thm:lya).
+First note that $K_h(x-X_n)$ is a sequence of independent but *not* identically distributed random variables: $h=h_n$ depends on $n$. Therefore, we look forward to apply Theorem \@ref(thm:lya).
 
 We prove first \@ref(eq:kdenorm1). For simplicity, denote $K_i:=K_h(x-X_i)$, $i=1,\ldots,n$. From the proof of Theorem \@ref(thm:kdebiasvar) we know that $\mathbb{E}[K_i]=\mathbb{E}[\hat f(x;h)]=f(x)+o(1)$ and 
 \begin{align*}
@@ -329,25 +355,32 @@ s_n^2&=\sum_{i=1}^n \mathbb{V}\mathrm{ar}[K_i]\\
 &=n\frac{R(K)}{h}f(x)(1+o(1)).
 \end{align*}
 An application of the $C_p$ inequality (first) and Jensen's inequality (second), gives: 
-$$
-\mathbb{E}\left[|K_i+\mathbb{E}[K_i]|^{2+\delta}\right]\leq C_{2+\delta}\left(\mathbb{E}\left[|K_i|^{2+\delta}\right]+|\mathbb{E}[K_i]|^{2+\delta}\right)\leq 2C_{2+\delta}\mathbb{E}\left[|K_i|^{2+\delta}\right]=O\left(\mathbb{E}\left[|K_i|^{2+\delta}\right]\right).
-$$
-In addition, we have that by a Taylor expansion after $z=\frac{x-y}{h}$:
+\begin{align*}
+\mathbb{E}\left[|K_i-\mathbb{E}[K_i]|^{2+\delta}\right]&\leq C_{2+\delta}\left(\mathbb{E}\left[|K_i|^{2+\delta}\right]+|\mathbb{E}[K_i]|^{2+\delta}\right)\\
+&\leq 2C_{2+\delta}\mathbb{E}\left[|K_i|^{2+\delta}\right]\\
+&=O\left(\mathbb{E}\left[|K_i|^{2+\delta}\right]\right).
+\end{align*}
+In addition, due to a Taylor expansion after $z=\frac{x-y}{h}$ and using that $\int K^{2+\delta}(z)\mathrm{d}z<\infty$:
 \begin{align*}
 \mathbb{E}\left[|K_i|^{2+\delta}\right]&=\frac{1}{h^{2+\delta}}\int K^{2+\delta}\left(\frac{x-y}{h}\right)f(y)\mathrm{d}y\\
 &=\frac{1}{h^{1+\delta}}\int K^{2+\delta}(z)f(x-hz)\mathrm{d}y\\
 &=\frac{1}{h^{1+\delta}}\int K^{2+\delta}(z)(f(x)+o(1))\mathrm{d}y\\
 &=O\left(h^{-(1+\delta)}\right).
 \end{align*}
-(Taking for example $\delta\leq2$ due to **A2**. The same previous remark on the remainder applies.)
 
 Then:
 \begin{align*}
-\frac{1}{s_n^{2+\delta}}&\sum_{i=1}^n\mathbb{E}\left[|K_i-\mathbb{E}[\hat f(x;h)]|^{2+\delta}\right]\\
+\frac{1}{s_n^{2+\delta}}&\sum_{i=1}^n\mathbb{E}\left[|K_i-\mathbb{E}[K_i]|^{2+\delta}\right]\\
 &=\left(\frac{h}{nR(K)f(x)}\right)^{1+\frac{\delta}{2}}(1+o(1))O\left(nh^{-(1+\delta)}\right)\\
 &=O\left((nh)^{-\frac{\delta}{2}}\right)
 \end{align*}
-and the Lyapunov's condition is satisfied. As a consequence, \@ref(eq:kdenorm1) is proved.
+and the Lyapunov's condition is satisfied. As a consequence, by Lyapunov's CLT and Slutsky's theorem:
+\begin{align*}
+\sqrt{\frac{nh}{R(K)f(x)}}&(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])\\
+&=(1+o(1))\frac{1}{s_n}\sum_{i=1}^n(K_i-\mathbb{E}[K_i])\\
+&\stackrel{d}{\longrightarrow}\mathcal{N}(0,1)
+\end{align*}
+and \@ref(eq:kdenorm1) is proved.
 
 To prove \@ref(eq:kdenorm2), we consider:
 \begin{align*}
@@ -363,7 +396,14 @@ Due to Example \@ref(exm:das) and Proposition \@ref(prp:ohps), we can prove that
 
 ```
 
-Note the rate $\sqrt{nh}$ in the asymptotic normality results. This is different from the standard CLT rate $\sqrt{n}$ (see Theorem \@ref(thm:clt)). It is *slower*: the variance of the limiting normal distribution decreases as $O((nh)^{-1})$ and not as $O(n^{-1})$. This phenomenon is related with the effective sample size used in the smoothing.
+```{remark}
+Note the rate $\sqrt{nh}$ in the asymptotic normality results. This is different from the standard CLT rate $\sqrt{n}$ (see Theorem \@ref(thm:clt)). It is *slower*: the variance of the limiting normal distribution decreases as $O((nh)^{-1})$ and not as $O(n^{-1})$. The phenomenon is related with the effective sample size used in the smoothing. 
+```
+
+```{exercise}
+Using \@ref(eq:kdenorm2) and Exercise \@ref(exr:das), show that $\hat f(x;h)=f(x)+o_\mathbb{P}(1)$.
+```
+
 
 ## Bandwidth selection {#dens-bwd}
 
@@ -553,7 +593,7 @@ hpi(x) # Default is two-stages
 
 ### Cross-validation {#dens-cv}
 
-We turn now our attention to a different philosophy of bandwidth estimation. Instead of trying to minimise the AMISE by plugging-in estimates for the unknown curvature term, we directly attempt to minimise the MISE by using the sample twice: one for computing the kde and other for *evalauting* its performance on estimating $f$. To avoid the clear dependence on the sample, we do this evaluation in a *cross-validatory* way: the data used for computing the kde is *not* used for its evaluation.
+We turn now our attention to a different philosophy of bandwidth estimation. Instead of trying to minimize the AMISE by plugging-in estimates for the unknown curvature term, we directly attempt to minimize the MISE by using the sample twice: one for computing the kde and other for *evalauting* its performance on estimating $f$. To avoid the clear dependence on the sample, we do this evaluation in a *cross-validatory* way: the data used for computing the kde is *not* used for its evaluation.
 
 We begin by expanding the square in the MISE expression:
 \begin{align*}
@@ -577,11 +617,11 @@ The motivation for \@ref(eq:lscv) is the following. The first term is unbiased b
 $$
 \int \hat f(x;h)f(x)\mathrm{d}x\approx\frac{1}{n}\sum_{i=1}^n \hat f(X_i;h)
 $$
-and, in order to mitigate the dependence of the sample, we replace $\hat f(X_i;h)$ by $\hat f_{-i}(X_i;h)$ above. In that way, we use the sample for estimating the integral involving $\hat f(\cdot;h)$, but fo each $X_i$ we compute the kde on the *remaining* points. The **least squares cross-validation** (LSCV) selector, also denoted **unbiased cross-validation** (UCV) selector, is defined as
+and, in order to mitigate the dependence of the sample, we replace $\hat f(X_i;h)$ by $\hat f_{-i}(X_i;h)$ above. In that way, we use the sample for estimating the integral involving $\hat f(\cdot;h)$, but for each $X_i$ we compute the kde on the *remaining* points. The **least squares cross-validation** (LSCV) selector, also denoted **unbiased cross-validation** (UCV) selector, is defined as
 $$
 \hat h_\mathrm{LSCV}:=\arg\min_{h>0}\mathrm{LSCV}(h).
 $$
-Numerical optimization is required for obtaining $\hat h_\mathrm{LSCV}$, contraty to the previous plug-in selectos, and there is little control on the shape of the objective function. This will be also the case for the forthcoming bandwidth selectors. The following remark warns about the dangers of numerical optimization in this context.
+Numerical optimization is required for obtaining $\hat h_\mathrm{LSCV}$, contrary to the previous plug-in selectors, and there is little control on the shape of the objective function. This will be also the case for the forthcoming bandwidth selectors. The following remark warns about the dangers of numerical optimization in this context.
 
 ```{remark}
 Numerical optimization of the LSCV function can be challenging. In practise, several local minima are possible, and the roughness of the objective function can vary notably depending on $n$ and $f$. As a consquence, optimization routines may get trapped in spurious solutions. To be on the safe side, it is always advisable to check the solution by plotting $\mathrm{LSCV}(h)$ for a range of $h$, or to perform a search in a bandwidth grid: $\hat h_\mathrm{LSCV}\approx\arg\min_{h_1,\ldots,h_G}\mathrm{LSCV}(h)$. 
@@ -727,7 +767,7 @@ where $\sigma^2$ depends only on $K$ and $f$, and measures how variable is the s
 
 - $n^{1/10}(\hat h_\mathrm{LSCV}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{LSCV}^2)$ and $n^{1/10}(\hat h_\mathrm{BCV}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{BCV}^2)$. Both selectors have a slow rate of convergence (compare it with the $n^{1/2}$ of the CLT). Inspection of the variances of both selectors reveals that, for the normal kernel $\sigma_\mathrm{LSCV}^2/\sigma_\mathrm{BCV}^2\approx 15.7$. Therefore, LSCV is considerably more variable than BCV.
 
-- $n^{-5/14}(\hat h_\mathrm{DPI}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{DPI}^2)$. Thus, the DPI selector has a convergence rate much faster than the cross-validation selectors. There is an appealing explanation for this phenomenon. Recall that $\hat h_\mathrm{BCV}$ minimices the slightly modified version of $\mathrm{BCV}(h)$ given by
+- $n^{-5/14}(\hat h_\mathrm{DPI}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{DPI}^2)$. Thus, the DPI selector has a convergence rate much faster than the cross-validation selectors. There is an appealing explanation for this phenomenon. Recall that $\hat h_\mathrm{BCV}$ minimizes the slightly modified version of $\mathrm{BCV}(h)$ given by
 $$
 \frac{1}{4}\mu_2^2(K)\tilde\psi_4(h)h^4+\frac{R(K)}{nh}
 $$
@@ -736,7 +776,7 @@ and
 \tilde\psi_4(h):=&\frac{1}{n(n-1)}\sum_{i=1}^n\sum_{\substack{j=1\\j\neq i}}^n(K_h''*K_h'')(X_i-X_j)\nonumber\\
 =&\frac{n}{n-1}\widetilde{R(f'')}.
 \end{align*}
-$\tilde\psi_4$ is a leave-out-diagonals estimate of $\psi_4$. Despite being different from $\hat\psi_4$, it serves for building a DPI analogous to BCV points towards the precise fact that drags down the performance of BCV. The modified version of the DPI minimises
+$\tilde\psi_4$ is a leave-out-diagonals estimate of $\psi_4$. Despite being different from $\hat\psi_4$, it serves for building a DPI analogous to BCV points towards the precise fact that drags down the performance of BCV. The modified version of the DPI minimizes
 $$
 \frac{1}{4}\mu_2^2(K)\tilde\psi_4(g)h^4+\frac{R(K)}{nh},
 $$
@@ -939,13 +979,13 @@ legend(x = "bottom", legend = c("CI estimated var", "CI known var",
 ```
 
 ```{exercise}
-Explore the coverage of the asymptotic CI for varying values of $h$. To that end, adapt the previous coe to workin a `manipulate` environment like the example given below.
+Explore the coverage of the asymptotic CI for varying values of $h$. To that end, adapt the previous code to work in a `manipulate` environment like the example given below.
 ```
 
 ```{r, echo = TRUE, eval = FALSE, collapse = TRUE, cache = TRUE}
 # Load manipulate
 # install.packages("manipulate")
-library(manipulate) 
+library(manipulate)
 
 # Sample
 x <- rnorm(100)
@@ -998,7 +1038,7 @@ Note that $h$ is in the scale of $t(X_i)$, not $X_i$. Hence another plus of this
 | Probit | Data in $(a,b)$   | $\Phi\left(\frac{x-a}{b-a}\right)$  | $\frac{1}{b-a}\phi\left(\frac{x-a}{b-a}\right)$ |
 | Shifted power | Heavily skewed data in $\mathbb{R}$ and above $-\lambda_1$  | $(x+\lambda_1)^{\lambda_2}\mathrm{sign}(\lambda_2)$ if $\lambda_2\neq0$ and $\log(x+\lambda_1)$ if $\lambda_2=0$ | $\lambda_2(x+\lambda_1)^{\lambda_2-1}\mathrm{sign}(\lambda_2)$ if $\lambda_2\neq0$ and $\frac{1}{x+\lambda_1}$ if $\lambda_2=0$ |
 
-The code below illustrates how to compute a transformation kde in practise.
+The code below illustrates how to compute a transformation kde in practice.
 
 ```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
 # Sample from an LN(0, 1)

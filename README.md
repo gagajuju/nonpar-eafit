@@ -6,7 +6,7 @@
 
 ## Overview
 
-A 12-hour module within the subject *Robust and nonparametric statistical techniques* for the course 2017/2018 of the [MSc in Applied Mathematics](http://www.eafit.edu.co/programas-academicos/posgrado/maestria-matematicas-aplicadas/Paginas/inicio.aspx) at [EAFIT University](http://www.eafit.edu.co/) (Colombia).
+A module within the subject *Robust and nonparametric statistical techniques* for the course 2017/2018 of the [MSc in Applied Mathematics](http://www.eafit.edu.co/programas-academicos/posgrado/maestria-matematicas-aplicadas/Paginas/inicio.aspx) at [EAFIT University](http://www.eafit.edu.co/) (Colombia).
 
 ## Syllabus
 
