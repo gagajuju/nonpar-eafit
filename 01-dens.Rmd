@@ -238,7 +238,7 @@ These two expressions are exact, but they are hard to interpret. Equation \@ref(
 ```{theorem, label = "kdebiasvar"}
 Under **A1**--**A3**, the bias and variance of the kde at $x$ are
 \begin{align}
-\mathrm{Bias}[\hat f(x;h)]&=\frac{\mu_2(K)}{2}f''(x)h^2+o(h^2),(\#eq:kdebias)\\
+\mathrm{Bias}[\hat f(x;h)]&=\frac{1}{2}\mu_2(K)f''(x)h^2+o(h^2),(\#eq:kdebias)\\
 \mathbb{V}\mathrm{ar}[\hat f(x;h)]&=\frac{R(K)}{nh}f(x)+o((nh)^{-1}).(\#eq:kdevar)
 \end{align}
 
@@ -260,7 +260,7 @@ Substituting \@ref(eq:kdebias2) in \@ref(eq:kdebias1), and bearing in mind that 
 \int K(z)&f(x-hz)\mathrm{d}z\\
 =&\,\int K(z)\Big\{f(x)+f'(x)hz+\frac{f''(x)}{2}h^2z^2\\
 &+o(h^2z^2)\Big\}\mathrm{d}z\\
-=&\,f(x)+\frac{\mu_2(K)}{2}f''(x)h^2+o(h^2),
+=&\,f(x)+\frac{1}{2}\mu_2(K)f''(x)h^2+o(h^2),
 \end{align*}
 which provides \@ref(eq:kdebias). 
 
@@ -341,7 +341,7 @@ Note that, due to the consistency, $\hat f(x;h)\stackrel{2}{\longrightarrow}f(x)
 Assume that $\int K^{2+\delta}(z)\mathrm{d}z<\infty$^[This is satisfied, for example, if the kernel decreases exponentially, *i.e.*, if $\exists\, \alpha,\,M>0: K(z)\leq e^{-\alpha|z|},\,\forall|z|>M$.] for $\delta>0$. Then, under **A1**--**A3**,
 \begin{align}
 &\sqrt{nh}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])\stackrel{d}{\longrightarrow}\mathcal{N}(0,R(K)f(x)),(\#eq:kdenorm1)\\
-&\sqrt{nh}\left(\hat f(x;h)-f(x)-\frac{\mu_2(K)}{2}f''(x)h^2\right)\stackrel{d}{\longrightarrow}\mathcal{N}(0,R(K)f(x)).(\#eq:kdenorm2)
+&\sqrt{nh}\left(\hat f(x;h)-f(x)-\frac{1}{2}\mu_2(K)f''(x)h^2\right)\stackrel{d}{\longrightarrow}\mathcal{N}(0,R(K)f(x)).(\#eq:kdenorm2)
 \end{align}
 
 ```
@@ -384,12 +384,12 @@ and \@ref(eq:kdenorm1) is proved.
 
 To prove \@ref(eq:kdenorm2), we consider:
 \begin{align*}
-\sqrt{nh}&\left(\hat f(x;h)-f(x)-\frac{\mu_2(K)}{2}f''(x)h^2\right)\\
+\sqrt{nh}&\left(\hat f(x;h)-f(x)-\frac{1}{2}\mu_2(K)f''(x)h^2\right)\\
 &=\sqrt{nh}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)]+o(h^2)).
 \end{align*}
 Due to Example \@ref(exm:das) and Proposition \@ref(prp:ohps), we can prove that $\hat f(x;h)-\mathbb{E}[\hat f(x;h)]=o_\mathbb{P}(1)$. Then, $\hat f(x;h)-\mathbb{E}[\hat f(x;h)]+o(h^2)=(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])(1+o_\mathbb{P}(h^2))$. Therefore, Slutsky's theorem and \@ref(eq:kdenorm2) give:
 \begin{align*}
-\sqrt{nh}&\left(\hat f(x;h)-f(x)-\frac{\mu_2(K)}{2}f''(x)h^2\right)\\
+\sqrt{nh}&\left(\hat f(x;h)-f(x)-\frac{1}{2}\mu_2(K)f''(x)h^2\right)\\
 &=\sqrt{nh}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])(1+o_\mathbb{P}(h^2))\\
 &\stackrel{d}{\longrightarrow}\mathcal{N}(0,R(K)f(x)).
 \end{align*}
@@ -423,7 +423,7 @@ is the squared distance between the kde and the target density. The ISE is a ran
 The MISE is convenient due to its mathematical tractability and its natural relation with the MSE. There are, however, other error criteria that present attractive properties, such as the *Mean Integrated Absolute Error* (MIAE):
 \begin{align*}
 \mathrm{MIAE}[\hat f(\cdot;h)]:=&\,\mathbb{E}\left[\int |\hat f(x;h)-f(x)|\mathrm{d}x\right]\\
-=&\,\int \mathbb{E}\left[|\hat f(x;h)-f(x)|^2\right]\mathrm{d}x.
+=&\,\int \mathbb{E}\left[|\hat f(x;h)-f(x)|\right]\mathrm{d}x.
 \end{align*}
 The MIAE, unless the MISE, is invariant with respect to monotone transformations of the data. For example, if $g(x)=f(t^{-1}(x))(t^{-1})'(x)$ is the density of $Y=t(X)$ and $X\sim f$, then if the change of variables $y=t(x)$ is made,
 \begin{align*}
@@ -434,7 +434,7 @@ Despite this appealing property, the analysis of MIAE is substantially more comp
 
 Once the MISE is set as the error criterion to be minimized, our aim is to find
 $$
-h_\mathrm{MISE}=\arg\min_{h>0}\mathrm{MISE}[\hat f(\cdot;h)].
+h_\mathrm{MISE}:=\arg\min_{h>0}\mathrm{MISE}[\hat f(\cdot;h)].
 $$
 For that purpose, we need an explicit expression of the MISE that we can attempt to minimize. An asymptotic expansion for the MISE can be easily derived from the MSE expression.
 
@@ -515,12 +515,12 @@ The previous selector is an example of a **zero-stage plug-in** selector, a term
 $$
 \int f^{(s)}(x)^2\mathrm{d}x=(-1)^s\int f^{(2s)}(x)f(x)\mathrm{d}x.
 $$
-This holds by a iterative application of integration by parts. For example, for $s=2$, take $u=f'(x)$ and $\mathrm{d}v=f''(x)\mathrm{d}x$. This gives
+This holds by a iterative application of integration by parts. For example, for $s=2$, take $u=f''(x)$ and $\mathrm{d}v=f''(x)\mathrm{d}x$. This gives
 \begin{align*}
 \int f''(x)^2\mathrm{d}x&=[f''(x)f'(x)]_{-\infty}^{+\infty}-\int f'(x)f'''(x)\mathrm{d}x\\
 &=-\int f'(x)f'''(x)\mathrm{d}x
 \end{align*}
-under the assumption that the derivatives vanish at infinity. Applying again integration by parts with $u=f'(x)$ and $\mathrm{d}v=f''(x)\mathrm{d}x$ gives the result. This simple derivation has an important consequence: for estimating the functionals $R(f^{(s)})$ it is only required to estimate for $r=2s$ the functionals
+under the assumption that the derivatives vanish at infinity. Applying again integration by parts with $u=f'''(x)$ and $\mathrm{d}v=f'(x)\mathrm{d}x$ gives the result. This simple derivation has an important consequence: for estimating the functionals $R(f^{(s)})$ it is only required to estimate for $r=2s$ the functionals
 $$
 \psi_r:=\int f^{(r)}(x)f(x)\mathrm{d}x=\mathbb{E}[f^{(r)}(X)].
 $$
@@ -531,11 +531,11 @@ Thanks to the previous expression, a possible way to estimate $\psi_r$ nonparame
 \hat\psi_r(g)&=\frac{1}{n}\sum_{i=1}^n\hat f^{(r)}(X_i;g)\nonumber\\
 &=\frac{1}{n^2}\sum_{i=1}^n\sum_{j=1}^nL_g^{(r)}(X_i-X_j),(\#eq:psir)
 \end{align}
-where $\hat f^{(r)}(\cdot;g)$ is the $r$-th derivative of a kde with bandwidth $g$ and kernel $L$, *i.e.* $\hat f^{(r)}(x;g)=\frac{1}{nh^r}\sum_{i=1}^nL^{(r)}\left(\frac{x-X_i}{g}\right)$. Note that $g$ and $L$ can be different from $h$ and $K$, respectively. It turns out that estimating $\psi_r$ involves the adequate selection of a bandwidth $g$. The agenda is analogous to the one for $h_\mathrm{AMISE}$, but now taking into account that both $\hat\psi_r(g)$ and $\psi_r$ are *scalar* quantities:
+where $\hat f^{(r)}(\cdot;g)$ is the $r$-th derivative of a kde with bandwidth $g$ and kernel $L$, *i.e.* $\hat f^{(r)}(x;g)=\frac{1}{ng^r}\sum_{i=1}^nL^{(r)}\left(\frac{x-X_i}{g}\right)$. Note that $g$ and $L$ can be different from $h$ and $K$, respectively. It turns out that estimating $\psi_r$ involves the adequate selection of a bandwidth $g$. The agenda is analogous to the one for $h_\mathrm{AMISE}$, but now taking into account that both $\hat\psi_r(g)$ and $\psi_r$ are *scalar* quantities:
 
 1. Under certain regularity assumptions (see Section 3.5 in @Wand1995 for full details), the asymptotic bias and variance of $\hat\psi_r(g)$ are obtained. With them, we can compute the asymptotic expansion of the MSE and obtain the *Asymptotic Mean Squared Error* AMSE:
 \begin{align*}
-\mathrm{AMSE}[\hat \psi_r(r)]=&\,\left\{\frac{L^{(r)}(0)}{ng^{r+1}}+\frac{\mu_2(L)\psi_{r+2}g^2}{4}\right\}+\frac{2R(L^{(r)})\psi_0}{n^2g^{2r+1}}\\
+\mathrm{AMSE}[\hat \psi_r(g)]=&\,\left\{\frac{L^{(r)}(0)}{ng^{r+1}}+\frac{\mu_2(L)\psi_{r+2}g^2}{4}\right\}+\frac{2R(L^{(r)})\psi_0}{n^2g^{2r+1}}\\
 &+\frac{4}{n}\left\{\int f^{(r)}(x)^2f(x)\mathrm{d}x-\psi_r^2\right\}.
 \end{align*}
 *Note*: $k$ is the highest integer such that $\mu_k(L)>0$. In these notes we have restricted to the case $k=2$ for the kernels $K$, but there are theoretical gains if one allows *high-order kernels* $L$ with vanishing even moments larger than $2$ for estimating $\psi_r$.
@@ -545,7 +545,7 @@ $$
 g_\mathrm{AMSE}=\left[-\frac{k!L^{(r)}(0)}{\mu_k(L)\psi_{r+k}n}\right]^{1/(r+k+1)}
 $$
 The order of the optimal AMSE is 
-$$\inf_{g>0}\mathrm{AMSE}[\hat \psi_r(r)]=\begin{cases}
+$$\inf_{g>0}\mathrm{AMSE}[\hat \psi_r(g)]=\begin{cases}
 O(n^{-(2k+1)/(r+k+1)}),&k<r,\\
 O(n^{-1}),&k\geq r,
 \end{cases}$$
@@ -763,11 +763,11 @@ We state next some insights from the convergence results of the DPI, LSCV, and B
 $$
 n^\nu(\hat h/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma^2),
 $$
-where $\sigma^2$ depends only on $K$ and $f$, and measures how variable is the selector. The rate $n^\nu$ serves to quantify how fast the relative $\hat h/h_\mathrm{MISE}-1$ decreases (the larger the $\nu$, the faster the convergence). Under certain regularity conditions, we have::
+where $\sigma^2$ depends only on $K$ and $f$, and measures how variable is the selector. The rate $n^\nu$ serves to quantify how fast the relative $\hat h/h_\mathrm{MISE}-1$ decreases (the larger the $\nu$, the faster the convergence). Under certain regularity conditions, we have:
 
 - $n^{1/10}(\hat h_\mathrm{LSCV}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{LSCV}^2)$ and $n^{1/10}(\hat h_\mathrm{BCV}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{BCV}^2)$. Both selectors have a slow rate of convergence (compare it with the $n^{1/2}$ of the CLT). Inspection of the variances of both selectors reveals that, for the normal kernel $\sigma_\mathrm{LSCV}^2/\sigma_\mathrm{BCV}^2\approx 15.7$. Therefore, LSCV is considerably more variable than BCV.
 
-- $n^{-5/14}(\hat h_\mathrm{DPI}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{DPI}^2)$. Thus, the DPI selector has a convergence rate much faster than the cross-validation selectors. There is an appealing explanation for this phenomenon. Recall that $\hat h_\mathrm{BCV}$ minimizes the slightly modified version of $\mathrm{BCV}(h)$ given by
+- $n^{5/14}(\hat h_\mathrm{DPI}/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma_\mathrm{DPI}^2)$. Thus, the DPI selector has a convergence rate much faster than the cross-validation selectors. There is an appealing explanation for this phenomenon. Recall that $\hat h_\mathrm{BCV}$ minimizes the slightly modified version of $\mathrm{BCV}(h)$ given by
 $$
 \frac{1}{4}\mu_2^2(K)\tilde\psi_4(h)h^4+\frac{R(K)}{nh}
 $$
@@ -783,10 +783,10 @@ $$
 where $g$ is independent of $h$. The two methods differ on the the way $g$ is chosen: BCV sets $g=h$ and the modified DPI looks for the best $g$ in terms of the $\mathrm{AMSE}[\tilde\psi_4(g)]$. It can be seen that $g_\mathrm{AMSE}=O(n^{-2/13})$, whereas the $h$ used in BCV is asymptotically $O(n^{-1/5})$. This suboptimality on the choice of $g$ is the reason of the asymptotic deficiency of BCV.
 
 We focus now on exploring the empirical performance of bandwidth selectors. The workhorse for doing that is simulation. A popular collection of simulation scenarios was given by @Marron1992 and are conveniently available through the package `nor1mix`. They forma collection of normal $r$-mixtures of the form
-$$
-f(x;\boldsymbol{\mu},\boldsymbol{\Sigma},\mathbf{w}):=\sum_{j=1}^rw_j\phi_{\sigma_j}(x-\mu_j),\quad  w_j\geq0,\quad j=1,\ldots.r,\quad \sum_{j=1}^rw_j=1.
-$$
-Densities of this form are specially attractive since they allow for arbitrarily flexibility and, if the normal kernel is employed, they allow for *explicit and exact* MISE expressions:
+\begin{align*}
+f(x;\boldsymbol{\mu},\boldsymbol{\sigma},\mathbf{w}):&=\sum_{j=1}^rw_j\phi_{\sigma_j}(x-\mu_j),
+\end{align*}
+where $w_j\geq0$, $j=1,\ldots,r$ and $\sum_{j=1}^rw_j=1$. Densities of this form are specially attractive since they allow for arbitrarily flexibility and, if the normal kernel is employed, they allow for *explicit and exact* MISE expressions:
 \begin{align}
 \mathrm{MISE}_r[\hat f(\cdot;h)]&=(2\sqrt{\pi}nh)^{-1}+\mathbf{w}'\{(1-n^{-1})\boldsymbol{\Omega}_2-2\boldsymbol{\Omega}_1+\boldsymbol{\Omega}_0\}\mathbf{w},\nonumber\\ (\boldsymbol{\Omega}_a)_{ij}&=\phi_{(ah^2+\sigma_i^2+\sigma_j^2)^{1/2}}(\mu_i-\mu_j),\quad i,j=1,\ldots,r.(\#eq:misenorm)
 \end{align}
@@ -848,9 +848,11 @@ $$
 \sqrt{nh}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])\stackrel{d}{\longrightarrow}\mathcal{N}(0,R(K)f(x)).
 $$
 Plugging-in $\hat f(x;h)=f(x)+O_\mathbb{P}(h^2+(nh)^{-1})=f(x)(1+o_\mathbb{P}(1))$ (see Exercise \@ref(exr:fop)) as an estimate for $f(x)$ in the variance, we have by the Slutsky's theorem that
-$$
-\sqrt{\frac{nh}{R(K)\hat f(x;h)}}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])=\sqrt{\frac{nh}{R(K)f(x)}}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])(1+o_\mathbb{P}(1))\stackrel{d}{\longrightarrow}\mathcal{N}(0,1).
-$$
+\begin{align*}
+\sqrt{\frac{nh}{R(K)\hat f(x;h)}}&(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])\\
+&=\sqrt{\frac{nh}{R(K)f(x)}}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])(1+o_\mathbb{P}(1))\\
+&\stackrel{d}{\longrightarrow}\mathcal{N}(0,1).
+\end{align*}
 Therefore, an **asymptotic $100(1-\alpha)\%$ confidence interval for $\mathbb{E}[\hat f(x;h)]$** that can be straightforwardly computed is:
 \begin{align}
 I=\left(\hat f(x;h)\pm z_{\alpha}\sqrt{\frac{R(K)\hat f(x;h)}{nh}}\right).(\#eq:ci)
@@ -1010,7 +1012,7 @@ We discuss in this section several practical issues for kernel density estimatio
 In Section \@ref(dens-kdeasymp) we assumed certain regularity conditions for $f$. Assumption **A1** stated that $f$ should be twice continuously differentiable (on $\mathbb{R}$). It is simple to think a counterexample for that: take any density with bounded support, for example a $\mathcal{LN}(0,1)$ in $(0,\infty)$, as seen below.
 
 ```{r, echo = TRUE, eval = FALSE, collapse = TRUE, cache = TRUE}
-# Sample from an LN(0, 1)
+# Sample from a LN(0, 1)
 set.seed(123456)
 samp <- rlnorm(n = 500)
 
@@ -1041,7 +1043,7 @@ Note that $h$ is in the scale of $t(X_i)$, not $X_i$. Hence another plus of this
 The code below illustrates how to compute a transformation kde in practice.
 
 ```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
-# Sample from an LN(0, 1)
+# Sample from a LN(0, 1)
 set.seed(123456)
 samp <- rlnorm(n = 500)
 
@@ -1150,25 +1152,20 @@ $$
 - $\hat f(x;h)=f(x)+o(h^2)+O_\mathbb{P}\left((nh)^{-1/2}\right)=f(x)(1+o_\mathbb{P}(1))$.
 - $\frac{1}{n}\sum_{i=1}^n(x-X_i)K_h(x-X_i)=\mu_2(K)f'(x)h^2+o(h^2)+O_\mathbb{P}\left(n^{-1/2}h^{\frac{1}{2}}\right)$.
 
-Then, provide a similar expansion result for $\frac{1}{n}\sum_{i=1}^n(x-X_i)^2K_h(x-X_i)$. *Hint*: use Chebychev inequality.
+*Hint*: use Chebychev inequality.
 ```
 
 ```{exercise}
 (theoretical, $\star\star\star$, Exercise 2.23 in @Wand1995) Show that the bias and variance for the transformation kde \@ref(eq:tkde) are
 \begin{align*}
-\mathrm{Bias}[\hat f_T(x;h,t)]&=\frac{\mu_2(K)}{2}g''(t(x))t'(x)h^2+o(h^2),\\
+\mathrm{Bias}[\hat f_T(x;h,t)]&=\frac{1}{2}\mu_2(K)g''(t(x))t'(x)h^2+o(h^2),\\
 \mathbb{V}\mathrm{ar}[\hat f_T(x;h,t)]&=\frac{R(K)}{nh}g(t(x))t'(x)^2+o((nh)^{-1}),
 \end{align*}
 where $g$ is the density of $t(X)$. Usig these results, prove that
 \begin{align*}
-\mathrm{AMISE}[\hat f_T(\cdot;h,t)]=\frac{1}{4}h^4\mu_2^2(K)\int t'(t^{-1}(x))g''(x)^2\mathrm{d}x+\frac{R(K)}{nh}\mathbb{E}[t'(X)].
+\mathrm{AMISE}[\hat f_T(\cdot;h,t)]=\frac{1}{4}\mu_2^2(K)\int t'(t^{-1}(x))g''(x)^2\mathrm{d}xh^4+\frac{R(K)}{nh}\mathbb{E}[t'(X)].
 \end{align*}
 
-```
-
-```{exercise}
-(practical, $\star$) TODO. 
-<!-- Faithful bivariate. -->
 ```
 
 ```{exercise}
@@ -1192,7 +1189,7 @@ Data on the salaries of the chief executive officer of 60 companies is available
     - Simulates a sample from a model mixture of `nor1mix`.
     - Computes the bandwidth selectors $\hat h_{\mathrm{RT}}$, $\hat h_{\mathrm{BCV}}$, $\hat h_{\mathrm{UCV}}$, and $\hat h_{\mathrm{DPI}}$, and stores them.
     
-2. Estimates the density of each bandwidth selector from its corresponding sample of size $M$. Use the RT selctor for estimating the density.
+2. Estimates the density of each bandwidth selector from its corresponding sample of size $M$. Use the RT selector for estimating the density.
 3. Plots the estimated densities together.
 4. Draws a vertical line for representing the $h_\mathrm{AMISE}$ bandwidth
 
@@ -1201,6 +1198,20 @@ Describe the results for the "Claw" and "Bimodal" densities in `nor1mix`, for sa
 
 ```{exercise}
 (practical, $\star\star\star$) Use \@ref(eq:misenorm) and the family of densities of @Marron1992 in `nor1mix` to compare the MISE and AMISE criteria. To that purpose, code \@ref(eq:misenorm) and the AMISE expression for the normal kernel and compare the two error curves and the two minimizers. Explore three models of your choice from `nor1mix` for sample sizes $n=50, 100, 200$. Describe in detail the results and the major takeaways.
-
 ```
 
+```{exercise, label = "multkde"}
+(practical, $\star\star\star$) The kde can be extended to a multivariate setting by  using *product kernels*. For a sample $\mathbf{X}_1,\ldots,\mathbf{X}_n$ in $\mathbb{R}^p$, the multivariate kde employing product kernels is 
+\begin{align*}
+\hat f(\mathbf{x};\mathbf{h})=\frac{1}{n}\sum_{i=1}^nK_{h_1}(x_1-X_{i,1})\stackrel{p}{\times}\cdots\times K_{h_p}(x_p-X_{i,p}),
+\end{align*}
+where $\mathbf{x}=(x_{1},\ldots,x_{p})$, $\mathbf{X}_i=(X_{i,1},\ldots,X_{i,p})$, and $\mathbf{h}=(h_1,\ldots,h_p)$ is a vector of bandwidths. 
+
+Do:
+
+- Implement a function that computes the bivariate kde using normal kernels. 
+- Create a sample by simulating $500$ points from a $\mathcal{N}((-1, -1), \mathrm{diag}(1, 2))$ and $500$ from a $\mathcal{N}((1, 1), \mathrm{diag}(2, 1))$.
+- Estimate the uknown density from sample of size $n=1000$.
+- Check graphically the correct implementation by comparing the kde with the true density (use `?contour`).
+
+```
