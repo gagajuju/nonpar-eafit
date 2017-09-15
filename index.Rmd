@@ -2,7 +2,7 @@
 title: "A short course on nonparametric curve estimation"
 subtitle: "MSc in Applied Mathematics at EAFIT University (Colombia)"
 author: "Eduardo García Portugués"
-date: "`r Sys.Date()`, v1.4"
+date: "`r Sys.Date()`, v1.5"
 knit: "bookdown::render_book"
 documentclass: book
 bibliography: nonpar-eafit.bib
@@ -503,14 +503,14 @@ knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/di
 
 Several great reference books have been used for preparing these notes. The following list details the sections in which each of them has been consulted:
 
-- @Fan1996 (Sections \@ref(reg-kre), \@ref(reg-asymp), \@ref(reg-rob), \@ref(reg-pen)).
+- @Fan1996 (Sections \@ref(reg-kre), \@ref(reg-asymp), \@ref(reg-bwd)).
 - @DasGupta2008 (Sections \@ref(intro-prob), \@ref(intro-stoch), \@ref(intro-ohs)).
-- @Scott2015 (Sections \@ref(dens-hist), \@ref(dens-bwd), \@ref(dens-kde)--\@ref(dens-bwd))).
+- @Scott2015 (Sections \@ref(dens-hist), \@ref(dens-kde), \@ref(dens-bwd))).
 - @Silverman1986 (Sections \@ref(dens-kde), \@ref(dens-bwd)).
 - @Vaart1998 (Sections \@ref(intro-stoch), \@ref(intro-ohs)).
-- @Wand1995 (Sections \@ref(dens-kde), \@ref(dens-bwd), \@ref(dens-prac), \@ref(dens-mult)).
+- @Wand1995 (Sections \@ref(dens-kde), \@ref(dens-bwd), \@ref(dens-prac)).
 - @Wasserman2004 (Sections \@ref(intro-stoch), \@ref(reg-param)).
-- @Wasserman2006 (Sections \@ref(intro-prob), \@ref(reg-loclik), \@ref(reg-pen), \@ref(dens-ci), \@ref(reg-ci)).
+- @Wasserman2006 (Sections \@ref(intro-prob), \@ref(dens-ci), \@ref(reg-bwd)).
 
 In addition, these notes are possible due to the existence of the incredible pieces of software @R-bookdown, @R-knitr, @R-rmarkdown, and @R-base.
 

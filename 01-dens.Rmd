@@ -214,10 +214,10 @@ Load the dataset `faithful`. Then:
 
 Asymptotic results give us insights on the large-sample ($n\to\infty$) properties of an estimator. One might think why are they are useful, since in practice we only have *finite* sample sizes. Apart from purely theoretical reasons, asymptotic results usually give *highly valuable insights* on the properties of the method, typically simpler than finite-sample results (which might be analytically untractable). 
 
-Along this section we will assume the following assumptions:
+Along this section we will make the following assumptions:
 
-- **A1**. The density $f$ is twice continuously differentiable and square integrable.
-- **A2**. The kernel $K$ is a symmetric and bounded pdf with finite fourth moment^[This implies that $\int z^pK(z)\mathrm{d}z<\infty$, with $0\leq p\leq 4$. Note that the odd moments are zero due to symmetry.].
+- **A1**. The density $f$ is twice continuously differentiable and the second derivative is square integrable.
+- **A2**. The kernel $K$ is a symmetric and bounded pdf with finite second moment and square integrable.
 - **A3**. $h=h_n$ is a deterministic sequence of bandwidths^[$h=h_n$ *always* depends on $n$ from now on, although the subscript is dropped for the ease of notation.] such that, when $n\to\infty$, $h\to0$ and $nh\to\infty$. 
 
 We need to introduce some notation. From now on, the integrals are thought to be over $\mathbb{R}$, if not stated otherwise. The second moment of the kernel is denoted as $\mu_2(K):=\int z^2K(z)\mathrm{d}z$. The squared integral of a function $f$, is denoted by $R(f):=\int f(x)^2\mathrm{d}x$. The *convolution* between two real functions $f$ and $g$, $f*g$, is the function
@@ -338,7 +338,7 @@ We apply that $\mathrm{MSE}[\hat f(x;h)]=(\mathbb{E}[\hat f(x;h)]-f(x))^2+\mathb
 Note that, due to the consistency, $\hat f(x;h)\stackrel{2}{\longrightarrow}f(x)\implies\hat f(x;h)\stackrel{\mathbb{P}}{\longrightarrow}f(x)\implies\hat f(x;h)\stackrel{d}{\longrightarrow}f(x)$ under **A1**--**A2**. However, these results are not useful for quantifying the randomness of $\hat f(x;h)$: the convergence is towards the degenerate random variable $f(x)$, for a given $x\in\mathbb{R}$. For that reason, we focus now on the asymptotic normality of the estimator.
 
 ```{theorem, label = "point"}
-Assume that $\int K^{2+\delta}(z)\mathrm{d}z<\infty$^[This is satisfied, for example, if the kernel decreases exponentially, *i.e.*, if $\exists\, \alpha,\,M>0: K(z)\leq e^{-\alpha|z|},\,\forall|z|>M$.] for $\delta>0$. Then, under **A1**--**A3**,
+Assume that $\int K^{2+\delta}(z)\mathrm{d}z<\infty$^[This is satisfied, for example, if the kernel decreases exponentially, *i.e.*, if $\exists\, \alpha,\,M>0: K(z)\leq e^{-\alpha|z|},\,\forall|z|>M$.] for some $\delta>0$. Then, under **A1**--**A3**,
 \begin{align}
 &\sqrt{nh}(\hat f(x;h)-\mathbb{E}[\hat f(x;h)])\stackrel{d}{\longrightarrow}\mathcal{N}(0,R(K)f(x)),(\#eq:kdenorm1)\\
 &\sqrt{nh}\left(\hat f(x;h)-f(x)-\frac{1}{2}\mu_2(K)f''(x)h^2\right)\stackrel{d}{\longrightarrow}\mathcal{N}(0,R(K)f(x)).(\#eq:kdenorm2)
@@ -401,7 +401,7 @@ Note the rate $\sqrt{nh}$ in the asymptotic normality results. This is different
 ```
 
 ```{exercise}
-Using \@ref(eq:kdenorm2) and Exercise \@ref(exr:das), show that $\hat f(x;h)=f(x)+o_\mathbb{P}(1)$.
+Using \@ref(eq:kdenorm2) and Exercise \@ref(exm:das), show that $\hat f(x;h)=f(x)+o_\mathbb{P}(1)$.
 ```
 
 
