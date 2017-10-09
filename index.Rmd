@@ -1,8 +1,8 @@
---- 
+---
 title: "A short course on nonparametric curve estimation"
 subtitle: "MSc in Applied Mathematics at EAFIT University (Colombia)"
 author: "Eduardo García Portugués"
-date: "`r Sys.Date()`, v1.5"
+date: "`r Sys.Date()`, v1.6"
 knit: "bookdown::render_book"
 documentclass: book
 bibliography: nonpar-eafit.bib
@@ -27,9 +27,9 @@ This course is intended to provide an introduction to **nonparametric estimation
 
 ## Course objectives and logistics {#intro-course}
 
-The **software** employed in the course is *the* statistical language [`R`](https://cran.r-project.org/) and its most common IDE (Integrated Development Environment) nowadays, [`RStudio`](https://www.rstudio.com/products/rstudio/download/). A basic prior knowledge of both is assumed^[Among others: basic programming in `R`, ability to work with objects and data structures, ability to produce graphics, knowledge of the main statistical functions, ability to run scripts in `RStudio`.]. The appendix presents basic introductions to `RStudio` and `R` for those students lacking basic expertise on them. 
+The **software** employed in the course is *the* statistical language [`R`](https://cran.r-project.org/) and its most common IDE (Integrated Development Environment) nowadays, [`RStudio`](https://www.rstudio.com/products/rstudio/download/). A basic prior knowledge of both is assumed^[Among others: basic programming in `R`, ability to work with objects and data structures, ability to produce graphics, knowledge of the main statistical functions, ability to run scripts in `RStudio`.]. The appendix presents basic introductions to `RStudio` and `R` for those students lacking basic expertise on them.
 
-The notes contain a substantial amount of snippets of code that are fully self-contained. Students are encouraged to bring their own laptops at the lessons to practice with the code. 
+The notes contain a substantial amount of snippets of code that are fully self-contained. Students are encouraged to bring their own laptops at the lessons to practice with the code.
 
 The required packages for the course are:
 ```{r, echo = TRUE, cache = TRUE, warning = FALSE, message = FALSE, eval = FALSE}
@@ -47,7 +47,7 @@ library(manipulate)
 ```
 The **Shiny interactive apps** on the notes can be downloaded and run locally. This allows in particular to examine their codes. Check [this GitHub repository](https://github.com/egarpor/ShinyServer) for the sources.
 
-Each topic of this contains a mix of theoretical and practical exercises for **grading**. Groups of *two students* must choose *three exercises* in total (at least one theoretical and other practical) from Sections \@ref(dens-exercises) and \@ref(reg-exercises) and turn them in order to be graded. The group grade is weighted according to the difficulty of the exercises, which is given by the number of stars: easy ($\star$), medium ($\star\star$), and hard ($\star\star\star$). The final grade ($0-5$) is 
+Each topic of this contains a mix of theoretical and practical exercises for **grading**. Groups of *two students* must choose *three exercises* in total (at least one theoretical and other practical) from Sections \@ref(dens-exercises) and \@ref(reg-exercises) and turn them in order to be graded. The group grade is weighted according to the difficulty of the exercises, which is given by the number of stars: easy ($\star$), medium ($\star\star$), and hard ($\star\star\star$). The final grade ($0-5$) is
 $$
 \frac{1}{3}\sum_{i=1}^n\frac{\mathrm{Score}_i}{5}(2+\star_i),
 $$
@@ -91,15 +91,15 @@ f_{X_1\vert \mathbf{X}_{-1}=\mathbf{x}_{-1}}(x_1)&:=\frac{f(\mathbf{x})}{f_{\mat
 \end{align*}
 The *conditional expectation* of $Y\vert X$ is the following random variable^[Recall that the $X$-part is random!]
 $$
-\mathbb{E}[Y\vert X]:=\int y \mathrm{d}F_{Y\vert X}(y\vert X). 
+\mathbb{E}[Y\vert X]:=\int y \mathrm{d}F_{Y\vert X}(y\vert X).
 $$
-The *conditional variance* of $Y|X$ is defined as 
+The *conditional variance* of $Y|X$ is defined as
 $$
 \mathbb{V}\mathrm{ar}[Y\vert X]:=\mathbb{E}[(Y-\mathbb{E}[Y\vert X])^2\vert X]=\mathbb{E}[Y^2\vert X]-\mathbb{E}[Y\vert X]^2.
 $$
 
 ```{proposition, name = "Laws of total expectation and variance"}
-Let $X$ and $Y$ be two random variables. 
+Let $X$ and $Y$ be two random variables.
 
 - Total expectation: if $\mathbb{E}[|Y|]<\infty$, then $\mathbb{E}[Y]=\mathbb{E}[\mathbb{E}[Y\vert X]]$.
 - Total variance: if $\mathbb{E}[Y^2]<\infty$, then $\mathbb{V}\mathrm{ar}[Y]=\mathbb{E}[\mathbb{V}\mathrm{ar}[Y\vert X]]+\mathbb{V}\mathrm{ar}[\mathbb{E}[Y\vert X]]$.
@@ -113,14 +113,14 @@ Prove the law of total variance from the law of total expectation.
 We conclude with some useful inequalities.
 
 ```{proposition, name = "Markov's inequality"}
-Let $X$ be a non-negative random variable with $\mathbb{E}[X]<\infty$. Then 
+Let $X$ be a non-negative random variable with $\mathbb{E}[X]<\infty$. Then
 $$
 \mathbb{P}[X>t]\leq\frac{\mathbb{E}[X]}{t}, \quad\forall t>0.
 $$
 ```
 
 ```{proposition, name = "Chebyshev's inequality"}
-Let $\mu=\mathbb{E}[X]$ and $\sigma^2=\mathbb{V}\mathrm{ar}[X]$. Then 
+Let $\mu=\mathbb{E}[X]$ and $\sigma^2=\mathbb{V}\mathrm{ar}[X]$. Then
 $$
 \mathbb{P}[|X-\mu|\geq t]\leq\frac{\sigma^2}{t^2},\quad \forall t>0.
 $$
@@ -347,7 +347,7 @@ ix. $(a_n+b_n)^k=O(a_n^k+b_n^k)$.
 The last result is a consequence of a useful inequality:
 
 ```{lemma, name = "$C_p$ inequality"}
-Given $a,b\in\mathbb{R}$ and $p>0$, 
+Given $a,b\in\mathbb{R}$ and $p>0$,
 \begin{align*}
 |a+b|^p\leq C_p(|a|^p+|b|^p), \quad C_p=\begin{cases}
 1,&p\leq1,\\
@@ -390,7 +390,7 @@ If $X_n=O_\mathbb{P}(a_n)$, then we say that *$X_n$ is big-$O_\mathbb{P}$ of $a_
 ```
 
 ```{example}
-Chebyshev inequality entails that $\mathbb{P}[|X-\mathbb{E}[X]|\geq t]\leq \frac{\mathbb{V}\mathrm{ar}[X]}{t^2}$, $\forall t>0$. Setting $\varepsilon:=\frac{\mathbb{V}\mathrm{ar}[X]}{t^2}$ and $C_\varepsilon:=\frac{1}{\sqrt{\varepsilon}}$, then $\mathbb{P}\left[|X-\mathbb{E}[X]|\geq \sqrt{\mathbb{V}\mathrm{ar}[X]}C_\varepsilon\right]\leq \varepsilon$. Therefore, 
+Chebyshev inequality entails that $\mathbb{P}[|X-\mathbb{E}[X]|\geq t]\leq \frac{\mathbb{V}\mathrm{ar}[X]}{t^2}$, $\forall t>0$. Setting $\varepsilon:=\frac{\mathbb{V}\mathrm{ar}[X]}{t^2}$ and $C_\varepsilon:=\frac{1}{\sqrt{\varepsilon}}$, then $\mathbb{P}\left[|X-\mathbb{E}[X]|\geq \sqrt{\mathbb{V}\mathrm{ar}[X]}C_\varepsilon\right]\leq \varepsilon$. Therefore,
 $$
 X-\mathbb{E}[X]=O_\mathbb{P}\left(\sqrt{\mathbb{V}\mathrm{ar}[X_n]}\right).
 $$
@@ -495,7 +495,9 @@ Is not so simple to obtain the exact MSE for \@ref(eq:expdistest), even if it is
 What does it happen when the data is generated from an $\mathrm{Exp}(\lambda)$? Then \@ref(eq:expdistest) uniformly dominates \@ref(eq:ecdf) in performance. But, even for small deviations from $\mathrm{Exp}(\lambda)$ given by $\Gamma(\lambda, p)$, $p=1+\delta$, \@ref(eq:expdistest) shows major problems in terms of bias, while \@ref(eq:ecdf) remains with the same performance. The animation in Figure \@ref(fig:mse) illustrates precisely this behaviour.
 ```
 
-```{r, mse, echo = FALSE, fig.cap = 'A simplified example of parametric and nonparametric estimation. The objective is to estimate the distribution function $F$ of a random variable. The data is generated from a $\\Gamma(\\lambda,p)$. The parametric method assumes that $p=1$, that is, that the data comes from a $\\mathrm{Exp}(\\lambda)$. The nonparametric method does not assume anything on the data generation process. The left plot shows the true distribution function and ten estimates of each method from samples of size $n$. The right plot shows the MSE of each method on estimationg $F(x)$. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/dist-mse/).', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
+(ref:msetitle) A simplified example of parametric and nonparametric estimation. The objective is to estimate the distribution function $F$ of a random variable. The data is generated from a $\Gamma(\lambda,p)$. The parametric method assumes that $p=1$, that is, that the data comes from a $\mathrm{Exp}(\lambda)$. The nonparametric method does not assume anything on the data generation process. The left plot shows the true distribution function and ten estimates of each method from samples of size $n$. The right plot shows the MSE of each method on estimationg $F(x)$. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/dist-mse/).
+
+```{r, mse, echo = FALSE, fig.cap = '(ref:msetitle)', screenshot.alt = "images/screenshots/dist-mse.png", dev = 'png', cache = TRUE, out.width = '70%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/dist-mse/', height = '650px')
 ```
 

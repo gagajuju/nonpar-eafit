@@ -26,11 +26,11 @@ The analysis of $\hat f_H(x;t_0,h)$ as a random variable is simple, once it is r
 \mathbb{E}[\hat f_H(x;t_0,h)]&=\frac{np_k}{nh}=f(\xi_{k,h}),\\
 \mathbb{V}\mathrm{ar}[\hat f_H(x;t_0,h)]&=\frac{np_k(1-p_k)}{n^2h^2}=\frac{f(\xi_{k,h})(1-hf(\xi_{k,h}))}{nh}.
 \end{align*}
-The above results show interesting insights: 
+The above results show interesting insights:
 
 1. If $h\to0$, then $\xi_{h,k}\to x$, resulting in $f(\xi_{k,h})\to f(x)$, and thus \@ref(eq:hist) becoming an *asymptotically* unbiased estimator of $f(x)$.
-2. But if $h\to0$, the variance increases. For decreasing the variance, $nh\to\infty$ is required. 
-3. The variance is directly dependent on $f(x)(1-hf(x))\approx f(x)$, hence the more variability at regions with higher density. 
+2. But if $h\to0$, the variance increases. For decreasing the variance, $nh\to\infty$ is required.
+3. The variance is directly dependent on $f(x)(1-hf(x))\approx f(x)$, hence the more variability at regions with higher density.
 
 A more detailed analysis of the histogram can be seen in Section 3.2.2 of @Scott2015. We skip it here since we the detailed asymptotic analysis for the more general kernel density estimator is given in Section \@ref(dens-kde).
 
@@ -62,7 +62,7 @@ rug(faithE) # Plotting the sample
 The shape of the histogram depends on:
 
 - $t_0$, since the separation between bins happens at $t_0k$, $k\in\mathbb{Z}$;
-- $h$, which controls the bin size and the effective number of bins for aggregating the sample. 
+- $h$, which controls the bin size and the effective number of bins for aggregating the sample.
 
 We focus first on exploring the dependence on $t_0$, as it serves for motivating the next density estimator.
 ```{r, echo = TRUE, collapse = TRUE, cache = TRUE}
@@ -92,7 +92,7 @@ High dependence on $t_0$ also happens when estimating densities that are not com
 ```{r, echo = TRUE, eval = FALSE, collapse = TRUE, cache = TRUE}
 # Sample 100 points from a N(0, 1) and 50 from a N(3, 0.25)
 set.seed(1234567)
-samp <- c(rnorm(n = 100, mean = 0, sd = 1), 
+samp <- c(rnorm(n = 100, mean = 0, sd = 1),
           rnorm(n = 50, mean = 3.25, sd = sqrt(0.5)))
 
 # min and max for choosing Bk1 and Bk2
@@ -102,7 +102,7 @@ range(samp)
 Bk1 <- seq(-2.5, 5, by = 0.5)
 Bk2 <- seq(-2.25, 5.25, by = 0.5)
 par(mfrow = c(1, 2))
-hist(samp, probability = TRUE, breaks = Bk1, ylim = c(0, 0.5), 
+hist(samp, probability = TRUE, breaks = Bk1, ylim = c(0, 0.5),
      main = "t0 = -2.5, h = 0.5")
 rug(samp)
 hist(samp, probability = TRUE, breaks = Bk2, ylim = c(0, 0.5),
@@ -112,19 +112,19 @@ rug(samp)
 
 ### Moving histogram {#dens-movhist}
 
-An alternative to avoid the dependence on $t_0$ is the *moving histogram* or *naive density estimator*. The idea is to aggregate the sample $X_1,\ldots,X_n$ in intervals of the form $(x-h, x+h)$ and then use its relative frequency in $(x-h,x+h)$ to approximate the density at $x$: 
+An alternative to avoid the dependence on $t_0$ is the *moving histogram* or *naive density estimator*. The idea is to aggregate the sample $X_1,\ldots,X_n$ in intervals of the form $(x-h, x+h)$ and then use its relative frequency in $(x-h,x+h)$ to approximate the density at $x$:
 \begin{align*}
 f(x)&=F'(x)\\
 &=\lim_{h\to0^+}\frac{F(x+h)-F(x-h)}{2h}\\
 &=\lim_{h\to0^+}\frac{\mathbb{P}[x-h<X<x+h]}{2h}.
 \end{align*}
-Recall the differences with the histogram: the intervals depend on the evaluation point $x$ and are centered around it. That allows to directly estimate $f(x)$ (without the proxy $f(x_0)$) by an estimate of the symmetric derivative. 
+Recall the differences with the histogram: the intervals depend on the evaluation point $x$ and are centered around it. That allows to directly estimate $f(x)$ (without the proxy $f(x_0)$) by an estimate of the symmetric derivative.
 
 More precisely, given a bandwidth $h>0$, the naive density estimator builds a piecewise constant function by considering the relative frequency of $X_1,\ldots,X_n$ inside $(x-h,x+h)$:
 \begin{align}
 \hat f_N(x;h):=\frac{1}{2nh}\sum_{i=1}^n1_{\{x-h<X_i<x+h\}}. (\#eq:movhist)
 \end{align}
-The function has $2n$ discontinuities that are located at $X_i\pm h$. 
+The function has $2n$ discontinuities that are located at $X_i\pm h$.
 
 Similarly to the histogram, the analysis of $\hat f_N(x;h)$ as a random variable follows from realizing that $\sum_{i=1}^n1_{\{x-h<X_i<x+h\}}\sim \mathrm{B}(n,p_{x,h})$, $p_{x,h}=\mathbb{P}[x-h<X<x+h]=F(x+h)-F(x-h)$. Then:
 \begin{align*}
@@ -141,11 +141,13 @@ These two results provide interesting insights on the effect of $h$:
 
 The animation in Figure \@ref(fig:movinghist) illustrates the previous points and gives insight on how the performance of \@ref(eq:movhist) varies smoothly with $h$.
 
-```{r, movinghist, echo = FALSE, fig.cap = 'Bias and variance for the moving histogram. The animation shows how for small bandwidths the bias of $\\hat f_N(x;h)$ on estimating $f(x)$ is small, but the variance is high, and how for large bandwidths the bias is large and the variance is small. The variance is represented by the asymptotic $95\\%$ confidence intervals for $\\hat f_N(x;h)$. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/bias-var-movhist/).', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
+(ref:movinghisttile) Bias and variance for the moving histogram. The animation shows how for small bandwidths the bias of $\hat f_N(x;h)$ on estimating $f(x)$ is small, but the variance is high, and how for large bandwidths the bias is large and the variance is small. The variance is represented by the asymptotic $95\%$ confidence intervals for $\hat f_N(x;h)$. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/bias-var-movhist/).
+
+```{r, movinghist, echo = FALSE, fig.cap = '(ref:movinghisttile)', screenshot.alt = "images/screenshots/bias-var-movhist.png", dev = 'png', cache = TRUE, out.width = '70%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/bias-var-movhist/', height = '900px')
 ```
 
-Estimator \@ref(eq:movhist) raises an important question: **Why giving the same weight to all $X_1,\ldots,X_n$ in $(x-h, x+h)$?** After all, we are estimating $f(x)=F'(x)$ by estimating $\frac{F(x+h)-F(x-h)}{2h}$ through the relative frequency of $X_1,\ldots,X_n$ in $(x-h,x+h)$. Should not be the data points closer to $x$ more important than the ones further away? The answer to this question shows that \@ref(eq:movhist) is indeed a particular case of a wider class of density estimators. 
+Estimator \@ref(eq:movhist) raises an important question: **Why giving the same weight to all $X_1,\ldots,X_n$ in $(x-h, x+h)$?** After all, we are estimating $f(x)=F'(x)$ by estimating $\frac{F(x+h)-F(x-h)}{2h}$ through the relative frequency of $X_1,\ldots,X_n$ in $(x-h,x+h)$. Should not be the data points closer to $x$ more important than the ones further away? The answer to this question shows that \@ref(eq:movhist) is indeed a particular case of a wider class of density estimators.
 
 ## Kernel density estimation {#dens-kde}
 
@@ -168,7 +170,9 @@ Several types of kernels are possible. The most popular is the *normal kernel* $
 
 It is useful to recall the kde with the normal kernel. If that is the case, then $K_h(x-X_i)=\phi_h(x-X_i)$ and the kernel is a the density of a $\mathcal{N}(X_i,h^2)$. Thus the bandwidth $h$ can be thought as the standard deviation of the normal densities that have mean zero.
 
-```{r, kdeconst, echo = FALSE, fig.cap = 'Construction of the kernel density estimator. The animation shows how the bandwidth and kernel affect the density estimate, and how the kernels are rescaled densities with modes at the data points. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/).', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
+(ref:kdeconsttitle) Construction of the kernel density estimator. The animation shows how the bandwidth and kernel affect the density estimate, and how the kernels are rescaled densities with modes at the data points. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/).
+
+```{r, kdeconst, echo = FALSE, fig.cap = '(ref:kdeconsttitle)', screenshot.alt = "images/screenshots/kde.png", dev = 'png', cache = TRUE, out.width = '70%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/', height = '1000px')
 ```
 
@@ -194,7 +198,7 @@ plot(density(x = samp, from = -4, to = 4), xlim = c(-5, 5))
 # The density object is a list
 kde <- density(x = samp, from = -5, to = 5, n = 1024)
 str(kde)
-# Note that the evaluation grid "x"" is not directly controlled, only through 
+# Note that the evaluation grid "x"" is not directly controlled, only through
 # "from, "to", and "n" (better use powers of 2)
 plot(kde$x, kde$y, type = "l")
 curve(dnorm(x), col = 2, add = TRUE) # True density
@@ -212,13 +216,13 @@ Load the dataset `faithful`. Then:
 
 ## Asymptotic properties {#dens-kdeasymp}
 
-Asymptotic results give us insights on the large-sample ($n\to\infty$) properties of an estimator. One might think why are they are useful, since in practice we only have *finite* sample sizes. Apart from purely theoretical reasons, asymptotic results usually give *highly valuable insights* on the properties of the method, typically simpler than finite-sample results (which might be analytically untractable). 
+Asymptotic results give us insights on the large-sample ($n\to\infty$) properties of an estimator. One might think why are they are useful, since in practice we only have *finite* sample sizes. Apart from purely theoretical reasons, asymptotic results usually give *highly valuable insights* on the properties of the method, typically simpler than finite-sample results (which might be analytically untractable).
 
 Along this section we will make the following assumptions:
 
 - **A1**. The density $f$ is twice continuously differentiable and the second derivative is square integrable.
 - **A2**. The kernel $K$ is a symmetric and bounded pdf with finite second moment and square integrable.
-- **A3**. $h=h_n$ is a deterministic sequence of bandwidths^[$h=h_n$ *always* depends on $n$ from now on, although the subscript is dropped for the ease of notation.] such that, when $n\to\infty$, $h\to0$ and $nh\to\infty$. 
+- **A3**. $h=h_n$ is a deterministic sequence of bandwidths^[$h=h_n$ *always* depends on $n$ from now on, although the subscript is dropped for the ease of notation.] such that, when $n\to\infty$, $h\to0$ and $nh\to\infty$.
 
 We need to introduce some notation. From now on, the integrals are thought to be over $\mathbb{R}$, if not stated otherwise. The second moment of the kernel is denoted as $\mu_2(K):=\int z^2K(z)\mathrm{d}z$. The squared integral of a function $f$, is denoted by $R(f):=\int f(x)^2\mathrm{d}x$. The *convolution* between two real functions $f$ and $g$, $f*g$, is the function
 \begin{align}
@@ -262,9 +266,9 @@ Substituting \@ref(eq:kdebias2) in \@ref(eq:kdebias1), and bearing in mind that 
 &+o(h^2z^2)\Big\}\mathrm{d}z\\
 =&\,f(x)+\frac{1}{2}\mu_2(K)f''(x)h^2+o(h^2),
 \end{align*}
-which provides \@ref(eq:kdebias). 
+which provides \@ref(eq:kdebias).
 
-For the *variance*, first note that 
+For the *variance*, first note that
 \begin{align}
 \mathbb{V}\mathrm{ar}[\hat f(x;h)]&=\frac{1}{n^2}\sum_{i=1}^n\mathbb{V}\mathrm{ar}[K_h(x-X_i)]\nonumber\\
 &=\frac{1}{n}\left\{\mathbb{E}[K_h^2(x-X)]-\mathbb{E}[K_h(x-X)]^2\right\}. (\#eq:kdevar1)
@@ -292,13 +296,13 @@ The bias and variance expressions \@ref(eq:kdebias) and \@ref(eq:kdevar) yield i
 
 - The bias decreases with $h$ *quadratically*. In addition, the bias at $x$ is directly proportional to $f''(x)$. This has an interesting interpretation:
 
-    - The bias is negative in concave regions, *i.e.* $\{x\in\mathbb{R}:f(x)''<0\}$. These regions correspod to *peaks and modes of $f$*, where the kde *underestimates* $f$ (tends to be below $f$). 
+    - The bias is negative in concave regions, *i.e.* $\{x\in\mathbb{R}:f(x)''<0\}$. These regions correspod to *peaks and modes of $f$*, where the kde *underestimates* $f$ (tends to be below $f$).
     - Conversely, the bias is positive in convex regions, *i.e.* $\{x\in\mathbb{R}:f(x)''>0\}$. These regions correspod to *valleys and tails of $f$*, where the kde *overestimates* $f$ (tends to be above $f$).
     - **The wilder the curvature $f''$, the harder to estimate $f$**. Flat density regions are easier to estimate than wiggling regions with high curvature (several modes).
 
 - The variance depends directly on $f(x)$. **The higher the density, the more variable is the kde.** Interestingly, the variance decreases as a factor of $(nh)^{-1}$, a consequence of $nh$ playing the role of the *effective sample size* for estimating $f(x)$. The density at $x$ is not estimated using all the sample points, but only a fraction proportional to $nh$ in a neighborhood of $x$.
 
-```{r, effective, echo = FALSE, fig.cap = 'Illustration of the effective sample size for estimating $f(x)$ at $x=2$. In blue, the kernels with contribution larger than $0.01$ to the kde. In grey, rest of the kernels.', dev = 'png', cache = TRUE, out.width = '90%'}
+```{r, effective, echo = FALSE, fig.cap = 'Illustration of the effective sample size for estimating $f(x)$ at $x=2$. In blue, the kernels with contribution larger than $0.01$ to the kde. In grey, rest of the kernels.', dev = 'png', cache = TRUE, out.width = '70%'}
 n <- 25
 h <- 0.2
 set.seed(1234567)
@@ -317,7 +321,7 @@ for (s in seq_along(samp)) {
   lines(x, dnorm(x, mean = samp[s], sd = h) / 50, col = col[s])
 }
 rug(samp, col = col, lwd = 2)
-legend("topleft", legend = expression(f(x), hat(f)(x * ";" * h)), 
+legend("topleft", legend = expression(f(x), hat(f)(x * ";" * h)),
        col = 1:2, lwd = 2)
 ```
 
@@ -348,13 +352,13 @@ Assume that $\int K^{2+\delta}(z)\mathrm{d}z<\infty$^[This is satisfied, for exa
 ```{proof}
 First note that $K_h(x-X_n)$ is a sequence of independent but *not* identically distributed random variables: $h=h_n$ depends on $n$. Therefore, we look forward to apply Theorem \@ref(thm:lya).
 
-We prove first \@ref(eq:kdenorm1). For simplicity, denote $K_i:=K_h(x-X_i)$, $i=1,\ldots,n$. From the proof of Theorem \@ref(thm:kdebiasvar) we know that $\mathbb{E}[K_i]=\mathbb{E}[\hat f(x;h)]=f(x)+o(1)$ and 
+We prove first \@ref(eq:kdenorm1). For simplicity, denote $K_i:=K_h(x-X_i)$, $i=1,\ldots,n$. From the proof of Theorem \@ref(thm:kdebiasvar) we know that $\mathbb{E}[K_i]=\mathbb{E}[\hat f(x;h)]=f(x)+o(1)$ and
 \begin{align*}
 s_n^2&=\sum_{i=1}^n \mathbb{V}\mathrm{ar}[K_i]\\
 &=n^2\mathbb{V}\mathrm{ar}[\hat f(x;h)]\\
 &=n\frac{R(K)}{h}f(x)(1+o(1)).
 \end{align*}
-An application of the $C_p$ inequality (first) and Jensen's inequality (second), gives: 
+An application of the $C_p$ inequality (first) and Jensen's inequality (second), gives:
 \begin{align*}
 \mathbb{E}\left[|K_i-\mathbb{E}[K_i]|^{2+\delta}\right]&\leq C_{2+\delta}\left(\mathbb{E}\left[|K_i|^{2+\delta}\right]+|\mathbb{E}[K_i]|^{2+\delta}\right)\\
 &\leq 2C_{2+\delta}\mathbb{E}\left[|K_i|^{2+\delta}\right]\\
@@ -397,7 +401,7 @@ Due to Example \@ref(exm:das) and Proposition \@ref(prp:ohps), we can prove that
 ```
 
 ```{remark}
-Note the rate $\sqrt{nh}$ in the asymptotic normality results. This is different from the standard CLT rate $\sqrt{n}$ (see Theorem \@ref(thm:clt)). It is *slower*: the variance of the limiting normal distribution decreases as $O((nh)^{-1})$ and not as $O(n^{-1})$. The phenomenon is related with the effective sample size used in the smoothing. 
+Note the rate $\sqrt{nh}$ in the asymptotic normality results. This is different from the standard CLT rate $\sqrt{n}$ (see Theorem \@ref(thm:clt)). It is *slower*: the variance of the limiting normal distribution decreases as $O((nh)^{-1})$ and not as $O(n^{-1})$. The phenomenon is related with the effective sample size used in the smoothing.
 ```
 
 ```{exercise}
@@ -456,7 +460,7 @@ The bandwidth that minimises the AMISE is
 $$
 h_\mathrm{AMISE}=\left[\frac{R(K)}{\mu_2^2(K)R(f'')n}\right]^{1/5}.
 $$
-The optimal AMISE is: 
+The optimal AMISE is:
 $$
 \inf_{h>0}\mathrm{AMISE}[\hat f(\cdot;h)]=\frac{5}{4}(\mu_2^2(K)R(K)^4)^{4/5}R(f'')^{1/5}n^{-4/5}.
 $$
@@ -488,7 +492,7 @@ The estimate $\hat\sigma$ can be chosen as the standard deviation $s$, or, in or
 $$
 \hat \sigma_{\mathrm{IQR}}:=\frac{X_{([0.75n])}-X_{([0.25n])}}{\Phi^{-1}(0.75)-\Phi^{-1}(0.25)}.
 $$
-@Silverman1986 suggests employing the minimum of both quantities, 
+@Silverman1986 suggests employing the minimum of both quantities,
 \begin{align}
 \hat\sigma=\min(s,\hat \sigma_{\mathrm{IQR}}). (\#eq:sigmahat)
 \end{align}
@@ -543,7 +547,7 @@ where $\hat f^{(r)}(\cdot;g)$ is the $r$-th derivative of a kde with bandwidth $
 $$
 g_\mathrm{AMSE}=\left[-\frac{k!L^{(r)}(0)}{\mu_k(L)\psi_{r+k}n}\right]^{1/(r+k+1)}
 $$
-The order of the optimal AMSE is 
+The order of the optimal AMSE is
 $$\inf_{g>0}\mathrm{AMSE}[\hat \psi_r(g)]=\begin{cases}
 O(n^{-(2k+1)/(r+k+1)}),&k<r,\\
 O(n^{-1}),&k\geq r,
@@ -559,8 +563,8 @@ $$
 $$
 Typically, **two stages** are considered a good trade-off between bias (mitigated when $\ell$ increases) and variance (augments with $\ell$) of the plug-in selector. This is the method proposed by @Sheather1991, where they consider $L=K$ and $k=2$, yielding what we call the **direct plug-in** (DPI). The algorithm is:
 
-1. Estimate $\psi_8$ using $\hat\psi_8^\mathrm{NS}:=\frac{105}{32\sqrt{\pi}\hat\sigma^9}$, where $\hat\sigma$ is given in \@ref(eq:sigmahat) 
-2. Estimate $\psi_6$ using $\hat\psi_6(g_1)$ from \@ref(eq:psir), where 
+1. Estimate $\psi_8$ using $\hat\psi_8^\mathrm{NS}:=\frac{105}{32\sqrt{\pi}\hat\sigma^9}$, where $\hat\sigma$ is given in \@ref(eq:sigmahat)
+2. Estimate $\psi_6$ using $\hat\psi_6(g_1)$ from \@ref(eq:psir), where
 $$
 g_1:=\left[-\frac{2K^{(6)}(0)}{\mu_2(K)\hat\psi^\mathrm{NS}_{8}n}\right]^{1/9}.
 $$
@@ -623,7 +627,7 @@ $$
 Numerical optimization is required for obtaining $\hat h_\mathrm{LSCV}$, contrary to the previous plug-in selectors, and there is little control on the shape of the objective function. This will be also the case for the forthcoming bandwidth selectors. The following remark warns about the dangers of numerical optimization in this context.
 
 ```{remark}
-Numerical optimization of the LSCV function can be challenging. In practise, several local minima are possible, and the roughness of the objective function can vary notably depending on $n$ and $f$. As a consquence, optimization routines may get trapped in spurious solutions. To be on the safe side, it is always advisable to check the solution by plotting $\mathrm{LSCV}(h)$ for a range of $h$, or to perform a search in a bandwidth grid: $\hat h_\mathrm{LSCV}\approx\arg\min_{h_1,\ldots,h_G}\mathrm{LSCV}(h)$. 
+Numerical optimization of the LSCV function can be challenging. In practise, several local minima are possible, and the roughness of the objective function can vary notably depending on $n$ and $f$. As a consquence, optimization routines may get trapped in spurious solutions. To be on the safe side, it is always advisable to check the solution by plotting $\mathrm{LSCV}(h)$ for a range of $h$, or to perform a search in a bandwidth grid: $\hat h_\mathrm{LSCV}\approx\arg\min_{h_1,\ldots,h_G}\mathrm{LSCV}(h)$.
 ```
 
 $\hat h_{\mathrm{LSCV}}$ is implemented in `R` through the function `bw.ucv`. `bw.ucv` uses `R`'s `optimize`, which is quite sensible to the selection of the search interval (long intervals containing the solution may lead to unsatisfactory termination of the search; and short intervals might not contain the minimum). Therefore, some care is needed and that is why the `bw.ucv.mod` function is presented.
@@ -643,18 +647,18 @@ bw.ucv(x = x, lower = 0.01, upper = 1)
 # bw.ucv.mod replaces the optimization routine of bw.ucv by an exhaustive search on
 # "h.grid" (chosen adaptatively from the sample) and optionally plots the LSCV curve
 # with "plot.cv"
-bw.ucv.mod <- function(x, nb = 1000L, 
-                       h.grid = diff(range(x)) * (seq(0.1, 1, l = 200))^2, 
+bw.ucv.mod <- function(x, nb = 1000L,
+                       h.grid = diff(range(x)) * (seq(0.1, 1, l = 200))^2,
                        plot.cv = FALSE) {
-  if ((n <- length(x)) < 2L) 
+  if ((n <- length(x)) < 2L)
     stop("need at least 2 data points")
   n <- as.integer(n)
-  if (is.na(n)) 
+  if (is.na(n))
     stop("invalid length(x)")
-  if (!is.numeric(x)) 
+  if (!is.numeric(x))
     stop("invalid 'x'")
   nb <- as.integer(nb)
-  if (is.na(nb) || nb <= 0L) 
+  if (is.na(nb) || nb <= 0L)
     stop("invalid 'nb'")
   storage.mode(x) <- "double"
   hmax <- 1.144 * sqrt(var(x)) * n^(-1/5)
@@ -663,7 +667,7 @@ bw.ucv.mod <- function(x, nb = 1000L,
   cnt <- Z[[2L]]
   fucv <- function(h) .Call(stats:::C_bw_ucv, n, d, cnt, h)
   # h <- optimize(fucv, c(lower, upper), tol = tol)$minimum
-  # if (h < lower + tol | h > upper - tol) 
+  # if (h < lower + tol | h > upper - tol)
   #   warning("minimum occurred at one end of the range")
   obj <- sapply(h.grid, function(h) fucv(h))
   h <- h.grid[which.min(obj)]
@@ -686,12 +690,12 @@ The next cross-validation selector is based on **biased cross-validation** (BCV)
 $$
 \mathrm{AMISE}[\hat f(\cdot;h)]=\frac{1}{4}\mu^2_2(K)R(f'')h^4+\frac{R(K)}{nh}
 $$
-and then plugs-in an estimate for $R(f'')$ based on a modification of $R(\hat{f}''(\cdot;h))$. The modification is 
+and then plugs-in an estimate for $R(f'')$ based on a modification of $R(\hat{f}''(\cdot;h))$. The modification is
 \begin{align}
 \widetilde{R(f'')}:=&\,R(\hat{f}''(\cdot;h))-\frac{R(K'')}{nh^5}\nonumber\\
 =&\,\frac{1}{n}\sum_{i=1}^n\sum_{\substack{j=1\\j\neq i}}^n(K_h''*K_h'')(X_i-X_j)(\#eq:Rtilde),
 \end{align}
-a *leave-out-diagonals* estimate of $R(f'')$. It is designed to reduce the bias of $R(\hat{f}''(\cdot;h))$, since 
+a *leave-out-diagonals* estimate of $R(f'')$. It is designed to reduce the bias of $R(\hat{f}''(\cdot;h))$, since
 $\mathbb{E}\left[R(\hat{f}''(\cdot;h))\right]=R(f'')+\frac{R(K'')}{nh^5}+O(h^2)$. [@Scott1987]. Plugging-in \@ref(eq:Rtilde) into the AMISE expression yields the BCV objective function and BCV bandwidth selector:
 \begin{align*}
 \mathrm{BCV}(h)&:=\frac{1}{4}\mu^2_2(K)\widetilde{R(f'')}h^4+\frac{R(K)}{nh},\\
@@ -717,18 +721,18 @@ bw.bcv(x = x, lower = 0.01, upper = 1)
 # bw.bcv.mod replaces the optimization routine of bw.bcv by an exhaustive search on
 # "h.grid" (chosen adaptatively from the sample) and optionally plots the BCV curve
 # with "plot.cv"
-bw.bcv.mod <- function(x, nb = 1000L, 
-                       h.grid = diff(range(x)) * (seq(0.1, 1, l = 200))^2, 
+bw.bcv.mod <- function(x, nb = 1000L,
+                       h.grid = diff(range(x)) * (seq(0.1, 1, l = 200))^2,
                        plot.cv = FALSE) {
-  if ((n <- length(x)) < 2L) 
+  if ((n <- length(x)) < 2L)
     stop("need at least 2 data points")
   n <- as.integer(n)
-  if (is.na(n)) 
+  if (is.na(n))
     stop("invalid length(x)")
-  if (!is.numeric(x)) 
+  if (!is.numeric(x))
     stop("invalid 'x'")
   nb <- as.integer(nb)
-  if (is.na(nb) || nb <= 0L) 
+  if (is.na(nb) || nb <= 0L)
     stop("invalid 'nb'")
   storage.mode(x) <- "double"
   hmax <- 1.144 * sqrt(var(x)) * n^(-1/5)
@@ -737,7 +741,7 @@ bw.bcv.mod <- function(x, nb = 1000L,
   cnt <- Z[[2L]]
   fbcv <- function(h) .Call(stats:::C_bw_bcv, n, d, cnt, h)
   # h <- optimize(fbcv, c(lower, upper), tol = tol)$minimum
-  # if (h < lower + tol | h > upper - tol) 
+  # if (h < lower + tol | h > upper - tol)
   #   warning("minimum occurred at one end of the range")
   obj <- sapply(h.grid, function(h) fbcv(h))
   h <- h.grid[which.min(obj)]
@@ -758,7 +762,7 @@ abline(v = bw.bcv(x = x), col = 3)
 
 ### Comparison of bandwidth selectors {#dens-comp}
 
-We state next some insights from the convergence results of the DPI, LSCV, and BCV selectors. All of them are based in results of the kind 
+We state next some insights from the convergence results of the DPI, LSCV, and BCV selectors. All of them are based in results of the kind
 $$
 n^\nu(\hat h/h_\mathrm{MISE}-1)\stackrel{d}{\longrightarrow}\mathcal{N}(0,\sigma^2),
 $$
@@ -805,7 +809,7 @@ hist(samp, freq = FALSE)
 x <- seq(-4, 4, length.out = 400)
 lines(x, dnorMix(x = x, obj = MW.nm9), col = 2)
 
-# Plot a MW object directly 
+# Plot a MW object directly
 # A normal with the same mean and variance is plotted in dashed lines
 par(mfrow = c(2, 2))
 plot(MW.nm5)
@@ -817,7 +821,9 @@ lines(MW.nm10) # Also possible
 
 Figure \@ref(fig:kdebwd) presents a visualization of the performance of the kde with different bandwidth selectors, carried out in the family of mixtures of @Marron1992.
 
-```{r, kdebwd, echo = FALSE, fig.cap = 'Performance comparison of bandwidth selectors. The RT, DPI, LSCV, and BCV are computed for each sample for a normal mixture density. For each sample, computes the ISEs of the selectors and sorts them from best to worst. Changing the scenarios gives insight on the adequacy of each selector to hard- and simple-to-estimate densities. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-bwd/).', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
+(ref:kdebwdtitle) Performance comparison of bandwidth selectors. The RT, DPI, LSCV, and BCV are computed for each sample for a normal mixture density. For each sample, computes the ISEs of the selectors and sorts them from best to worst. Changing the scenarios gives insight on the adequacy of each selector to hard- and simple-to-estimate densities. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-bwd/).
+
+```{r, kdebwd, echo = FALSE, fig.cap = '(ref:kdebwdtitle)', screenshot.alt = "images/screenshots/kde-bwd.png", dev = 'png', cache = TRUE, out.width = '70%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-bwd/', height = '950px')
 ```
 
@@ -840,7 +846,7 @@ As a consequence, if $K=\phi$ (*i.e.*, $K_h=\phi_h$) and $f(\cdot)=\phi_\sigma(\
 \end{align}
 Thus, the *exact* expectation of the kde for estimating the density of a $\mathcal{N}(\mu,\sigma^2)$ is the density of a $\mathcal{N}(\mu,\sigma^2+h^2)$. Clearly, when $h\to0$, the bias disappears (at expenses of increasing the variance, of course). Removing this finite-sample size bias is not simple: if the bias is expanded, $f''$ appears. Thus for attempting to unbias $\hat f(\cdot;h)$ we have to estimate $f''$, which is much more complicated than estimating $f$! Taking second derivatives on the kde does not simply work out-of-the-box, since the bandwidths for estimating $f$ and $f''$ scale differently. We refer the interested reader to Section 2.12 in @Wand1995 for a quick review of derivative kde.
 
-The previous deadlock can be solved if we limit our ambitions. Rather than constructing a confidence interval for $f(x)$, we will do it for $\mathbb{E}[\hat f(x;h)]=(K_h*f)(x)$. There is nothing wrong with this as long as we are careful when we report the results to make it clear that the CI is for $(K_h*f)(x)$ and not $f(x)$. 
+The previous deadlock can be solved if we limit our ambitions. Rather than constructing a confidence interval for $f(x)$, we will do it for $\mathbb{E}[\hat f(x;h)]=(K_h*f)(x)$. There is nothing wrong with this as long as we are careful when we report the results to make it clear that the CI is for $(K_h*f)(x)$ and not $f(x)$.
 
 The building block for the CI for $\mathbb{E}[\hat f(x;h)]=(K_h*f)(x)$ is Theorem \@ref(thm:point), which stated that:
 $$
@@ -899,7 +905,7 @@ hatVarKde <- kde$y * Rk / (n * h)
 
 # True expectation and variance (because the density is a normal)
 EKh <- dnorm(x = kde$x, mean = mu, sd = sqrt(sigma^2 + h^2))
-varKde <- (dnorm(kde$x, mean = mu, sd = sqrt(h^2 / 2 + sigma^2)) / 
+varKde <- (dnorm(kde$x, mean = mu, sd = sqrt(h^2 / 2 + sigma^2)) /
              (2 * sqrt(pi) * h) - EKh^2) / n
 
 # CI with estimated variance
@@ -919,8 +925,8 @@ lines(kde$x, ciUp1, col = "gray")
 lines(kde$x, ciUp2, col = "gray", lty = 2)
 lines(kde$x, ciLow2, col = "gray", lty = 2)
 lines(kde$x, EKh, col = "red")
-legend("topright", legend = c("Estimate", "CI estimated var", 
-                              "CI known var", "Smoothed density"), 
+legend("topright", legend = c("Estimate", "CI estimated var",
+                              "CI known var", "Smoothed density"),
        col = c("black", "gray", "gray", "red"), lwd = 2, lty = c(1, 1, 2, 1))
 ```
 
@@ -937,7 +943,7 @@ alpha <- 0.05; zalpha <- qnorm(1 - alpha/2) # alpha for CI
 # Compute expectation and variance
 kde <- density(x = 0, bw = h, from = -4, to = 4, n = nGrid) # Just to get kde$x
 EKh <- dnorm(x = kde$x, mean = mu, sd = sqrt(sigma^2 + h^2))
-varKde <- (dnorm(kde$x, mean = mu, sd = sqrt(h^2 / 2 + sigma^2)) / 
+varKde <- (dnorm(kde$x, mean = mu, sd = sqrt(h^2 / 2 + sigma^2)) /
            (2 * sqrt(pi) * h) - EKh^2) / n
 
 # For storing if the mean is inside the CI
@@ -946,35 +952,35 @@ insideCi1 <- insideCi2 <- matrix(nrow = M, ncol = nGrid)
 # Simulation
 set.seed(12345)
 for (i in 1:M) {
-  
+
   # Sample & kde
   x <- rnorm(n = n, mean = mu, sd = sigma)
   kde <- density(x = x, bw = h, from = -4, to = 4, n = nGrid)
   hatSdKde <- sqrt(kde$y * Rk / (n * h))
-  
+
   # CI with estimated variance
   ciLow1 <- kde$y - zalpha * hatSdKde
   ciUp1 <- kde$y + zalpha * hatSdKde
-  
+
   # CI with known variance
   ciLow2 <- kde$y - zalpha * sqrt(varKde)
   ciUp2 <- kde$y + zalpha * sqrt(varKde)
-  
+
   # Check if for each x the mean is inside the CI
   insideCi1[i, ] <- EKh > ciLow1 & EKh < ciUp1
   insideCi2[i, ] <- EKh > ciLow2 & EKh < ciUp2
-  
+
 }
 
 # Plot results
-plot(kde$x, colMeans(insideCi1), ylim = c(0.25, 1), type = "l", 
+plot(kde$x, colMeans(insideCi1), ylim = c(0.25, 1), type = "l",
      main = "Coverage CIs", xlab = "x", ylab = "Coverage")
 lines(kde$x, colMeans(insideCi2), col = 4)
 abline(h = 1 - alpha, col = 2)
-abline(h = 1 - alpha + c(-1, 1) * qnorm(0.975) * 
+abline(h = 1 - alpha + c(-1, 1) * qnorm(0.975) *
          sqrt(alpha * (1 - alpha) / M), col = 2, lty = 2)
-legend(x = "bottom", legend = c("CI estimated var", "CI known var", 
-                                "Nominal level", 
+legend(x = "bottom", legend = c("CI estimated var", "CI known var",
+                                "Nominal level",
                                 "95% CI for the nominal level"),
        col = c(1, 4, 2, 2), lwd = 2, lty = c(1, 1, 1, 2))
 ```
@@ -993,7 +999,7 @@ x <- rnorm(100)
 
 # Simple plot of kde for varying h
 manipulate({
-  
+
   kde <- density(x = x, from = -4, to = 4, bw = h)
   plot(kde, ylim = c(0, 1), type = "l", main = "")
   curve(dnorm(x), from = -4, to = 4, col = 2, add = TRUE)
@@ -1039,9 +1045,11 @@ Note that $h$ is in the scale of $t(X_i)$, not $X_i$. Hence another plus of this
 | Probit | Data in $(a,b)$   | $\Phi^{-1}\left(\frac{x-a}{b-a}\right)$  | $(b-a)\phi\left(\frac{\Phi^{-1}(x)-a}{b-a}\right)^{-1}$ |
 | Shifted power | Heavily skewed data in $\mathbb{R}$ and above $-\lambda_1$  | $(x+\lambda_1)^{\lambda_2}\mathrm{sign}(\lambda_2)$ if $\lambda_2\neq0$ and $\log(x+\lambda_1)$ if $\lambda_2=0$ | $\lambda_2(x+\lambda_1)^{\lambda_2-1}\mathrm{sign}(\lambda_2)$ if $\lambda_2\neq0$ and $\frac{1}{x+\lambda_1}$ if $\lambda_2=0$ |
 
-```{r, kdetransf, echo = FALSE, fig.cap = 'Construction of the transformation kde for the log and probit transformations. The left panel shows the kde \\@ref(eq:kde) applied to the transformed data. The right plot shows the transformed kde \\@ref(eq:tkde). Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/).', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
+(ref:kdetransftitle) Construction of the transformation kde for the log and probit transformations. The left panel shows the kde \@ref(eq:kde) applied to the transformed data. The right plot shows the transformed kde \@ref(eq:tkde). Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/).
+
+```{r, kdetransf, echo = FALSE, fig.cap = '(ref:kdetransftitle)', screenshot.alt = "images/screenshots/kde-transf.png", dev = 'png', cache = TRUE, out.width = '70%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/', height = '1000px')
-``` 
+```
 
 The code below illustrates how to compute a transformation kde in practice.
 
@@ -1073,7 +1081,7 @@ Sampling a kde is relatively straightforward. The trick is to recall
 $$
 \hat f(x;h)=\frac{1}{n}\sum_{i=1}^nK_h(x-X_i)
 $$
-as a mixture density made of $n$ mixture components in which each of them is sampled independently. The only part that might require special treatment is sampling from the density $K$, although for most of the implemented kernels `R` contains specific sampling functions. 
+as a mixture density made of $n$ mixture components in which each of them is sampled independently. The only part that might require special treatment is sampling from the density $K$, although for most of the implemented kernels `R` contains specific sampling functions.
 
 The algorithm for sampling $N$ points goes as follows:
 
@@ -1096,10 +1104,10 @@ plot(density(samp, bw = h))
 # Naive sampling algorithm
 sampKde <- numeric(1e6)
 for (k in 1:1e6) {
-  
+
   i <- sample(x = 1:100, size = 1)
   sampKde[k] <- rnorm(n = 1, mean = samp[i], sd = h)
-  
+
 }
 
 # Add kde of the sampled kde - almost equal
@@ -1113,7 +1121,7 @@ sampKde <- rnorm(1e6, mean = samp[i], sd = h)
 lines(density(sampKde), col = 3)
 
 ```
- 
+
 ## Exercises {#dens-exercises}
 
 This is the list of evaluable exercises for Chapter \@ref(dens). The number of stars represents an estimate of their difficulty: easy ($\star$), medium ($\star\star$), and hard ($\star\star\star$).
@@ -1169,7 +1177,7 @@ Data on the salaries of the chief executive officer of 60 companies is available
 ```
 
 ```{exercise}
-(practical, $\star\star$) Implement the transformation kde \@ref(eq:tkde) for the three transformations given in Section \@ref(dens-prac). You can tweak the output of the `density` function in `R` and add an extra argument for selecting the kind of transformation. Or you can implement it directly from scratch. 
+(practical, $\star\star$) Implement the transformation kde \@ref(eq:tkde) for the three transformations given in Section \@ref(dens-prac). You can tweak the output of the `density` function in `R` and add an extra argument for selecting the kind of transformation. Or you can implement it directly from scratch.
 ```
 
 ```{exercise}
@@ -1179,7 +1187,7 @@ Data on the salaries of the chief executive officer of 60 companies is available
 
     - Simulates a sample from a model mixture of `nor1mix`.
     - Computes the bandwidth selectors $\hat h_{\mathrm{RT}}$, $\hat h_{\mathrm{BCV}}$, $\hat h_{\mathrm{UCV}}$, and $\hat h_{\mathrm{DPI}}$, and stores them.
-    
+
 2. Estimates the density of each bandwidth selector from its corresponding sample of size $M$. Use the RT selector for estimating the density.
 3. Plots the estimated densities together.
 4. Draws a vertical line for representing the $h_\mathrm{AMISE}$ bandwidth
@@ -1192,15 +1200,15 @@ Describe the results for the "Claw" and "Bimodal" densities in `nor1mix`, for sa
 ```
 
 ```{exercise, label = "multkde"}
-(practical, $\star\star\star$) The kde can be extended to a multivariate setting by  using *product kernels*. For a sample $\mathbf{X}_1,\ldots,\mathbf{X}_n$ in $\mathbb{R}^p$, the multivariate kde employing product kernels is 
+(practical, $\star\star\star$) The kde can be extended to a multivariate setting by  using *product kernels*. For a sample $\mathbf{X}_1,\ldots,\mathbf{X}_n$ in $\mathbb{R}^p$, the multivariate kde employing product kernels is
 \begin{align*}
 \hat f(\mathbf{x};\mathbf{h})=\frac{1}{n}\sum_{i=1}^nK_{h_1}(x_1-X_{i,1})\stackrel{p}{\times}\cdots\times K_{h_p}(x_p-X_{i,p}),
 \end{align*}
-where $\mathbf{x}=(x_{1},\ldots,x_{p})$, $\mathbf{X}_i=(X_{i,1},\ldots,X_{i,p})$, and $\mathbf{h}=(h_1,\ldots,h_p)$ is a vector of bandwidths. 
+where $\mathbf{x}=(x_{1},\ldots,x_{p})$, $\mathbf{X}_i=(X_{i,1},\ldots,X_{i,p})$, and $\mathbf{h}=(h_1,\ldots,h_p)$ is a vector of bandwidths.
 
 Do:
 
-- Implement a function that computes the bivariate kde using normal kernels. 
+- Implement a function that computes the bivariate kde using normal kernels.
 - Create a sample by simulating $500$ points from a $\mathcal{N}((-1, -1), \mathrm{diag}(1, 2))$ and $500$ from a $\mathcal{N}((1, 1), \mathrm{diag}(2, 1))$.
 - Estimate the unknown density from sample of size $n=1000$.
 - Check graphically the correct implementation by comparing the kde with the true density (use `?contour`).
