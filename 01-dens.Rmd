@@ -404,7 +404,6 @@ Note the rate $\sqrt{nh}$ in the asymptotic normality results. This is different
 Using \@ref(eq:kdenorm2) and Exercise \@ref(exm:das), show that $\hat f(x;h)=f(x)+o_\mathbb{P}(1)$.
 ```
 
-
 ## Bandwidth selection {#dens-bwd}
 
 As we saw in the previous sections, bandwidth selection is a key issue in density estimation. The purpose of this section is to introduce objective and automatic bandwidth selectors that attempt to minimize the estimation error of the target density $f$.
@@ -1009,9 +1008,9 @@ We discuss in this section several practical issues for kernel density estimatio
 
 ### Boundary issues and transformations {#dens-transf}
 
-In Section \@ref(dens-kdeasymp) we assumed certain regularity conditions for $f$. Assumption **A1** stated that $f$ should be twice continuously differentiable (on $\mathbb{R}$). It is simple to think a counterexample for that: take any density with bounded support, for example a $\mathcal{LN}(0,1)$ in $(0,\infty)$, as seen below.
+In Section \@ref(dens-kdeasymp) we assumed certain regularity conditions for $f$. Assumption **A1** stated that $f$ should be twice continuously differentiable (on $\mathbb{R}$). It is simple to think a counterexample for that: take any density with bounded support, for example a $\mathcal{LN}(0,1)$ in $(0,\infty)$, as seen below. The the kde will run into troubles.
 
-```{r, echo = TRUE, eval = FALSE, collapse = TRUE, cache = TRUE}
+```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
 # Sample from a LN(0, 1)
 set.seed(123456)
 samp <- rlnorm(n = 500)
@@ -1037,16 +1036,16 @@ Note that $h$ is in the scale of $t(X_i)$, not $X_i$. Hence another plus of this
 | Transformation |      Useful for    |   $t(x)$   |    $t'(x)$    |
 |:--------------:|:------------------:|:----------:|:-------------:|
 | Log | Data in $(a,\infty)$, $a\in\mathbb{R}$   | $\log(x-a)$  | $\frac{1}{x-a}$ |
-| Probit | Data in $(a,b)$   | $\Phi\left(\frac{x-a}{b-a}\right)$  | $\frac{1}{b-a}\phi\left(\frac{x-a}{b-a}\right)$ |
+| Probit | Data in $(a,b)$   | $\Phi^{-1}\left(\frac{x-a}{b-a}\right)$  | $(b-a)\phi\left(\frac{\Phi^{-1}(x)-a}{b-a}\right)^{-1}$ |
 | Shifted power | Heavily skewed data in $\mathbb{R}$ and above $-\lambda_1$  | $(x+\lambda_1)^{\lambda_2}\mathrm{sign}(\lambda_2)$ if $\lambda_2\neq0$ and $\log(x+\lambda_1)$ if $\lambda_2=0$ | $\lambda_2(x+\lambda_1)^{\lambda_2-1}\mathrm{sign}(\lambda_2)$ if $\lambda_2\neq0$ and $\frac{1}{x+\lambda_1}$ if $\lambda_2=0$ |
+
+```{r, kdetransf, echo = FALSE, fig.cap = 'Construction of the transformation kde for the log and probit transformations. The left panel shows the kde \\@ref(eq:kde) applied to the transformed data. The right plot shows the transformed kde \\@ref(eq:tkde). Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/).', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/', height = '1000px')
+``` 
 
 The code below illustrates how to compute a transformation kde in practice.
 
 ```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
-# Sample from a LN(0, 1)
-set.seed(123456)
-samp <- rlnorm(n = 500)
-
 # kde with log-transformed data
 kde <- density(log(samp))
 plot(kde, main = "kde of transformed data")
@@ -1067,14 +1066,6 @@ plot(kdeTransf, main = "Transformed kde")
 curve(dlnorm(x), col = 2, add = TRUE)
 rug(samp)
 ```
-
-<!-- 
-App transformation
-
-```{r, kdetransf, echo = FALSE, fig.cap = '.Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/).', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
-knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/', height = '900px')
-``` 
--->
 
 ### Sampling {#dens-sampling}
 
@@ -1211,7 +1202,7 @@ Do:
 
 - Implement a function that computes the bivariate kde using normal kernels. 
 - Create a sample by simulating $500$ points from a $\mathcal{N}((-1, -1), \mathrm{diag}(1, 2))$ and $500$ from a $\mathcal{N}((1, 1), \mathrm{diag}(2, 1))$.
-- Estimate the uknown density from sample of size $n=1000$.
+- Estimate the unknown density from sample of size $n=1000$.
 - Check graphically the correct implementation by comparing the kde with the true density (use `?contour`).
 
 ```
