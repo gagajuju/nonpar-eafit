@@ -5,6 +5,5 @@ _book
 _bookdown_files
 rsconnect
 TODO
-datasets/~*.xlsx
 *.bib.bak
 *.bib.sav

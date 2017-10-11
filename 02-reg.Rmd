@@ -1,8 +1,8 @@
 # Regression estimation {#reg}
 
-The relation of two random variables $X$ and $Y$ can be completely characterized by their joint cdf $F$, or equivalently, by the joint pdf $f$ if $(X,Y)$ is continuous, the case we will address. In the regression setting, we are interested in predicting/explaining the *response* $Y$ by means of the *predictor* $X$ from a sample $(X_1,Y_1),\ldots,(X_n,Y_n)$. The role of the variables is not symmetric: $X$ is *used* to predict/explain $Y$. 
+The relation of two random variables $X$ and $Y$ can be completely characterized by their joint cdf $F$, or equivalently, by the joint pdf $f$ if $(X,Y)$ is continuous, the case we will address. In the regression setting, we are interested in predicting/explaining the *response* $Y$ by means of the *predictor* $X$ from a sample $(X_1,Y_1),\ldots,(X_n,Y_n)$. The role of the variables is not symmetric: $X$ is *used* to predict/explain $Y$.
 
-The complete knowledge of $Y$ when $X=x$ is given by the conditional pdf: $f_{Y\vert X=x}(y)=\frac{f(x,y)}{f_X(x)}$. While this pdf provides full knowledge, it is also a challenging task: for each $x$ we have to estimate a *curve*! A simpler approach, yet still challenging, is to estimate the conditional mean (a scalar) for each $x$. This is the so-called *regression function*^[Recall that we assume that $(X,Y)$ is continuous.]
+The complete knowledge of $Y$ when $X=x$ is given by the conditional pdf: $f_{Y\vert X=x}(y)=\frac{f(x,y)}{f_X(x)}$. While this pdf provides full knowledge about $Y\vert X=x$, it is also a challenging task to estimate it: for each $x$ we have to estimate a *curve*! A simpler approach, yet still challenging, is to estimate the conditional mean (a scalar) for each $x$. This is the so-called *regression function*^[Recall that we assume that $(X,Y)$ is continuous.]
 $$
 m(x):=\mathbb{E}[Y\vert X=x]=\int y\mathrm{d}F_{Y\vert X=x}(y)=\int yf_{Y\vert X=x}(y)\mathrm{d}y.
 $$
@@ -22,7 +22,7 @@ We review now a couple of useful parametric regression models that will be used 
 
 #### Model formulation and least squares {-}
 
-The multiple linear regression considers employs *multiple* predictors $X_1,\ldots,X_p$^[Not to confuse with a sample!] for explaining a single response $Y$ by *assuming* a linear relation of the form
+The multiple linear regression employs *multiple* predictors $X_1,\ldots,X_p$^[Not to confuse with a sample!] for explaining a single response $Y$ by *assuming* that a linear relation of the form
 \begin{align}
 Y=\beta_0+\beta_1 X_1+\ldots+\beta_p X_p+\varepsilon (\#eq:lm)
 \end{align}
@@ -33,17 +33,19 @@ holds between the predictors $X_1,\ldots,X_p$ and the response $Y$. In \@ref(eq:
 since $\mathbb{E}[\varepsilon|X_1=x_1,\ldots,X_p=x_p]=0$. Therefore, the mean of $Y$ is changing in a *linear* fashion with respect to the values of $X_1,\ldots,X_p$. Hence the interpretation of the coefficients:
 
 - $\beta_0$: is the mean of $Y$ when $X_1=\ldots=X_p=0$.
-- $\beta_j$, $1\leq j\leq p$: is the increment in mean of $Y$ for an increment of one unit in $X_j=x_j$, provided that the remaining variables *do not change*.
+- $\beta_j$, $1\leq j\leq p$: is the **additive** increment in mean of $Y$ for an increment of one unit in $X_j=x_j$, provided that the remaining variables *do not change*.
 
-Figure \@ref(fig:leastsquares2) illustrates the geometrical interpretation of a multiple linear model: a plane in the $(p+1)$-dimensional space. If $p=1$, the plane is the regression line for simple linear regression. If $p=2$, then the plane can be visualized in a three-dimensional plot.
+Figure \@ref(fig:multmarg) illustrates the geometrical interpretation of a multiple linear model: a plane in the $(p+1)$-dimensional space. If $p=1$, the plane is the regression line for simple linear regression. If $p=2$, then the plane can be visualized in a three-dimensional plot. TODO: add another figure.
 
-```{r, leastsquares2, echo = FALSE, fig.cap = 'The least squares regression plane $y=\\hat\\beta_0+\\hat\\beta_1x_1+\\hat\\beta_2x_2$ and its dependence on the kind of squared distance considered.', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
-knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/least-squares-3D/', height = '700px')
+(ref:multmargtitle) The regression plane (blue) of $Y$ on $X_1$ and $X_2$, and its relation with the regression lines (green lines) of $Y$ on $X_1$ (left) and $Y$ on $X_2$ (right). The red points represent the sample for $(X_1,X_2,Y)$ and the black points the subsamples for $(X_1,X_2)$ (bottom), $(X_1,Y)$ (left) and $(X_2,Y)$ (right). Note that the regression plane is not a direct extension of the marginal regression lines.
+
+```{r, multmarg, echo = FALSE, fig.cap = '(ref:multmargtitle)', dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
+knitr::include_graphics("images/R/multmarg.png")
 ```
 
-The estimation of $\beta_0,\beta_1,\ldots,\beta_p$ is done by minimizing the so-called *residual sum of squares* (RSS). First we need to introduce some helpful matrix notation:
+The estimation of $\beta_0,\beta_1,\ldots,\beta_p$ is done by minimizing the so-called *Residual Sum of Squares* (RSS). First we need to introduce some helpful matrix notation:
 
-- A sample of $(X_1,\ldots,X_p,Y)$ is $(X_{11},\ldots,X_{1p},Y_1),\ldots,(X_{n1},\ldots,X_{np},Y_n)$, where $X_{ij}$ denotes the $i$-th observation of the $j$-th predictor $X_j$. We denote with $\mathbf{X}_i=(X_{i1},\ldots,X_{ip})$ to the $i$-th observation of $(X_1,\ldots,X_p)$, so the sample simplifies to $(\mathbf{X}_{1},Y_1),\ldots,(\mathbf{X}_{n},Y_n)$
+- A sample of $(X_1,\ldots,X_p,Y)$ is denoted by $(X_{11},\ldots,X_{1p},Y_1),\ldots,(X_{n1},\ldots,X_{np},Y_n)$, where $X_{ij}$ denotes the $i$-th observation of the $j$-th predictor $X_j$. We denote with $\mathbf{X}_i=(X_{i1},\ldots,X_{ip})$ to the $i$-th observation of $(X_1,\ldots,X_p)$, so the sample simplifies to $(\mathbf{X}_{1},Y_1),\ldots,(\mathbf{X}_{n},Y_n)$.
 
 - The *design matrix* contains all the information of the predictors and a column of ones
 $$
@@ -51,10 +53,10 @@ $$
 1 & X_{11} & \cdots & X_{1p}\\
 \vdots & \vdots & \ddots & \vdots\\
 1 & X_{n1} & \cdots & X_{np}
-\end{pmatrix}_{n\times(p+1)}
+\end{pmatrix}_{n\times(p+1)}.
 $$
 
-- The *vector of responses* $\mathbf{Y}$, the *vector of coefficients* $\boldsymbol\beta$ and the *vector of errors* are, respectively^[The vectors are regarded as column matrices.],
+- The *vector of responses* $\mathbf{Y}$, the *vector of coefficients* $\boldsymbol\beta$ and the *vector of errors* are, respectively,
 $$
 \mathbf{Y}=\begin{pmatrix}
 Y_1 \\
@@ -86,7 +88,7 @@ The RSS for the multiple linear regression is
 \text{RSS}(\boldsymbol\beta):=&\,\sum_{i=1}^n(Y_i-\beta_0-\beta_1X_{i1}-\ldots-\beta_pX_{ik})^2\nonumber\\
 =&\,(\mathbf{Y}-\mathbf{X}\boldsymbol{\beta})'(\mathbf{Y}-\mathbf{X}\boldsymbol{\beta}).(\#eq:rss)
 \end{align}
-The RSS aggregates the *squared vertical distances* from the data to a regression plane given by $\boldsymbol\beta$. Note that the *vertical distances* are considered because we want to minimize the error in the *prediction* of $Y$^[The treatment of the variables is *not symmetrical*. If that was the case, we will consider perpendicular distances, which yield to Principal Component Analysis (PCA).]. The least squares estimators are *the*^[They are unique and always exist.] minimizers of the RSS:
+The RSS aggregates the *squared vertical distances* from the data to a regression plane given by $\boldsymbol\beta$. Note that the *vertical distances* are considered because we want to minimize the error in the *prediction* of $Y$. Thus, the treatment of the variables is *not symmetrical*^[If that was the case, we would consider perpendicular distances, which yield to Principal Component Analysis (PCA).]; see Figure \@ref(fig:leastsquares2). The least squares estimators are the minimizers of the RSS:
 \begin{align*}
 \hat{\boldsymbol{\beta}}:=\arg\min_{\boldsymbol{\beta}\in\mathbb{R}^{p+1}} \text{RSS}(\boldsymbol{\beta}).
 \end{align*}
@@ -97,6 +99,12 @@ Luckily, thanks to the matrix form of \@ref(eq:rss), it is simple to compute a c
 
 ```{exercise, label = "ls"}
 $\hat{\boldsymbol{\beta}}$ can be obtained differentiating \@ref(eq:rss). Prove it using that $\frac{\partial \mathbf{A}\mathbf{x}}{\partial \mathbf{x}}=\mathbf{A}$ and $\frac{\partial f(\mathbf{x})'g(\mathbf{x})}{\partial \mathbf{x}}=f(\mathbf{x})'\frac{\partial g(\mathbf{x})}{\partial \mathbf{x}}+g(\mathbf{x})'\frac{\partial}{\partial f(\mathbf{x})}$ for two vector-valued functions $f$ and $g$.
+```
+
+(ref:leastsquares2title) The least squares regression plane $y=\hat\beta_0+\hat\beta_1x_1+\hat\beta_2x_2$ and its dependence on the kind of squared distance considered. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/least-squares-3D/).
+
+```{r, leastsquares2, echo = FALSE, fig.cap = '(ref:leastsquares2title)', screenshot.alt = "images/screenshots/least-squares-3D.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/least-squares-3D/', height = '700px')
 ```
 
 Let's check that indeed the coefficients given by `R`'s `lm` are the ones given by \@ref(eq:ls) in a toy linear model.
@@ -120,9 +128,8 @@ dataAnimation <- data.frame(x1 = x1, x2 = x2, yLin = yLin,
                             yQua = yQua, yExp = yExp)
 
 # Call lm
-
-# lm employs formula = response ~ predictor1 + predictor2 + ... 
-# (names according to the data frame names) for denoting the regression 
+# lm employs formula = response ~ predictor1 + predictor2 + ...
+# (names according to the data frame names) for denoting the regression
 # to be done
 mod <- lm(yLin ~ x1 + x2, data = dataAnimation)
 summary(mod)
@@ -147,7 +154,7 @@ beta
 ```
 
 ```{exercise}
-Compute $\boldsymbol{\beta}$ for the regressions `yLin ~ x1 + x2`, `yQua ~ x1 + x2` and `yExp ~ x2 + x3` using equation \@ref(eq:ls) and the function `lm`. Check that the fitted plane and the coefficient estimates are coherent.
+Compute $\boldsymbol{\beta}$ for the regressions `yLin ~ x1 + x2`, `yQua ~ x1 + x2`, and `yExp ~ x2 + x3` using equation \@ref(eq:ls) and the function `lm`. Check that the fitted plane and the coefficient estimates are coherent.
 ```
 
 Once we have the least squares estimates $\hat{\boldsymbol{\beta}}$, we can define the next two concepts:
@@ -162,7 +169,7 @@ $$
 $$
 where $\mathbf{H}:=\mathbf{X}(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'$ is called the *hat matrix* because it "puts the hat into $\mathbf{Y}$". What it does is to project $\mathbf{Y}$ into the regression plane (see Figure \@ref(fig:leastsquares2)).
 
-- The *estimated residuals* $\hat \varepsilon_1,\ldots,\hat \varepsilon_n$, where
+- The *residuals* (or estimated errors) $\hat \varepsilon_1,\ldots,\hat \varepsilon_n$, where
 \begin{align*}
 \hat\varepsilon_i:=Y_i-\hat Y_i,\quad i=1,\ldots,n.
 \end{align*}
@@ -170,9 +177,9 @@ They are the vertical distances between actual data and fitted data.
 
 #### Model assumptions {-}
 
-Up to know we have not made any probabilistic assumption on the data. $\hat{\boldsymbol{\beta}}$ was derived from geometrical arguments, not probabilistic ones. However, some probabilistic assumptions are required for inferring the *unknown* population coefficients $\boldsymbol{\beta}$ from the sample $(\mathbf{X}_1, Y_1),\ldots,(\mathbf{X}_n, Y_n)$.
+Up to now, we have not made any probabilistic assumption on the data generation process. $\hat{\boldsymbol{\beta}}$ was derived from purely geometrical arguments, not probabilistic ones. However, some probabilistic assumptions are required for inferring the *unknown* population coefficients $\boldsymbol{\beta}$ from the sample $(\mathbf{X}_1, Y_1),\ldots,(\mathbf{X}_n, Y_n)$.
 
-```{r, linearmodel2, echo = FALSE, out.width = '90%', fig.cap = 'The key concepts of the simple linear model. The blue densities denote the conditional density of $Y$ for each cut in the $X$ axis. The yellow band denotes where the $95\\%$ of the data is, according to the model. The red points represent data following the model.', cache = TRUE}
+```{r, linearmodel2, echo = FALSE, fig.pos = 'h!', out.width = '70%', fig.cap = 'The key concepts of the simple linear model. The blue densities denote the conditional density of $Y$ for each cut in the $X$ axis. The yellow band denotes where the $95\\%$ of the data is, according to the model. The red points represent data following the model.', cache = TRUE}
 knitr::include_graphics("images/R/linearmodel.png")
 ```
 
@@ -184,18 +191,20 @@ iii. **Normality**: $\varepsilon_i\sim\mathcal{N}(0,\sigma^2)$ for $i=1,\ldots,n
 iv. **Independence of the errors**: $\varepsilon_1,\ldots,\varepsilon_n$ are independent (or uncorrelated, $\mathbb{E}[\varepsilon_i\varepsilon_j]=0$, $i\neq j$, since they are assumed to be normal).
 
 A good one-line summary of the linear model is the following (independence is assumed)
-\begin{align*}
-Y|(X_1=x_1,\ldots,X_p=x_p)\sim \mathcal{N}(\beta_0+\beta_1x_1+\ldots+\beta_px_p,\sigma^2).
-\end{align*}
-The above summary is the *population version* of the linear model (it is expressed in terms of the random variables). The *sample version* that summarizes assumptions i--iv is
+\begin{align}
+Y|(X_1=x_1,\ldots,X_p=x_p)\sim \mathcal{N}(\beta_0+\beta_1x_1+\ldots+\beta_px_p,\sigma^2).(\#eq:linsum)
+\end{align}
+Inference on the parameters $\boldsymbol\beta$ and $\sigma$ can be done, conditionally^[We assume that the randomness is on the response only.] on $X_1,\ldots,X_n$, from \@ref(eq:linsum). We do not explore this further, referring the interested reader to [these notes](https://bookdown.org/egarpor/SSS2-UC3M/multlin-inference.html). Instead of that, we remark the connection bethween least squares estimation and the maximum likelihood estimator derived from \@ref(eq:linsum).
+
+First, note that \@ref(eq:linsum) is the *population version* of the linear model (it is expressed in terms of the random variables, not in terms of their samples). The *sample version* that summarizes assumptions i--iv is
 $$
-\mathbf{Y}|\mathbf{X}\sim \mathcal{N}_n(\mathbf{X}\boldsymbol{\beta},\sigma^2\mathbf{I}).
+\mathbf{Y}|(\mathbf{X}_1,\ldots,\mathbf{X}_p)\sim \mathcal{N}_n(\mathbf{X}\boldsymbol{\beta},\sigma^2\mathbf{I}).
 $$
-Using this result, it is easy obtain the log-likelihood function of $Y_1,\ldots,Y_n$ conditionally^[We assume that the randomness is on the response only.] on $X_1,\ldots,X_n$ as
+Using this result, it is easy obtain the log-likelihood function of $Y_1,\ldots,Y_n$ conditionally^[We assume that the randomness is on the response only.] on $\mathbf{X}_1,\ldots,\mathbf{X}_n$ as
 \begin{align}
 \ell(\boldsymbol{\beta})=\log\phi_{\sigma^2\mathbf{I}}(\mathbf{Y}-\mathbf{X}\boldsymbol{\beta})=\sum_{i=1}^n\log\phi_{\sigma}(Y_i-(\mathbf{X}\boldsymbol{\beta})_i).(\#eq:ell)
 \end{align}
-The last result justifies the consideration of the least squares estimate: it equals the maximum likelihood estimator derived under assumptions i--iv.
+Finally, the next result justifies the consideration of the least squares estimate: it equals the maximum likelihood estimator derived under assumptions i--iv.
 
 ```{theorem}
 Under assumptions i--iv, the maximum likelihood estimate of $\boldsymbol{\beta}$ is the least squares estimate \@ref(eq:ls):
@@ -215,16 +224,16 @@ Optimizing $\ell$ does not require knowledge on $\sigma^2$, since differentiatin
 
 #### Model formulation {-}
 
-When the response $Y$ can take only two values, codified for convenience as $1$ (success) and $0$ (failure), it is called a *binary* variable. A binary variable, known also as a *Bernoulli variable*, is a $\mathrm{B}(1, p)$. Recall that $\mathbb{\mathrm{B}(1, p)}=\mathbb{P}[\mathrm{B}(1, p)=1]=p$.
+When the response $Y$ can take only two values, codified for convenience as $1$ (success) and $0$ (failure), it is called a *binary* variable. A binary variable, known also as a *Bernoulli variable*, is a $\mathrm{B}(1, p)$. Recall that $\mathbb{E}[\mathrm{B}(1, p)]=\mathbb{P}[\mathrm{B}(1, p)=1]=p$.
 
 If $Y$ is a binary variable and $X_1,\ldots,X_p$ are predictors associated to $Y$, the purpose in *logistic regression* is to estimate
 \begin{align}
 p(x_1,\ldots,x_p):=&\,\mathbb{P}[Y=1|X_1=x_1,\ldots,X_p=x_p]\nonumber\\
 =&\,\mathbb{E}[Y|X_1=x_1,\ldots,X_p=x_p],(\#eq:expp)
 \end{align}
-this is, how the probability of $Y=1$ is changing according to particular values, denoted by $x_1,\ldots,x_p$, of the predictors $X_1,\ldots,X_p$. A tempting possibility is to consider a linear model for \@ref(eq:expp), $p(x_1,\ldots,x_p)=\beta_0+\beta_1x_1+\ldots+\beta_px_p$. However, such a model will run into serious problems inevitably: negative probabilities and probabilities larger than one.
+this is, how the probability of $Y=1$ is changing according to particular values, denoted by $x_1,\ldots,x_p$, of the predictors $X_1,\ldots,X_p$. A tempting possibility is to consider a linear model for \@ref(eq:expp), $p(x_1,\ldots,x_p)=\beta_0+\beta_1x_1+\ldots+\beta_px_p$. However, such a model will run into serious problems inevitably: negative probabilities and probabilities larger than one will arise.
 
-The solution is to consider a function to encapsulate the value of $z=\beta_0+\beta_1x_1+\ldots+\beta_px_p$, in $\mathbb{R}$, and map it back to $[0,1]$. There are several alternatives to do so, based on distribution functions $F:\mathbb{R}\longrightarrow[0,1]$ that deliver $y=F(z)\in[0,1]$. Different choices of $F$ give rise to different models, the most common being the *logistic distribution function*:
+A solution is to consider a function to encapsulate the value of $z=\beta_0+\beta_1x_1+\ldots+\beta_px_p$, in $\mathbb{R}$, and map it back to $[0,1]$. There are several alternatives to do so, based on distribution functions $F:\mathbb{R}\longrightarrow[0,1]$ that deliver $y=F(z)\in[0,1]$. Different choices of $F$ give rise to different models, the most common being the *logistic distribution function*:
 \begin{align*}
 \mathrm{logistic}(z):=\frac{e^z}{1+e^z}=\frac{1}{1+e^{-z}}.
 \end{align*}
@@ -232,7 +241,9 @@ Its inverse, $F^{-1}:[0,1]\longrightarrow\mathbb{R}$, known as the *logit functi
 \begin{align*}
 \mathrm{logit}(p):=\mathrm{logistic}^{-1}(p)=\log\frac{p}{1-p}.
 \end{align*}
-This is a *link function*, this is, a function that maps a given space (in this case $[0,1]$) into $\mathbb{R}$. The term link function is employed in *generalized linear models*, which follow exactly the same philosophy of the logistic regression -- mapping the domain of $Y$ to $\mathbb{R}$ in order to apply there a linear model. We will concentrate here exclusively on the logit as a link function. Therefore, the *logistic model* is
+This is a *link function*, this is, a function that maps a given space (in this case $[0,1]$) into $\mathbb{R}$. The term link function is employed in *generalized linear models*, which follow exactly the same philosophy of the logistic regression -- mapping the domain of $Y$ to $\mathbb{R}$ in order to apply there a linear model. As said, different link functions are possible, but we will concentrate here exclusively on the logit as a link function.
+
+The *logistic model* is defined as the following parametric form for \@ref(eq:expp):
 \begin{align}
 p(x_1,\ldots,x_p)&=\mathrm{logistic}(\beta_0+\beta_1x_1+\ldots+\beta_px_p)\nonumber\\
 &=\frac{1}{1+e^{-(\beta_0+\beta_1x_1+\ldots+\beta_px_p)}}.(\#eq:eq-log)
@@ -243,11 +254,11 @@ The linear form inside the exponent has a clear interpretation:
 - If $\beta_0+\beta_1x_1+\ldots+\beta_px_p<0$, then $p(x_1,\ldots,x_p)<\frac{1}{2}$ ($Y=1$ less likely).
 - If $\beta_0+\beta_1x_1+\ldots+\beta_px_p>0$, then $p(x_1,\ldots,x_p)>\frac{1}{2}$ ($Y=1$ more likely).
 
-To be more precise on the interpretation of the coefficients $\beta_0,\ldots,\beta_p$ we need to introduce the *odds*. The **odds is an equivalent way of expressing the distribution of probabilities in a binary variable**. Since $\mathbb{P}[Y=1]=p$ and $\mathbb{P}[Y=0]=1-p$, both the success and failure probabilities can be inferred from $p$. Instead of using $p$ to characterize the distribution of $Y$, we can use
+To be more precise on the interpretation of the coefficients $\beta_0,\ldots,\beta_p$ we need to introduce the concept of *odds*. The **odds is an equivalent way of expressing the distribution of probabilities in a binary variable**. Since $\mathbb{P}[Y=1]=p$ and $\mathbb{P}[Y=0]=1-p$, both the success and failure probabilities can be inferred from $p$. Instead of using $p$ to characterize the distribution of $Y$, we can use
 \begin{align}
 \mathrm{odds}(Y)=\frac{p}{1-p}=\frac{\mathbb{P}[Y=1]}{\mathbb{P}[Y=0]}.(\#eq:eq-odds)
 \end{align}
-The odds is the *ratio between the probability of success and the probability of failure*. It is extensively used in betting^[Recall that the result of a bet is binary: you win or lose the bet.] due to its better interpretability. For example, if a horse $Y$ has a probability $p=2/3$ of winning a race ($Y=1$), then the odds of the horse is
+The odds is the *ratio between the probability of success and the probability of failure*. It is extensively used in betting due to its better interpretability. For example, if a horse $Y$ has a probability $p=2/3$ of winning a race ($Y=1$), then the odds of the horse is
 $$
 \text{odds}=\frac{p}{1-p}=\frac{2/3}{1/3}=2.
 $$
@@ -269,14 +280,14 @@ We can rewrite \@ref(eq:eq-log) in terms of the odds \@ref(eq:eq-odds). If we do
 \end{align*}
 This provides the following interpretation of the coefficients:
 
-- $e^{\beta_0}$: is the odds when $X_1=\ldots=X_p=0$.
+- $e^{\beta_0}$: is the odds of $Y=1$ when $X_1=\ldots=X_p=0$.
 - $e^{\beta_j}$, $1\leq j\leq k$: is the **multiplicative** increment of the odds for an increment of one unit in $X_j=x_j$, provided that the remaining variables *do not change*. If the increment in $X_j$ is of $r$ units, then the multiplicative increment in the odds is $(e^{\beta_j})^r$.
 
 #### Model assumptions and estimation {-}
 
 Some probabilistic assumptions are required for performing inference on the model parameters $\boldsymbol\beta$ from the sample $(\mathbf{X}_1, Y_1),\ldots,(\mathbf{X}_n, Y_n)$. These assumptions are somehow simpler than the ones for linear regression.
 
-```{r, logisticmodel, echo = FALSE, out.width = '90%', fig.cap = 'The key concepts of the logistic model. The blue bars represent the conditional distribution of probability of $Y$ for each cut in the $X$ axis. The red points represent data following the model.', cache = TRUE}
+```{r, logisticmodel, echo = FALSE, fig.pos = 'h!', out.width = '70%', fig.cap = 'The key concepts of the logistic model. The blue bars represent the conditional distribution of probability of $Y$ for each cut in the $X$ axis. The red points represent data following the model.', cache = TRUE}
 knitr::include_graphics("images/R/logisticmodel.png")
 ```
 
@@ -298,10 +309,13 @@ Since $Y_i\sim \mathrm{Ber}(p(\mathbf{X}_i))$, $i=1,\ldots,n$, the log-likelihoo
 \ell(\boldsymbol{\beta})=&\,\sum_{i=1}^n\log\left(p(\mathbf{X}_i)^{Y_i}(1-p(\mathbf{X}_i))^{1-Y_i}\right)\\
 =&\,\sum_{i=1}^n\left\{Y_i\log(p(\mathbf{X}_i))+(1-Y_i)\log(1-p(\mathbf{X}_i))\right\}.
 \end{align*}
-Unfortunately, due to the non-linearity of the optimization problem there are no explicit expressions for $\hat{\boldsymbol{\beta}}$. These have to be obtained numerically by means of an iterative procedure, which may run into problems in low sample situations with perfect classification.
+Unfortunately, due to the non-linearity of the optimization problem there are no explicit expressions for $\hat{\boldsymbol{\beta}}$. These have to be obtained numerically by means of an iterative procedure, which may run into problems in low sample situations with perfect classification. Unlike in the linear model, inference is not exact from the assumptions, but approximate in terms of maximum likelihood theory. We do not explore this further and refer the interested reader to [these notes](https://bookdown.org/egarpor/SSS2-UC3M/logreg-inference.html).
 
 Figure \@ref(fig:maximumlikelihood) shows how the log-likelihood changes with respect to the values for $(\beta_0,\beta_1)$ in three data patterns.
-```{r, maximumlikelihood, echo = FALSE, fig.cap = 'The logistic regression fit and its dependence on $\\beta_0$ (horizontal displacement) and $\\beta_1$ (steepness of the curve). Recall the effect of the sign of $\\beta_1$ in the curve: if positive, the logistic curve has an \'s\' form; if negative, the form is a reflected \'s\'.', screenshot.alt = "TODO.png", dev = 'png', cache = TRUE, out.width = '90%'}
+
+(ref:maximumlikelihoodtitle) The logistic regression fit and its dependence on $\beta_0$ (horizontal displacement) and $\beta_1$ (steepness of the curve). Recall the effect of the sign of $\beta_1$ in the curve: if positive, the logistic curve has an 's' form; if negative, the form is a reflected 's'. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/log-maximum-likelihood/).
+
+```{r, maximumlikelihood, echo = FALSE, fig.cap = '(ref:maximumlikelihoodtitle)', screenshot.alt = "images/screenshots/log-maximum-likelihood.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/log-maximum-likelihood/', height = '900px')
 ```
 
@@ -325,9 +339,8 @@ y3 <- rbinom(50, size = 1, prob = 1 / (1 + exp(-y3)))
 dataMle <- data.frame(x = x, y1 = y1, y2 = y2, y3 = y3)
 
 # Call glm
-
-# glm employs formula = response ~ predictor1 + predictor2 + ... 
-# (names according to the data frame names) for denoting the regression 
+# glm employs formula = response ~ predictor1 + predictor2 + ...
+# (names according to the data frame names) for denoting the regression
 # to be done. We need to specify family = "binomial" to make a
 # logistic regression
 mod <- glm(y1 ~ x, family = "binomial", data = dataMle)
@@ -364,7 +377,7 @@ m(x)=&\,\mathbb{E}[Y\vert X=x]\nonumber\\
 =&\,\int y f_{Y\vert X=x}(y)\mathrm{d}y\nonumber\\
 =&\,\frac{\int y f(x,y)\mathrm{d}y}{f_X(x)}.
 \end{align*}
-This expression shows an interesting point: the regression function can be computed from the density joint density $f$ and the marginal $f_X$. Therefore, given a sample $(X_1,Y_1),\ldots,(X_n,Y_n)$, an estimate of $m$ follows by replacing the previous densities by their kdes. To that aim, recall that in Exercise \@ref(exr:multkde) we defined a multivariate extension of the kde based on product kernels. For the two dimensional case, the kde with equal bandwidths $\mathbf{h}=(h,h)$ is 
+This expression shows an interesting point: the regression function can be computed from the joint density $f$ and the marginal $f_X$. Therefore, given a sample $(X_1,Y_1),\ldots,(X_n,Y_n)$, an estimate of $m$ follows by replacing the previous densities by their kdes. To that aim, recall that in Exercise \@ref(exr:multkde) we defined a multivariate extension of the kde based on product kernels. For the two dimensional case, the kde with equal bandwidths $\mathbf{h}=(h,h)$ is
 \begin{align}
 \hat f(x,y;h)=\frac{1}{n}\sum_{i=1}^nK_{h}(x_1-X_{i})K_{h}(y-Y_{i}).(\#eq:kdem)
 \end{align}
@@ -380,30 +393,30 @@ This yields the so-called **Nadaraya-Watson**^[Termed due to the coetaneous prop
 \begin{align}
 \hat m(x;0,h):=\frac{1}{n}\sum_{i=1}^n\frac{K_h(x-X_i)}{\frac{1}{n}\sum_{i=1}^nK_h(x-X_i)}Y_i=\sum_{i=1}^nW^0_{i}(x)Y_i, (\#eq:nw)
 \end{align}
-where $W^0_{i}(x):=\frac{K_h(x-X_i)}{\sum_{i=1}^nK_h(x-X_i)}$. This estimate can be seen as a weighted average of $Y_1,\ldots,Y_n$ by means of the set of weights $\{W_{n,i}(x)\}_{i=1}^n$ (check that they add to one). The set of weights depends on the evaluation point $x$. That means that the Nadaraya-Watson estimator is a **local mean of $Y_1,\ldots,Y_n$ around $X=x$**. 
+where $W^0_{i}(x):=\frac{K_h(x-X_i)}{\sum_{i=1}^nK_h(x-X_i)}$. This estimate can be seen as a weighted average of $Y_1,\ldots,Y_n$ by means of the set of weights $\{W_{n,i}(x)\}_{i=1}^n$ (check that they add to one). The set of weights depends on the evaluation point $x$. That means that the Nadaraya-Watson estimator is a **local mean of $Y_1,\ldots,Y_n$ around $X=x$**.
 
 Let's implement the Nadaraya-Watson estimate to get a feeling of how it works in practice.
 
 ```{r, echo = TRUE, collapse = TRUE, cache = TRUE}
 # Nadaraya-Watson
 mNW <- function(x, X, Y, h, K = dnorm) {
-	
+
   # Arguments
   # x: evaluation points
-	# X: vector (size n) with the predictors
-	# Y: vector (size n) with the response variable
-	# h: bandwidth
-	# K: kernel
-  
+  # X: vector (size n) with the predictors
+  # Y: vector (size n) with the response variable
+  # h: bandwidth
+  # K: kernel
+
   # Matrix of size n x length(x)
   Kx <- sapply(X, function(Xi) K((x - Xi) / h) / h)
-  
+
   # Weights
   W <- Kx / rowSums(Kx) # Column recycling!
-  
+
   # Means at x ("drop" to drop the matrix attributes)
   drop(W %*% Y)
-  
+
 }
 
 # Generate some data to test the implementation
@@ -423,7 +436,7 @@ plot(X, Y)
 rug(X, side = 1); rug(Y, side = 2)
 lines(xGrid, m(xGrid), col = 1)
 lines(xGrid, mNW(x = xGrid, X = X, Y = Y, h = h), col = 2)
-legend("topright", legend = c("True regression", "Nadaraya-Watson"), 
+legend("topright", legend = c("True regression", "Nadaraya-Watson"),
        lwd = 2, col = 1:2)
 ```
 
@@ -436,7 +449,7 @@ The code below illustrates the effect of varying $h$ for the Nadaraya-Watson est
 ```{r, echo = TRUE, eval = FALSE, collapse = TRUE, cache = TRUE}
 # Simple plot of N-W for varying h's
 manipulate({
-  
+
   # Plot data
   plot(X, Y)
   rug(X, side = 1); rug(Y, side = 2)
@@ -499,7 +512,7 @@ we can re-express \@ref(eq:hatb) into a *weighted least squares problem* whose e
 Using the equalities given in Exercise \@ref(exr:ls), prove \@ref(eq:betaw).
 ```
 
-The estimate for $m(x)$ is then computed as 
+The estimate for $m(x)$ is then computed as
 \begin{align*}
 \hat m(x;p,h):&=\hat\beta_0\\
 &=\mathbf{e}_1'(\mathbf{X}'\mathbf{W}\mathbf{X})^{-1}\mathbf{X}'\mathbf{W}\mathbf{Y}\\
@@ -531,9 +544,9 @@ xGrid <- seq(-10, 10, l = 500)
 
 # Bandwidth
 h <- 0.25
-lp0 <- locpoly(x = X, y = Y, bandwidth = h, degree = 0, range.x = c(-10, 10), 
+lp0 <- locpoly(x = X, y = Y, bandwidth = h, degree = 0, range.x = c(-10, 10),
                gridsize = 500)
-lp1 <- locpoly(x = X, y = Y, bandwidth = h, degree = 1, range.x = c(-10, 10), 
+lp1 <- locpoly(x = X, y = Y, bandwidth = h, degree = 1, range.x = c(-10, 10),
                gridsize = 500)
 
 # Plot data
@@ -542,7 +555,7 @@ rug(X, side = 1); rug(Y, side = 2)
 lines(xGrid, m(xGrid), col = 1)
 lines(lp0$x, lp0$y, col = 2)
 lines(lp1$x, lp1$y, col = 3)
-legend("bottom", legend = c("True regression", "Local constant", 
+legend("bottom", legend = c("True regression", "Local constant",
                          "Local linear"),
        lwd = 2, col = 1:3)
 ```
@@ -550,9 +563,9 @@ legend("bottom", legend = c("True regression", "Local constant",
 ```{r, echo = TRUE, eval = FALSE, collapse = TRUE, cache = TRUE}
 # Simple plot of local polynomials for varying h's
 manipulate({
-  
+
   # Plot data
-  lpp <- locpoly(x = X, y = Y, bandwidth = h, degree = p, range.x = c(-10, 10), 
+  lpp <- locpoly(x = X, y = Y, bandwidth = h, degree = p, range.x = c(-10, 10),
                  gridsize = 500)
   plot(X, Y)
   rug(X, side = 1); rug(Y, side = 2)
@@ -596,10 +609,10 @@ The bias and variance expressions \@ref(eq:mbias) and \@ref(eq:mvar) yield inter
 
 - The bias decreases with $h$ *quadratically* for $p=0,1$. The bias at $x$ is directly proportional to $m''(x)$ if $p=1$ and affected by $m''(x)$ if $p=0$. This has the same interpretation as in the density setting:
 
-    - The bias is negative in concave regions, *i.e.* $\{x\in\mathbb{R}:m(x)''<0\}$. These regions correspod to *peaks and modes of $m$*
-    - Conversely, the bias is positive in convex regions, *i.e.* $\{x\in\mathbb{R}:m(x)''>0\}$. These regions correspod to *valleys of $m$*.
+    - The bias is negative in concave regions, *i.e.* $\{x\in\mathbb{R}:m(x)''<0\}$. These regions correspond to *peaks and modes of $m$*
+    - Conversely, the bias is positive in convex regions, *i.e.* $\{x\in\mathbb{R}:m(x)''>0\}$. These regions correspond to *valleys of $m$*.
     - **The wilder the curvature $m''$, the harder to estimate $m$**.
-    
+
 - The bias for $p=0$ at $x$ is affected by $m'(x)$, $f'(x)$, and $f(x)$. Precisely, **the lower the density $f(x)$, the larger the bias**. And **the faster $m$ and $f$ change at $x$, the larger the bias**. Thus the bias of the local constant estimator is much more sensible to $m(x)$ and $f(x)$ than the local linear (which is only sensible to $m''(x)$). Particularly, the fact that it depends on $f'(x)$ and $f(x)$ is referred as the *design bias* since it depends merely on the predictor's distribution.
 
 - The variance depends directly on $\frac{\sigma^2(x)}{f(x)}$ for $p=0,1$. As a consequence, **the lower the density and larger the conditional variance, the more variable is $\hat m(\cdot;p,h)$.** The variance decreases at a factor of $(nh)^{-1}$ due to the effective sample size.
@@ -615,7 +628,6 @@ Assume that $\mathbb{E}[(Y-m(x))^{2+\delta}\vert X=x]<\infty$ for some $\delta>0
 
 ```
 
-
 ## Bandwidth selection {#reg-bwd}
 
 Bandwidth selection is, as in kernel density estimation, of key practical importance. Several bandwidth selectors, in the spirit of the plug-in and cross-validation ideas discussed in Section \@ref(dens-bwd) have been proposed. There are, for example, a rule-of-thumb analogue (see Section 4.2 in @Fan1996) and a direct plug-in analogue (see Section 5.8 in @Wand1995). For simplicity, we will focus only on the **cross-validation** bandwidth selector.
@@ -629,7 +641,7 @@ However, this is a bad idea. Attempting to minimize \@ref(eq:badcv) always leads
 ```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
 # Grid for representing (3.22)
 hGrid <- seq(0.1, 1, l = 200)^2
-error <- sapply(hGrid, function(h) 
+error <- sapply(hGrid, function(h)
   mean((Y - mNW(x = X, X = X, Y = Y, h = h))^2))
 
 # Error curve
@@ -670,13 +682,13 @@ xGrid <- seq(-10, 10, l = 500)
 
 # Objective function
 cvNW <- function(X, Y, h, K = dnorm) {
-  	sum(((Y - mNW(x = X, X = X, Y = Y, h = h, K = K)) / 
+  	sum(((Y - mNW(x = X, X = X, Y = Y, h = h, K = K)) /
   	       (1 - K(0) / colSums(K(outer(X, X, "-") / h))))^2)
-} 
+}
 
 # Find optimum CV bandwidth, with sensible grid
-bw.cv.grid <- function(X, Y, 
-                       h.grid = diff(range(X)) * (seq(0.1, 1, l = 200))^2, 
+bw.cv.grid <- function(X, Y,
+                       h.grid = diff(range(X)) * (seq(0.1, 1, l = 200))^2,
                        K = dnorm, plot.cv = FALSE) {
 	obj <- sapply(h.grid, function(h) cvNW(X = X, Y = Y, h = h, K = K))
   h <- h.grid[which.min(obj)]
@@ -697,30 +709,29 @@ plot(X, Y)
 rug(X, side = 1); rug(Y, side = 2)
 lines(xGrid, m(xGrid), col = 1)
 lines(xGrid, mNW(x = xGrid, X = X, Y = Y, h = h), col = 2)
-legend("topright", legend = c("True regression", "Nadaraya-Watson"), 
+legend("topright", legend = c("True regression", "Nadaraya-Watson"),
        lwd = 2, col = 1:2)
 ```
 
 ```{exercise}
-Compare if 
+Compare if TODO
 ```
 
 <!--
-
 ## Confidence intervals {#reg-ci}
+
+Add credits
 
 Variance estimation.
 Asymptotic infeasible.
 Wild bootstrap.
+-->
 
 ## Local likelihood {#reg-loclik}
 
-Binary (Wasserman)
-Cross-validation 
+Add credits. Binary (Wasserman). Cross-validation.
 
-$\ell(f)=$
-
--->
+$\ell(f)$
 
 ## Exercises {#reg-exercises}
 
@@ -731,7 +742,7 @@ This is the list of evaluable exercises for Chapter \@ref(reg). The number of st
 ```
 
 ```{exercise}
-(theoretical, $\star$) TODO
+(theoretical, $\star\star$) TODO local lik
 ```
 
 ```{exercise}
@@ -739,7 +750,7 @@ This is the list of evaluable exercises for Chapter \@ref(reg). The number of st
 ```
 
 ```{exercise}
-(theoretical, $\star\star$) TODO
+(theoretical, $\star\star$) Show that the Nadaraya-Watson is unbiased (in conditional expectation with respect to $X_1,\ldots,X_n$) when the regression function is constant: $m(x)=c$, $c\in\mathbb{R}$. Show the same for the local linear estimator for a linear regression function $m(x)=a+bx$, $a,b\in\mathbb{R}$. *Hint*: use \@ref(eq:we).
 ```
 
 ```{exercise, label = "loc"}
@@ -751,7 +762,7 @@ This is the list of evaluable exercises for Chapter \@ref(reg). The number of st
 ```
 
 ```{exercise}
-(practical, $\star$) TODO
+(practical, $\star$) TODO compare expressions CV
 ```
 
 ```{exercise}
@@ -767,10 +778,9 @@ This is the list of evaluable exercises for Chapter \@ref(reg). The number of st
 ```
 
 ```{exercise}
-(practical, $\star\star\star$) Implement the local linear estimator. The function must take a sample `X`, a sample `Y`, the points `x` at which the estimate should be obtained, the bandwidth `h` and the kernel `K`. Test its correct behaviour by estimating an artificial dataset that follows a linear model.
+(practical, $\star\star\star$) Implement the local linear estimator. The function must take a sample `X`, a sample `Y`, the points `x` at which the estimate should be obtained, the bandwidth `h` and the kernel `K`. Test its correct behavior by estimating an artificial dataset that follows a linear model.
 ```
 
 ```{exercise}
-(practical, $\star\star\star$) TODO.
+(practical, $\star\star\star$) local lik
 ```
-
