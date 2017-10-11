@@ -143,7 +143,7 @@ The animation in Figure \@ref(fig:movinghist) illustrates the previous points an
 
 (ref:movinghisttile) Bias and variance for the moving histogram. The animation shows how for small bandwidths the bias of $\hat f_N(x;h)$ on estimating $f(x)$ is small, but the variance is high, and how for large bandwidths the bias is large and the variance is small. The variance is represented by the asymptotic $95\%$ confidence intervals for $\hat f_N(x;h)$. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/bias-var-movhist/).
 
-```{r, movinghist, echo = FALSE, fig.cap = '(ref:movinghisttile)', screenshot.alt = "images/screenshots/bias-var-movhist.png", dev = 'png', cache = TRUE, out.width = '70%'}
+```{r, movinghist, echo = FALSE, fig.cap = '(ref:movinghisttile)', screenshot.alt = "images/screenshots/bias-var-movhist.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/bias-var-movhist/', height = '900px')
 ```
 
@@ -166,17 +166,17 @@ by \@ref(eq:movhist2), we give equal weight to all the points $X_1,\ldots,X_n$. 
 \end{align}
 A common notation is $K_h(z):=\frac{1}{h}K\left(\frac{z}{h}\right)$, so $\hat f(x;h)=\frac{1}{n}\sum_{i=1}^nK_h(x-X_i)$.
 
-Several types of kernels are possible. The most popular is the *normal kernel* $K(z)=\phi(z)$, although the *Epanechnikov kernel*, $K(z)=\frac{3}{4}(1-z^2)1_{\{|z|<1\}}$, is the most efficient. The *rectangular kernel* $K(z)=\frac{1}{2}1_{\{|z|<1\}}$ yields the moving histogram as a particular case. The kde inherits the smoothness properties of the kernel. That means, for example, \@ref(eq:kde) with a normal kernel is infinitely differentiable. But with an Epanechnikov kernel, \@ref(eq:kde) is not differentiable, and with a rectangular kernel is not even continuous. However, if a certain smoothness is guaranteed (continuity at least), the *choice of the kernel has little importance in practise* (at least compared with the choice of $h$). Figure \@ref(fig:kdeconst) illustrates the construction of the kde, and the bandwidth and kernel effects.
+Several types of kernels are possible. The most popular is the *normal kernel* $K(z)=\phi(z)$, although the *Epanechnikov kernel*, $K(z)=\frac{3}{4}(1-z^2)1_{\{|z|<1\}}$, is the most efficient. The *rectangular kernel* $K(z)=\frac{1}{2}1_{\{|z|<1\}}$ yields the moving histogram as a particular case. The kde inherits the smoothness properties of the kernel. That means, for example, \@ref(eq:kde) with a normal kernel is infinitely differentiable. But with an Epanechnikov kernel, \@ref(eq:kde) is not differentiable, and with a rectangular kernel is not even continuous. However, if a certain smoothness is guaranteed (continuity at least), the *choice of the kernel has little importance in practice* (at least compared with the choice of $h$). Figure \@ref(fig:kdeconst) illustrates the construction of the kde, and the bandwidth and kernel effects.
 
 It is useful to recall the kde with the normal kernel. If that is the case, then $K_h(x-X_i)=\phi_h(x-X_i)$ and the kernel is a the density of a $\mathcal{N}(X_i,h^2)$. Thus the bandwidth $h$ can be thought as the standard deviation of the normal densities that have mean zero.
 
 (ref:kdeconsttitle) Construction of the kernel density estimator. The animation shows how the bandwidth and kernel affect the density estimate, and how the kernels are rescaled densities with modes at the data points. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/).
 
-```{r, kdeconst, echo = FALSE, fig.cap = '(ref:kdeconsttitle)', screenshot.alt = "images/screenshots/kde.png", dev = 'png', cache = TRUE, out.width = '70%'}
+```{r, kdeconst, echo = FALSE, fig.cap = '(ref:kdeconsttitle)', screenshot.alt = "images/screenshots/kde.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/', height = '1000px')
 ```
 
-Implementation of kde in `R` is built-in through the `density` function. The function automatically chooses the bandwidth $h$ using a *bandwith selector* which will be studied in detail in Section \@ref(dens-bwd).
+Implementation of kde in `R` is built-in through the `density` function. The function automatically chooses the bandwidth $h$ using a *bandwidth selector* which will be studied in detail in Section \@ref(dens-bwd).
 
 ```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
 # Sample 100 points from a N(0, 1)
@@ -254,7 +254,7 @@ For the *bias* we consider the change of variables $z=\frac{x-y}{h}$, $y=x-hz$, 
 \mathbb{E}[\hat f(x;h)]&=\int K_h(x-y)f(y)\mathrm{d}y\nonumber\\
 &=\int K(z)f(x-hz)\mathrm{d}z.(\#eq:kdebias1)
 \end{align}
-Since $h\to0$, an applycation of a scond-order Taylor expansion gives
+Since $h\to0$, an application of a second-order Taylor expansion gives
 \begin{align}
 f(x-hz)=&\,f(x)+f'(x)hz+\frac{f''(x)}{2}h^2z^2\\
 &+o(h^2z^2). (\#eq:kdebias2)
@@ -302,7 +302,7 @@ The bias and variance expressions \@ref(eq:kdebias) and \@ref(eq:kdevar) yield i
 
 - The variance depends directly on $f(x)$. **The higher the density, the more variable is the kde.** Interestingly, the variance decreases as a factor of $(nh)^{-1}$, a consequence of $nh$ playing the role of the *effective sample size* for estimating $f(x)$. The density at $x$ is not estimated using all the sample points, but only a fraction proportional to $nh$ in a neighborhood of $x$.
 
-```{r, effective, echo = FALSE, fig.cap = 'Illustration of the effective sample size for estimating $f(x)$ at $x=2$. In blue, the kernels with contribution larger than $0.01$ to the kde. In grey, rest of the kernels.', dev = 'png', cache = TRUE, out.width = '70%'}
+```{r, effective, echo = FALSE, fig.cap = 'Illustration of the effective sample size for estimating $f(x)$ at $x=2$. In blue, the kernels with contribution larger than $0.01$ to the kde. In grey, rest of the kernels.', dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
 n <- 25
 h <- 0.2
 set.seed(1234567)
@@ -456,7 +456,7 @@ Trivial.
 The dominating part of the MISE is denoted as AMISE, which stands for *Asymptotic MISE*: $\mathrm{AMISE}[\hat f(\cdot;h)]=\frac{1}{4}\mu^2_2(K)R(f'')h^4+\frac{R(K)}{nh}$. Due to its closed expression, it is possible to obtain a bandwidth that minimizes the AMISE.
 
 ```{corollary}
-The bandwidth that minimises the AMISE is
+The bandwidth that minimizes the AMISE is
 $$
 h_\mathrm{AMISE}=\left[\frac{R(K)}{\mu_2^2(K)R(f'')n}\right]^{1/5}.
 $$
@@ -596,7 +596,7 @@ hpi(x) # Default is two-stages
 
 ### Cross-validation {#dens-cv}
 
-We turn now our attention to a different philosophy of bandwidth estimation. Instead of trying to minimize the AMISE by plugging-in estimates for the unknown curvature term, we directly attempt to minimize the MISE by using the sample twice: one for computing the kde and other for *evalauting* its performance on estimating $f$. To avoid the clear dependence on the sample, we do this evaluation in a *cross-validatory* way: the data used for computing the kde is *not* used for its evaluation.
+We turn now our attention to a different philosophy of bandwidth estimation. Instead of trying to minimize the AMISE by plugging-in estimates for the unknown curvature term, we directly attempt to minimize the MISE by using the sample twice: one for computing the kde and other for *evaluating* its performance on estimating $f$. To avoid the clear dependence on the sample, we do this evaluation in a *cross-validatory* way: the data used for computing the kde is *not* used for its evaluation.
 
 We begin by expanding the square in the MISE expression:
 \begin{align*}
@@ -627,7 +627,7 @@ $$
 Numerical optimization is required for obtaining $\hat h_\mathrm{LSCV}$, contrary to the previous plug-in selectors, and there is little control on the shape of the objective function. This will be also the case for the forthcoming bandwidth selectors. The following remark warns about the dangers of numerical optimization in this context.
 
 ```{remark}
-Numerical optimization of the LSCV function can be challenging. In practise, several local minima are possible, and the roughness of the objective function can vary notably depending on $n$ and $f$. As a consquence, optimization routines may get trapped in spurious solutions. To be on the safe side, it is always advisable to check the solution by plotting $\mathrm{LSCV}(h)$ for a range of $h$, or to perform a search in a bandwidth grid: $\hat h_\mathrm{LSCV}\approx\arg\min_{h_1,\ldots,h_G}\mathrm{LSCV}(h)$.
+Numerical optimization of the LSCV function can be challenging. In practice, several local minima are possible, and the roughness of the objective function can vary notably depending on $n$ and $f$. As a consequence, optimization routines may get trapped in spurious solutions. To be on the safe side, it is always advisable to check the solution by plotting $\mathrm{LSCV}(h)$ for a range of $h$, or to perform a search in a bandwidth grid: $\hat h_\mathrm{LSCV}\approx\arg\min_{h_1,\ldots,h_G}\mathrm{LSCV}(h)$.
 ```
 
 $\hat h_{\mathrm{LSCV}}$ is implemented in `R` through the function `bw.ucv`. `bw.ucv` uses `R`'s `optimize`, which is quite sensible to the selection of the search interval (long intervals containing the solution may lead to unsatisfactory termination of the search; and short intervals might not contain the minimum). Therefore, some care is needed and that is why the `bw.ucv.mod` function is presented.
@@ -823,7 +823,7 @@ Figure \@ref(fig:kdebwd) presents a visualization of the performance of the kde 
 
 (ref:kdebwdtitle) Performance comparison of bandwidth selectors. The RT, DPI, LSCV, and BCV are computed for each sample for a normal mixture density. For each sample, computes the ISEs of the selectors and sorts them from best to worst. Changing the scenarios gives insight on the adequacy of each selector to hard- and simple-to-estimate densities. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-bwd/).
 
-```{r, kdebwd, echo = FALSE, fig.cap = '(ref:kdebwdtitle)', screenshot.alt = "images/screenshots/kde-bwd.png", dev = 'png', cache = TRUE, out.width = '70%'}
+```{r, kdebwd, echo = FALSE, fig.cap = '(ref:kdebwdtitle)', screenshot.alt = "images/screenshots/kde-bwd.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-bwd/', height = '950px')
 ```
 
@@ -930,7 +930,7 @@ legend("topright", legend = c("Estimate", "CI estimated var",
        col = c("black", "gray", "gray", "red"), lwd = 2, lty = c(1, 1, 2, 1))
 ```
 
-The above code computes the ci. But it dos not show any insight on the effective coverage of the ci. The next simulation exercise deals with this issue.
+The above code computes the CI. But it dos not show any insight on the effective coverage of the CI. The next simulation exercise deals with this issue.
 
 ```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
 # Simulation setting
@@ -1029,7 +1029,7 @@ rug(samp)
 
 What is happening is clear: the kde is spreading probability mass outside the support of $\mathcal{LN}(0,1)$, because the kernels are functions defined in $\mathbb{R}$. Since the kde places probability mass at negative values, it takes it from the positive side, resulting in a severe negative bias around $0$. As a consequence, the kde does not integrate one in the support of the data. No matter what is the sample size considered, the kde will always have a **negative bias of $O(h)$ at the boundary**, instead of the standard $O(h^2)$.
 
-A simple approach to deal with the *boundary bis* is to map a compactly-supported density $f$ into a real-supported density $g$, that is simpler to estimate, by means of a transformation $t$:
+A simple approach to deal with the *boundary bias* is to map a compactly-supported density $f$ into a real-supported density $g$, that is simpler to estimate, by means of a transformation $t$:
 $$
 f(x)=g(t(x))t'(x).
 $$
@@ -1047,7 +1047,7 @@ Note that $h$ is in the scale of $t(X_i)$, not $X_i$. Hence another plus of this
 
 (ref:kdetransftitle) Construction of the transformation kde for the log and probit transformations. The left panel shows the kde \@ref(eq:kde) applied to the transformed data. The right plot shows the transformed kde \@ref(eq:tkde). Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/).
 
-```{r, kdetransf, echo = FALSE, fig.cap = '(ref:kdetransftitle)', screenshot.alt = "images/screenshots/kde-transf.png", dev = 'png', cache = TRUE, out.width = '70%'}
+```{r, kdetransf, echo = FALSE, fig.cap = '(ref:kdetransftitle)', screenshot.alt = "images/screenshots/kde-transf.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde-transf/', height = '1000px')
 ```
 
@@ -1151,7 +1151,7 @@ $$
 - $\hat f(x;h)=f(x)+o(h^2)+O_\mathbb{P}\left((nh)^{-1/2}\right)=f(x)(1+o_\mathbb{P}(1))$.
 - $\frac{1}{n}\sum_{i=1}^n(x-X_i)K_h(x-X_i)=\mu_2(K)f'(x)h^2+o(h^2)+O_\mathbb{P}\left(n^{-1/2}h^{\frac{1}{2}}\right)$.
 
-*Hint*: use Chebychev inequality.
+*Hint*: use Chebyshev inequality.
 ```
 
 ```{exercise}
@@ -1181,7 +1181,7 @@ Data on the salaries of the chief executive officer of 60 companies is available
 ```
 
 ```{exercise}
-(practical, $\star\star\star$) A bandwidth selector is a random variable. Visualizing its density can help to understand its behaviour, especially if it is compared with the asymptotic optimal bandwidth $h_\mathrm{AMISE}$. Create a script that does the following steps:
+(practical, $\star\star\star$) A bandwidth selector is a random variable. Visualizing its density can help to understand its behavior, especially if it is compared with the asymptotic optimal bandwidth $h_\mathrm{AMISE}$. Create a script that does the following steps:
 
 1. For $j=1,\ldots,M=10000$:
 

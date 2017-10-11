@@ -5,7 +5,7 @@
 This is what you have to do in order to install `R` and `RStudio` in your own computer:
 
 1. In Mac OS X, download and install first [`XQuartz`](https://www.xquartz.org/) and log out and back on your Mac OS X account (this is an **important** step that is required for 3D graphics to work). Be sure that your Mac OS X system is up-to-date.
-2. Download the latest version of `R` at <https://cran.r-project.org/>. For Windows, you can download it directly [here](https://cran.r-project.org/bin/windows/base/release.html). For Mac OS X you can download the latest version (at the time of writing this, `3.4.1`) [here](https://cran.r-project.org/bin/macosx/R-3.4.1.pkg). 
+2. Download the latest version of `R` at <https://cran.r-project.org/>. For Windows, you can download it directly [here](https://cran.r-project.org/bin/windows/base/release.html). For Mac OS X you can download the latest version (at the time of writing this, `3.4.1`) [here](https://cran.r-project.org/bin/macosx/R-3.4.1.pkg).
 3. Install `R`. In Windows, be sure to select the `'Startup options'` and then choose `'SDI'` in the `'Display Mode'` options. Leave the rest of installation options as default.
 4. Download the latest version of `RStudio` for your system at <https://www.rstudio.com/products/rstudio/download/#download> and install it.
 
@@ -18,7 +18,7 @@ If there is any Linux user, kindly follow the corresponding instructions [here](
 1. The code is written in scripts in the *source panel* (upper-right panel in Figure \@ref(fig:rstudio));
 2. for running a line or code selection from the script in the *console* (first tab in the lower-right panel in Figure \@ref(fig:rstudio)), you do it with the keyboard shortcut `'Ctrl+Enter'` (Windows and Linux) or `'Cmd+Enter'` (Mac OS X).
 
-```{r, rstudio, echo = FALSE, out.width = '70%', fig.cap = 'Main window of `RStudio`. The red showws the code panel and the yellow shows the console output. Extracted from [here](https://www.rstudio.com/wp-content/uploads/2016/01/rstudio-IDE-cheatsheet.pdf).', cache = TRUE}
+```{r, rstudio, echo = FALSE, fig.pos = 'h!', out.width = '70%', fig.cap = 'Main window of `RStudio`. The red shows the code panel and the yellow shows the console output. Extracted from [here](https://www.rstudio.com/wp-content/uploads/2016/01/rstudio-IDE-cheatsheet.pdf).', cache = TRUE}
 knitr::include_graphics("images/images/RStudio.png")
 ```
 
@@ -108,8 +108,8 @@ X
 Do the following:
 
 - Store $-123$ in the variable `y`.
-- Store the log of the square of `y` in `z`. 
-- Store $\frac{y-z}{y+z^2}$ in `y` and remove `z`. 
+- Store the log of the square of `y` in `z`.
+- Store $\frac{y-z}{y+z^2}$ in `y` and remove `z`.
 - Output the value of `y`. *Answer*: `4.366734`.
 
 ```
@@ -277,7 +277,7 @@ myDf
 names(myDf) <- c("newname1", "newname2")
 myDf
 
-# The nice thing is that you can access variables by its name with 
+# The nice thing is that you can access variables by its name with
 # the "$" operator
 myDf$newname1
 
@@ -660,7 +660,7 @@ add(1, 1) # Arguments names can be omitted
 # Saves us a few keystrokes when computing a lm and a summary
 lmSummary <- function(formula, data) {
   model <- lm(formula = formula, data = data)
-  summary(model) 
+  summary(model)
 }
 # If no return(), the function returns the value of the last expression
 
@@ -692,7 +692,7 @@ sapply(1:10, myFun) # Returns a 2 x 10 matrix
 sumSeries <- function(n) sum(1:n)
 plot(1:10, sapply(1:10, sumSeries), type = "l")
 
-# "apply" applies iteratively a function to rows (1) or columns (2) 
+# "apply" applies iteratively a function to rows (1) or columns (2)
 # of a matrix or data frame
 A <- matrix(1:10, nrow = 5, ncol = 2)
 A
@@ -772,6 +772,6 @@ Do the following:
 
 - Compute $\mathbf{C}_{n\times k}$ in $\mathbf{C}_{n\times k}=\mathbf{A}_{n\times m} \mathbf{B}_{m\times k}$ from $\mathbf{A}$ and $\mathbf{B}$. Use that $c_{i,j}=\sum_{l=1}^ma_{i,l}b_{l,j}$. Test the implementation with simple examples.
 - Create a function that samples a $\mathcal{N}(0,1)$ and returns the first sampled point that is larger than $4$.
-- Create a function that simulates $N$ samples from the distribution of $\max(X_1,\ldots,X_n)$ where $X_1,\ldots,X_n$ are iid $\mathcal{U}(0,1)$. 
+- Create a function that simulates $N$ samples from the distribution of $\max(X_1,\ldots,X_n)$ where $X_1,\ldots,X_n$ are iid $\mathcal{U}(0,1)$.
 
 ```
