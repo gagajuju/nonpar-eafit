@@ -103,7 +103,7 @@ $\hat{\boldsymbol{\beta}}$ can be obtained differentiating \@ref(eq:rss). Prove 
 
 (ref:leastsquares2title) The least squares regression plane $y=\hat\beta_0+\hat\beta_1x_1+\hat\beta_2x_2$ and its dependence on the kind of squared distance considered. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/least-squares-3D/).
 
-```{r, leastsquares2, echo = FALSE, fig.cap = '(ref:leastsquares2title)', screenshot.alt = "images/screenshots/least-squares-3D.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
+```{r, leastsquares2, echo = FALSE, fig.cap = '(ref:leastsquares2title)', screenshot.alt = "images/screenshots/least-squares-3D.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '100%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/least-squares-3D/', height = '700px')
 ```
 
@@ -315,7 +315,7 @@ Figure \@ref(fig:maximumlikelihood) shows how the log-likelihood changes with re
 
 (ref:maximumlikelihoodtitle) The logistic regression fit and its dependence on $\beta_0$ (horizontal displacement) and $\beta_1$ (steepness of the curve). Recall the effect of the sign of $\beta_1$ in the curve: if positive, the logistic curve has an 's' form; if negative, the form is a reflected 's'. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/log-maximum-likelihood/).
 
-```{r, maximumlikelihood, echo = FALSE, fig.cap = '(ref:maximumlikelihoodtitle)', screenshot.alt = "images/screenshots/log-maximum-likelihood.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
+```{r, maximumlikelihood, echo = FALSE, fig.cap = '(ref:maximumlikelihoodtitle)', screenshot.alt = "images/screenshots/log-maximum-likelihood.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '100%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/log-maximum-likelihood/', height = '900px')
 ```
 
@@ -536,7 +536,7 @@ Figure \@ref(fig:kreg) illustrates the construction of the local polynomial esti
 
 (ref:kregtitle) Construction of the local polynomial estimator. The animation shows how local polynomial fits in a neighborhood of $x$ are combined to provide an estimate of the regression function, which depends on the polynomial degree, bandwidth, and kernel (gray density at the bottom). The data points are shaded according to their weights for the local fit at $x$. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kreg/).
 
-```{r, kreg, echo = FALSE, fig.cap = '(ref:kregtitle)', screenshot.alt = "images/screenshots/kreg.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
+```{r, kreg, echo = FALSE, fig.cap = '(ref:kregtitle)', screenshot.alt = "images/screenshots/kreg.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '100%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kreg/', height = '1000px')
 ```
 
@@ -770,8 +770,8 @@ The parameter $\theta(x_1,\ldots,x_p)$ of the conditional distribution in the la
 
 (ref:locliktitle) Construction of the local likelihood estimator. The animation shows how local likelihood fits in a neighborhood of $x$ are combined to provide an estimate of the regression function for binary response, which depends on the polynomial degree, bandwidth, and kernel (gray density at the bottom). The data points are shaded according to their weights for the local fit at $x$. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/loclik/).
 
-```{r, loclik, echo = FALSE, fig.cap = '(ref:locliktitle)', screenshot.alt = "images/screenshots/loclik.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
-knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/loclik/', height = '1000px')
+```{r, loclik, echo = FALSE, fig.cap = '(ref:locliktitle)', screenshot.alt = "images/screenshots/loclik.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '100%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/loclik/', height = '900px')
 ```
 
 We illustrate the local likelihood principle for the logistic regression, the simplest non-linear model. In this case, $(X_1,Y_1),\ldots,(X_n,Y_n)$ with

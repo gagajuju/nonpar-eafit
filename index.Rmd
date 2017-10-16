@@ -499,7 +499,7 @@ What does it happen when the data is generated from an $\mathrm{Exp}(\lambda)$? 
 
 (ref:msetitle) A simplified example of parametric and nonparametric estimation. The objective is to estimate the distribution function $F$ of a random variable. The data is generated from a $\Gamma(\lambda,p)$. The parametric method assumes that $p=1$, that is, that the data comes from a $\mathrm{Exp}(\lambda)$. The nonparametric method does not assume anything on the data generation process. The left plot shows the true distribution function and ten estimates of each method from samples of size $n$. The right plot shows the MSE of each method on estimationg $F(x)$. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/dist-mse/).
 
-```{r, mse, echo = FALSE, fig.cap = '(ref:msetitle)', screenshot.alt = "images/screenshots/dist-mse.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
+```{r, mse, echo = FALSE, fig.cap = '(ref:msetitle)', screenshot.alt = "images/screenshots/dist-mse.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '100%'}
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/dist-mse/', height = '650px')
 ```
 
