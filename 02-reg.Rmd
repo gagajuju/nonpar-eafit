@@ -194,7 +194,7 @@ A good one-line summary of the linear model is the following (independence is as
 \begin{align}
 Y|(X_1=x_1,\ldots,X_p=x_p)\sim \mathcal{N}(\beta_0+\beta_1x_1+\ldots+\beta_px_p,\sigma^2).(\#eq:linsum)
 \end{align}
-Inference on the parameters $\boldsymbol\beta$ and $\sigma$ can be done, conditionally^[We assume that the randomness is on the response only.] on $X_1,\ldots,X_n$, from \@ref(eq:linsum). We do not explore this further, referring the interested reader to [these notes](https://bookdown.org/egarpor/SSS2-UC3M/multlin-inference.html). Instead of that, we remark the connection bethween least squares estimation and the maximum likelihood estimator derived from \@ref(eq:linsum).
+Inference on the parameters $\boldsymbol\beta$ and $\sigma$ can be done, conditionally^[We assume that the randomness is on the response only.] on $X_1,\ldots,X_n$, from \@ref(eq:linsum). We do not explore this further, referring the interested reader to [these notes](https://bookdown.org/egarpor/SSS2-UC3M/multlin-inference.html). Instead of that, we remark the connection between least squares estimation and the maximum likelihood estimator derived from \@ref(eq:linsum).
 
 First, note that \@ref(eq:linsum) is the *population version* of the linear model (it is expressed in terms of the random variables, not in terms of their samples). The *sample version* that summarizes assumptions i--iv is
 $$
@@ -206,7 +206,7 @@ Using this result, it is easy obtain the log-likelihood function of $Y_1,\ldots,
 \end{align}
 Finally, the next result justifies the consideration of the least squares estimate: it equals the maximum likelihood estimator derived under assumptions i--iv.
 
-```{theorem}
+```{theorem, label = "lik"}
 Under assumptions i--iv, the maximum likelihood estimate of $\boldsymbol{\beta}$ is the least squares estimate \@ref(eq:ls):
 $$
 \hat{\boldsymbol{\beta}}_\mathrm{ML}=\arg\max_{\boldsymbol{\beta}\in\mathbb{R}^{p+1}}\ell(\boldsymbol{\beta})=(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}\mathbf{Y}.
@@ -305,10 +305,10 @@ Y|(X_1=x_1,\ldots,X_p=x_p)&\sim\mathrm{Ber}\left(\mathrm{logistic}(\beta_0+\beta
 \end{align*}
 
 Since $Y_i\sim \mathrm{Ber}(p(\mathbf{X}_i))$, $i=1,\ldots,n$, the log-likelihood of $\boldsymbol{\beta}$ is
-\begin{align*}
-\ell(\boldsymbol{\beta})=&\,\sum_{i=1}^n\log\left(p(\mathbf{X}_i)^{Y_i}(1-p(\mathbf{X}_i))^{1-Y_i}\right)\\
-=&\,\sum_{i=1}^n\left\{Y_i\log(p(\mathbf{X}_i))+(1-Y_i)\log(1-p(\mathbf{X}_i))\right\}.
-\end{align*}
+\begin{align}
+\ell(\boldsymbol{\beta})=&\,\sum_{i=1}^n\log\left(p(\mathbf{X}_i)^{Y_i}(1-p(\mathbf{X}_i))^{1-Y_i}\right)\nonumber\\
+=&\,\sum_{i=1}^n\left\{Y_i\log(p(\mathbf{X}_i))+(1-Y_i)\log(1-p(\mathbf{X}_i))\right\}.(\#eq:lllogist)
+\end{align}
 Unfortunately, due to the non-linearity of the optimization problem there are no explicit expressions for $\hat{\boldsymbol{\beta}}$. These have to be obtained numerically by means of an iterative procedure, which may run into problems in low sample situations with perfect classification. Unlike in the linear model, inference is not exact from the assumptions, but approximate in terms of maximum likelihood theory. We do not explore this further and refer the interested reader to [these notes](https://bookdown.org/egarpor/SSS2-UC3M/logreg-inference.html).
 
 Figure \@ref(fig:maximumlikelihood) shows how the log-likelihood changes with respect to the values for $(\beta_0,\beta_1)$ in three data patterns.
@@ -393,7 +393,7 @@ This yields the so-called **Nadaraya-Watson**^[Termed due to the coetaneous prop
 \begin{align}
 \hat m(x;0,h):=\frac{1}{n}\sum_{i=1}^n\frac{K_h(x-X_i)}{\frac{1}{n}\sum_{i=1}^nK_h(x-X_i)}Y_i=\sum_{i=1}^nW^0_{i}(x)Y_i, (\#eq:nw)
 \end{align}
-where $W^0_{i}(x):=\frac{K_h(x-X_i)}{\sum_{i=1}^nK_h(x-X_i)}$. This estimate can be seen as a weighted average of $Y_1,\ldots,Y_n$ by means of the set of weights $\{W_{n,i}(x)\}_{i=1}^n$ (check that they add to one). The set of weights depends on the evaluation point $x$. That means that the Nadaraya-Watson estimator is a **local mean of $Y_1,\ldots,Y_n$ around $X=x$**.
+where $W^0_{i}(x):=\frac{K_h(x-X_i)}{\sum_{i=1}^nK_h(x-X_i)}$. This estimate can be seen as a weighted average of $Y_1,\ldots,Y_n$ by means of the set of weights $\{W_{n,i}(x)\}_{i=1}^n$ (check that they add to one). The set of weights depends on the evaluation point $x$. That means that the Nadaraya-Watson estimator is a **local mean of $Y_1,\ldots,Y_n$ around $X=x$** (see Figure \@ref(fig:kreg)).
 
 Let's implement the Nadaraya-Watson estimate to get a feeling of how it works in practice.
 
@@ -441,7 +441,9 @@ legend("topright", legend = c("True regression", "Nadaraya-Watson"),
 ```
 
 ```{exercise}
-Implement your own version of the Nadaraya-Watson estimator in `R` and compare it with `mNW`. You may focus only on the normal kernel. Are you able to improve the speed of `mNW`? Use `system.time` to measure the running times for a sample size of $n=10000$.
+Implement your own version of the Nadaraya-Watson estimator in `R` and compare it with `mNW`. You may focus only on the normal kernel and reduce the accuracy of the final computation up to `1e-7` to achieve better efficiency. Are you able to improve the speed of `mNW`? Use `system.time` or the `microbenchmark` package to measure the running times for a sample size of $n=10000$.
+
+**Winner-takes-all bonus**: the significative fastest version of the Nadaraya-Watson estimator (under the above conditions) will get a bonus of 0.5 points.
 ```
 
 The code below illustrates the effect of varying $h$ for the Nadaraya-Watson estimator using `manipulate`.
@@ -530,6 +532,14 @@ W_i^1(x)=\frac{\hat s_2(x;h)-\hat s_1(x;h)(X_i-x)}{\hat s_2(x;h)\hat s_0(x;h)-\h
 \end{align}
 where $\hat s_r(x;h):=\frac{1}{n}\sum_{i=1}^n(X_i-x)^rK_h(x-X_i)$.
 
+Figure \@ref(fig:kreg) illustrates the construction of the local polynomial estimator (up to cubic degree) and shows how $\hat\beta_0=\hat m(x;p,h)$, the intercept of the local fit, estimates $m$ at $x$.
+
+(ref:kregtitle) Construction of the local polynomial estimator. The animation shows how local polynomial fits in a neighborhood of $x$ are combined to provide an estimate of the regression function, which depends on the polynomial degree, bandwidth, and kernel (gray density at the bottom). The data points are shaded according to their weights for the local fit at $x$. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kreg/).
+
+```{r, kreg, echo = FALSE, fig.cap = '(ref:kregtitle)', screenshot.alt = "images/screenshots/kreg.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kreg/', height = '1000px')
+```
+
 `KernSmooth`'s `locpoly` implements the local polynomial estimator. Below are some examples of its usage.
 
 ```{r, echo = TRUE, collapse = TRUE, cache = TRUE}
@@ -581,19 +591,19 @@ p = slider(min = 0, max = 4, initial = 0, step = 1))
 
 ## Asymptotic properties {#reg-asymp}
 
-The purpose of this section is to provide some key asymptotic results for the bias, variance and asymptotic normality of the local linear and local constant estimators. These provide useful insights on the effect of $p$, $m$, $f$ and $\sigma^2$ in the performance of the estimators. Proofs and detailed analysis are skipped; we refer the interested reader to @Ruppert1994, Section 5.3 @Wand1995, and Section 3.2 @Fan1996.
+The purpose of this section is to provide some key asymptotic results for the bias, variance, and asymptotic normality of the local linear and local constant estimators. These provide useful insights on the effect of $p$, $m$, $f$, and $\sigma^2$ in the performance of the estimators. Proofs and detailed analysis are skipped; we refer the interested reader to @Ruppert1994, Section 5.3 of @Wand1995, and Section 3.2 of @Fan1996.
 
 Along this section we will make the following assumptions:
 
 - **A1**. $m$ is twice continuously differentiable.
 - **A2**. $\sigma^2$ is continuous and positive.
 - **A3**. $f$ is continuously differentiable and positive.
-- **A4**. The kernel $K$ is a symmetric and bounded pdf with finite second moment and square integrable.
+- **A4**. The kernel $K$ is a symmetric and bounded pdf with finite second moment and is square integrable.
 - **A5**. $h=h_n$ is a deterministic sequence of bandwidths such that, when $n\to\infty$, $h\to0$ and $nh\to\infty$.
 
 The bias and variance are expanded in their *conditional* versions on the predictor's sample $X_1,\ldots,X_n$. The reason of analyzing the conditional instead of the *unconditional* versions is avoiding technical difficulties that integration with respect to the predictor's density may pose.
 
-```{theorem}
+```{theorem, label = "biasvarloc"}
 Under **A1**--**A5**, the conditional bias and variance of the local constant ($p=0$) and local linear ($p=1$) estimators are
 \begin{align}
 \mathrm{Bias}[\hat m(x;p,h)\vert X_1,\ldots,X_n]&=B_p(x)h^2+o_\mathbb{P}(h^2),(\#eq:mbias)\\
@@ -617,6 +627,8 @@ The bias and variance expressions \@ref(eq:mbias) and \@ref(eq:mvar) yield inter
 
 - The variance depends directly on $\frac{\sigma^2(x)}{f(x)}$ for $p=0,1$. As a consequence, **the lower the density and larger the conditional variance, the more variable is $\hat m(\cdot;p,h)$.** The variance decreases at a factor of $(nh)^{-1}$ due to the effective sample size.
 
+An extended version of Theorem \@ref(thm:biasvarloc), given in Theorem 3.1 of @Fan1996, shows that **odd order polynomial fits are preferable to even order polynomial fits**. The reason is that odd orders introduce an extra coefficient for the polynomial fit that allows to reduce the bias, while at the same time they keep the variance unchanged. In summary, the conclusions of the above analysis of $p=0$ vs. $p=1$, namely that $p=1$ has smaller bias than $p=0$ (but of the same order) and the same variance as $p=0$, extend to the case $p=2\nu$ vs. $p=2\nu+1$, $\nu\in\mathbb{N}$. This allows to claim that local polynomial fitting *is an odd world* (@Fan1996).
+
 Finally, we have the asymptotic pointwise normality of the estimator.
 
 ```{theorem}
@@ -633,9 +645,9 @@ Assume that $\mathbb{E}[(Y-m(x))^{2+\delta}\vert X=x]<\infty$ for some $\delta>0
 Bandwidth selection is, as in kernel density estimation, of key practical importance. Several bandwidth selectors, in the spirit of the plug-in and cross-validation ideas discussed in Section \@ref(dens-bwd) have been proposed. There are, for example, a rule-of-thumb analogue (see Section 4.2 in @Fan1996) and a direct plug-in analogue (see Section 5.8 in @Wand1995). For simplicity, we will focus only on the **cross-validation** bandwidth selector.
 
 Following an analogy with the fit of the linear model, we could look for the bandwidth $h$ such that it minimizes the RSS of the form
-\begin{align*}
+\begin{align}
 \frac{1}{n}\sum_{i=1}^n(Y_i-\hat m(X_i;p,h))^2.(\#eq:badcv)
-\end{align*}
+\end{align}
 However, this is a bad idea. Attempting to minimize \@ref(eq:badcv) always leads to $h\approx 0$ that results in a useless interpolation of the data. Let's see an example.
 
 ```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
@@ -713,25 +725,201 @@ legend("topright", legend = c("True regression", "Nadaraya-Watson"),
        lwd = 2, col = 1:2)
 ```
 
-```{exercise}
-Compare if TODO
-```
-
-<!--
-## Confidence intervals {#reg-ci}
-
-Add credits
-
-Variance estimation.
-Asymptotic infeasible.
-Wild bootstrap.
--->
-
 ## Local likelihood {#reg-loclik}
 
-Add credits. Binary (Wasserman). Cross-validation.
+We explore in this section an extension of the local polynomial estimator. This extension aims to estimate the regression function by relying in the likelihood, rather than the least squares. Thus, the idea behind the local likelihood is to **fit, locally, parametric models by maximum likelihood**.
 
-$\ell(f)$
+We begin by seeing that local likelihood using the the linear model is equivalent to local polynomial modelling. Theorem \@ref(thm:lik) showed that, under the assumptions given in Section \@ref(reg-lin), the maximum likelihood estimate of $\boldsymbol{\beta}$ in the linear model
+\begin{align}
+Y|(X_1,\ldots,X_p)\sim\mathcal{N}(\beta_0+\beta_1X_1+\ldots+\beta_pX_p,\sigma^2)(\#eq:linmod)
+\end{align}
+was equivalent to the least squares estimate, $\hat{\boldsymbol{\beta}}_\mathrm{ML}=(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}\mathbf{Y}$. The reason was the form of the conditional (on $X_1,\ldots,X_p$) likelihood:
+\begin{align*}
+\ell(\boldsymbol{\beta})=&\,-\frac{n}{2}\log(2\pi\sigma^2)\nonumber\\
+&-\frac{1}{2\sigma^2}\sum_{i=1}^n(Y_i-\beta_0-\beta_1X_{i1}-\ldots-\beta_pX_{ip})^2.
+\end{align*}
+If there is a single predictor $X$, polynomial fitting of order $p$ of the conditional meal can be achieved by the well-known trick of identifying the $j$-th predictor $X_j$ in \@ref(eq:linmod) by $X^j$. This results in
+\begin{align}
+Y|X\sim\mathcal{N}(\beta_0+\beta_1X+\ldots+\beta_pX^p,\sigma^2).(\#eq:linmodp)
+\end{align}
+Therefore, maximizing with respect to $\boldsymbol{\beta}$ the *weighted log-likelihood of the linear model around $x$* of \@ref(eq:linmodp),
+\begin{align*}
+\ell_{x,h}(\boldsymbol{\beta})=&\,-\frac{n}{2}\log(2\pi\sigma^2)\\
+&-\frac{1}{2\sigma^2}\sum_{i=1}^n(Y_i-\beta_0-\beta_1X_i-\ldots-\beta_pX_i^p)^2K_h(x-X_i),
+\end{align*}
+provides $\hat\beta_0=\hat m(x;p,h)$, the local polynomial estimator, as it was obtained in \@ref(eq:hatb).
+
+The same idea can be applied for other parametric models. The family of *generalized linear models*^[The logistic model is a generalized linear model, as seen in Section \@ref(reg-log)], which presents an extension of the linear model to different kinds of response variables, provides a particularly convenient parametric framework. Generalized linear models are constructed by mapping the support of $Y$ to $\mathbb{R}$ by a link function $g$, and then modeling the *transformed* expectation by a linear model. Thus, a generalized linear model for the predictors $X_1,\ldots,X_p$, assumes
+\begin{align*}
+g\left(\mathbb{E}[Y|X_1=x_1,\ldots,X_p=x_p]\right)&=\beta_0+\beta_1x_1+\ldots+\beta_px_p
+\end{align*}
+or, equivalently,
+\begin{align*}
+\mathbb{E}[Y|X_1=x_1,\ldots,X_p=x_p]&=g^{-1}\left(\beta_0+\beta_1x_1+\ldots+\beta_px_p\right)
+\end{align*}
+together with a distribution assumption for $Y|(X_1,\ldots,X_p)$. The following table lists some useful transformations and distributions that are adequate to model responses in different supports. Recall that the linear and logistic models of Sections \@ref(reg-lin) and \@ref(reg-log) are obtained from the first and second rows, respectively.
+
+| Support of $Y$ | Distribution | Link $g(x)$ | $g^{-1}(y)$ | $Y\vert(X_1=x_1,\ldots,X_p=x_p)$ |
+|:--------------:|:------------:|:-----------:|:-----------:|:-----------------------------:|
+| $\mathbb{R}$ | $\mathcal{N}(\mu,\sigma^2)$ | $x$ | $y$ | $\mathcal{N}(\beta_0+\beta_1x_1+\ldots+\beta_px_p,\sigma^2)$|
+| $(0,\infty)$ | $\mathrm{Exp}(\lambda)$ | $x^{-1}$ | $y^{-1}$ | $\mathrm{Exp}(\beta_0+\beta_1x_1+\ldots+\beta_px_p)$ |
+| $0,1,\ldots,n$ | $\mathrm{B}(n,p)$ | $\log\left(\frac{x}{n-x}\right)$ | $\frac{n}{1-e^{-y}}$ | $\mathrm{B}\left(n,\frac{n}{1-e^{-(\beta_0+\beta_1x_1+\ldots+\beta_px_p)}}\right)$ |
+| $0,1,2,\ldots$ | $\mathrm{Pois}(\lambda)$ | $\log(x)$ | $e^y$ | $\mathrm{Pois}(e^{\beta_0+\beta_1x_1+\ldots+\beta_px_p})$ |
+
+The parameter $\theta(x_1,\ldots,x_p)$ of the conditional distribution in the last column can be retrieved with $\theta(x_1,\ldots,x_p)=g(\mathbb{E}[Y|X_1=x_1,\ldots,X_p=x_p])$. Recall that, again, if there is only one predictor, identifying the $j$-th predictor $X_j$ by $X^j$ in the above expressions allows to consider $p$-th order polynomial fits for $g\left(\mathbb{E}[Y|X_1=x_1,\ldots,X_p=x_p]\right)$.
+
+(ref:locliktitle) Construction of the local likelihood estimator. The animation shows how local likelihood fits in a neighborhood of $x$ are combined to provide an estimate of the regression function for binary response, which depends on the polynomial degree, bandwidth, and kernel (gray density at the bottom). The data points are shaded according to their weights for the local fit at $x$. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/loclik/).
+
+```{r, loclik, echo = FALSE, fig.cap = '(ref:locliktitle)', screenshot.alt = "images/screenshots/loclik.png", dev = 'png', cache = TRUE, fig.pos = 'h!', out.width = '70%'}
+knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/loclik/', height = '1000px')
+```
+
+We illustrate the local likelihood principle for the logistic regression, the simplest non-linear model. In this case, $(X_1,Y_1),\ldots,(X_n,Y_n)$ with
+$$
+Y_i|X_i\sim \mathrm{Ber}(p(X_i)),\quad i=1,\ldots,n.
+$$
+for $p(x)=\mathbb{P}[Y=1|X=x]=\mathbb{E}[Y|X=x]$. The link function is
+$g(x)=\mathrm{logit}(x)=\log\left(\frac{x}{1-x}\right)$ and $\theta(x)=\mathrm{logit}(p(x))$. Assuming that $\theta(x)=\beta_0+\beta_1x+\ldots+\beta_px^p$^[If $p=1$, then we have the usual logistic model.], we have that the log-likelihood of $\boldsymbol{\beta}$ is
+\begin{align*}
+\ell(\boldsymbol{\beta})
+=&\,\sum_{i=1}^n\left\{Y_i\log(\mathrm{logistic}(\theta(X_i)))+(1-Y_i)\log(1-\mathrm{logistic}(\theta(X_i)))\right\}\nonumber\\
+=&\,\sum_{i=1}^n\ell(Y_i,\theta(X_i)),
+\end{align*}
+where we consider the *log-likelihood addend*
+\[
+\ell(y,\theta)=y\theta-\log(1+e^\theta)
+\]
+and make explicit the dependence on $\theta(x)$ for clarity in the next developments, and implicit the dependence on $\boldsymbol{\beta}$. The *local log-likelihood of $\boldsymbol{\beta}$ around $x$* is then
+\begin{align}
+\ell_{x,h}(\boldsymbol{\beta})
+=\sum_{i=1}^n\ell(Y_i,\theta(X_i-x))K_h(x-X_i).(\#eq:logploclik)
+\end{align}
+Maximizing^[No analytical solution for the optimization problem, numerical optimization is needed.] the local log-likelihood \@ref(eq:logploclik) with respect to $\boldsymbol{\beta}$ provides
+$$
+\hat{\boldsymbol{\beta}}=\arg\max_{\boldsymbol{\beta}\in\mathbb{R}^{p+1}}\ell_{x,h}(\boldsymbol{\beta}).
+$$
+The local likelihood estimate of $\theta(x)$ is
+\[
+\hat\theta(x):=\hat\beta_0.
+\]
+Note that the dependence of $\hat\beta_0$ on $x$ and $h$ is omitted. From $\hat\theta(x)$, we can obtain the *local logistic regression* evaluated at $x$ as
+\begin{align}
+\hat m_{\ell}(x;h,p):=&\,g^{-1}\left(\hat\theta(x)\right)\\
+=&\,\mathrm{logistic}(\hat\beta_0).(\#eq:glmloc)
+\end{align}
+
+The code below shows three different ways of implementing the local logistic regression (of first degree) in `R`.
+
+```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
+# Simulate some data
+n <- 200
+logistic <- function(x) 1 / (1 + exp(-x))
+p <- function(x) logistic(1 - 3 * sin(x))
+set.seed(123456)
+X <- runif(n = n, -3, 3)
+Y <- rbinom(n = n, size = 1, prob = p(X))
+
+# Set bandwidth and evaluation grid
+h <- 0.25
+x <- seq(-3, 3, l = 501)
+
+# Optimize the weighted log-likelihood through glm's built in procedure
+suppressWarnings(
+  fitGlm <- sapply(x, function(x) {
+    K <- dnorm(x = x, mean = X, sd = h)
+    glm.fit(x = cbind(1, X - x), y = Y, weights = K,
+            family = binomial())$coefficients[1]
+  })
+)
+
+# Optimize the weighted log-likelihood explicitly
+suppressWarnings(
+  fitNlm <- sapply(x, function(x) {
+    K <- dnorm(x = x, mean = X, sd = h)
+    nlm(f = function(beta) {
+      -sum(K * (Y * (beta[1] + beta[2] * (X - x)) -
+                  log(1 + exp(beta[1] + beta[2] * (X - x)))))
+      }, p = c(0, 0))$estimate[1]
+  })
+)
+
+# Using locfit
+# Bandwidth can not be controlled explicitly - only though nn in ?lp
+library(locfit)
+fitLocfit <- locfit(Y ~ lp(X, deg = 1, nn = 0.25), family = "binomial",
+                    kern = "gauss")
+
+# Compare fits
+plot(x, p(x), ylim = c(0, 1.5), type = "l", lwd = 2)
+lines(x, logistic(fitGlm), col = 2)
+lines(x,logistic(fitNlm), col = 2, lty = 2)
+plot(fitLocfit, add = TRUE, col = 4)
+legend("topright", legend = c("p(x)", "glm", "nlm", "locfit"), lwd = 2,
+       col = c(1, 2, 2, 4), lty = c(1, 2, 1, 1))
+```
+
+Bandwidth selection can be done by means of *likelihood cross-validation*. The objective is to maximize the local likelihood fit at $(Y_i,X_i)$ but removing the influence by the datum itself. That is, maximizing
+\begin{align}
+\mathrm{LCV}(h)=\sum_{i=1}^n\ell(Y_i,\hat\theta_{-i}(X_i)),(\#eq:cvloclik)
+\end{align}
+where $\hat\theta_{-i}(X_i)$ represents the local fit at $X_i$ without the $i$-th datum $(X_i,Y_i)$. Unfortunately, the nonlinearity of \@ref(eq:glmloc) forbids a simplifying result as Proposition \@ref(prp:cv). Thus, in principle, it is required to fit $n$ local likelihoods for sample size $n-1$ for obtaining a single evaluation of \@ref(eq:cvloclik).
+
+There is, however, an approximation (see Sections 4.3.3 and 4.4.3 of @Loader1999) to \@ref(eq:cvloclik) that only requires a local likelihood fit for a single sample. We sketch its basis as follows, without aiming to go in full detail. The approximation considers the first and second derivatives of $\ell(y,\theta)$ with respect to $\theta$, $\dot{\ell}(y,\theta)$ and $\ddot{\ell}(y,\theta)$. In the case of the logistic model, these are:
+\begin{align*}
+\dot{\ell}(y,\theta)&=y-\mathrm{logistic}(\theta),\\
+\ddot{\ell}(y,\theta)&=-\mathrm{logistic}(\theta)(1 - \mathrm{logistic}(\theta)).
+\end{align*}
+It can be seen that (Exercise 4.6 in @Loader1999)
+\begin{align}
+\hat\theta_{-i}(X_i)\approx\hat\theta(X_i)-\mathrm{infl}(X_i)\left(\dot{l}(Y_i,\hat\theta(X_i))\right)^2,(\#eq:thetai)
+\end{align}
+where $\hat\theta(X_i)$ represents the local fit at $X_i$ and the *influence function* is defined as (page 75 of @Loader1999)
+\[
+\mathrm{infl}(x):=\mathbf{e}_1'(\mathbf{X}_x'\mathbf{W}_x\mathbf{V}\mathbf{X}_x)^{-1}\mathbf{e}_1K(0)
+\]
+for the matrices
+\begin{align*}
+\mathbf{X}_x:=\begin{pmatrix}
+1 & X_1-x & \cdots & (X_1-x)^p/p!\\
+\vdots & \vdots & \ddots & \vdots\\
+1 & X_n-x & \cdots & (X_n-x)^p/p!\\
+\end{pmatrix}_{n\times(p+1)}
+\end{align*}
+and
+\begin{align*}
+\mathbf{W}_x&:=\mathrm{diag}(K_h(X_1-x),\ldots, K_h(X_n-x)),\\
+\mathbf{V}&:=-\mathrm{diag}(\ddot{l}(Y_1,\theta(X_1)),\ldots, \ddot{l}(Y_n,\theta(X_n))).
+\end{align*}
+A one-term Taylor expansion of $\ell(Y_i,\hat\theta_{-i}(X_i))$ using \@ref(eq:thetai) gives
+\[
+\ell(Y_i,\hat\theta_{-i}(X_i))=\ell(Y_i,\hat\theta(X_i))-\mathrm{infl}(X_i)\left(\dot{\ell}(Y_i,\theta(X_i))\right)^2.
+\]
+Therefore:
+\begin{align*}
+\mathrm{LCV}(h)&=\sum_{i=1}^n\ell(Y_i,\hat\theta_{-i}(X_i))\\
+&\approx\sum_{i=1}^n\ell(Y_i,\hat\theta(X_i))+\mathrm{infl}(X_i)\left(\dot{\ell}(Y_i,\hat\theta(X_i))\right)^2.
+\end{align*}
+Recall that $\theta(X_i)$ are unknown and hence they must be estimated.
+
+We conclude by illustrating how to compute the LCV function and optimize it (keep in mind that much more efficient implementations are possible!).
+
+```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
+# Exact LCV - recall that we *maximize* the LCV!
+h <- seq(0.1, 2, by = 0.1)
+suppressWarnings(
+  LCV <- sapply(h, function(h) {
+  sum(sapply(1:n, function(i) {
+    K <- dnorm(x = X[i], mean = X[-i], sd = h)
+    nlm(f = function(beta) {
+      -sum(K * (Y[-i] * (beta[1] + beta[2] * (X[-i] - X[i])) -
+                  log(1 + exp(beta[1] + beta[2] * (X[-i] - X[i])))))
+      }, p = c(0, 0))$minimum
+    }))
+  })
+)
+plot(h, LCV, type = "o")
+abline(v = h[which.max(LCV)], col = 2)
+```
 
 ## Exercises {#reg-exercises}
 
@@ -742,12 +930,12 @@ This is the list of evaluable exercises for Chapter \@ref(reg). The number of st
 ```
 
 ```{exercise}
-(theoretical, $\star\star$) TODO local lik
+(theoretical, $\star\star$) Obtain the optimization problem for the local Poisson regression (for the first degree) and the local binomial regression (of first degree also).
 ```
 
-```{exercise}
-(theoretical, $\star\star$) TODO
-```
+<!-- 
+Provide the corresponding approximate expression for the cross-validation given in \@ref(eq:approxcv)
+-->
 
 ```{exercise}
 (theoretical, $\star\star$) Show that the Nadaraya-Watson is unbiased (in conditional expectation with respect to $X_1,\ldots,X_n$) when the regression function is constant: $m(x)=c$, $c\in\mathbb{R}$. Show the same for the local linear estimator for a linear regression function $m(x)=a+bx$, $a,b\in\mathbb{R}$. *Hint*: use \@ref(eq:we).
@@ -762,25 +950,29 @@ This is the list of evaluable exercises for Chapter \@ref(reg). The number of st
 ```
 
 ```{exercise}
-(practical, $\star$) TODO compare expressions CV
+(practical, $\star\star$, Example 4.6 in @Wasserman2006)
+The dataset at <http://www.stat.cmu.edu/~larry/all-of-nonpar/=data/bpd.dat> (alternative [link](https://github.com/egarpor/nonpar-eafit/blob/master/datasets/bdp.txt?raw=true)) contains information about the presence of bronchopulmonary dysplasia (binary response) and the birth weight in grams (predictor) of 223 babies. Use the function `locfit` of the `locfit` library  with the argument `family = "binomial"` and plot its output. Explore and comment on the resulting estimates, providing insights about the data.
 ```
 
 ```{exercise}
-(practical, $\star$) TODO
+(practical, $\star\star$)
+The `ChickWeight` dataset in `R` contains 578 observations of `weight` and `Times` of chicks. Fit a local binomial or local Poisson regression of `weight` on `Times`. Use the function `locfit` of the `locfit` library  with the argument `family = "binomial"` or `family = "poisson"` and explore the bandwidth effect. Explore and comment on the resulting estimates. What is the estimated expected time of a chick that weights 200 grams? 
 ```
 
 ```{exercise}
-(practical, $\star\star$) TODO
+(practical, $\star\star\star$) Implement your own version of the local linear estimator. The function must take a sample `X`, a sample `Y`, the points `x` at which the estimate should be obtained, the bandwidth `h` and the kernel `K`. Test its correct behavior by estimating an artificial dataset that follows a linear model.
 ```
 
 ```{exercise}
-(practical, $\star\star$) TODO
+(practical, $\star\star\star$) Implement your own version of the local likelihood estimator of first degree for exponential response. The function must take a sample `X`, a sample `Y`, the points `x` at which the estimate should be obtained, the bandwidth `h` and the kernel `K`. Test its correct behavior by estimating an artificial dataset that follows a generalized linear model with exponential response, this is,
+\[
+Y|X=x \sim \mathrm{Exp}(\lambda(x)),\quad \lambda(x)=e^{\beta_0+\beta_1x},
+\]
+using a cross-validated bandwidth. *Hint*: use `optim` or `nlm` for optimizing a function in `R`.
 ```
 
+<!--
 ```{exercise}
-(practical, $\star\star\star$) Implement the local linear estimator. The function must take a sample `X`, a sample `Y`, the points `x` at which the estimate should be obtained, the bandwidth `h` and the kernel `K`. Test its correct behavior by estimating an artificial dataset that follows a linear model.
+(practical, $\star\star\star$) Compare the exact \@ref(eq:cvloclik) and approximate \@ref(eq:approxcv) cross-validation functions for the local logistic regression. To that aim, plot several realizations both curves and their minima, for samples simulated from $X\sim\mathcal{U}(-1,1)$ and $Y|X=x\sim\mathrm{Ber}(\mathrm{logistic}(1 + x))$. Use $\theta(X_i)\approx\hat\theta(X_i)$. Use sample sizes $n=50, 100, 500$. Comment on the results.
 ```
-
-```{exercise}
-(practical, $\star\star\star$) local lik
-```
+-->

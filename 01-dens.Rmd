@@ -1173,11 +1173,11 @@ where $g$ is the density of $t(X)$. Usig these results, prove that
 
 ```{exercise}
 (practical, $\star\star$, Exercise 6.5 in @Wasserman2006)
-Data on the salaries of the chief executive officer of 60 companies is available at <http://lib.stat.cmu.edu/DASL/Datafiles/ceodat.html>. Investigate the distribution of salaries using a kde. Use $\hat h_\mathrm{LSCV}$ to choose the amount of smoothing. Also consider $\hat h_\mathrm{RT}$. There appear to be a few bumps in the density. Are they real? Use confidence bands to address this question. Finally, comment on the resulting estimates.
+Data on the salaries of the chief executive officer of 60 companies is available at <http://lib.stat.cmu.edu/DASL/Datafiles/ceodat.html> (alternative [link](https://github.com/egarpor/nonpar-eafit/blob/master/datasets/ceodat.txt?raw=true)). Investigate the distribution of salaries using a kde. Use $\hat h_\mathrm{LSCV}$ to choose the amount of smoothing. Also consider $\hat h_\mathrm{RT}$. There appear to be a few bumps in the density. Are they real? Use confidence bands to address this question. Finally, comment on the resulting estimates.
 ```
 
 ```{exercise}
-(practical, $\star\star$) Implement the transformation kde \@ref(eq:tkde) for the three transformations given in Section \@ref(dens-prac). You can tweak the output of the `density` function in `R` and add an extra argument for selecting the kind of transformation. Or you can implement it directly from scratch.
+(practical, $\star\star$) Implement your own version of the transformation kde \@ref(eq:tkde) for the three transformations given in Section \@ref(dens-prac). You can tweak the output of the `density` function in `R` and add an extra argument for selecting the kind of transformation. Or you can implement it directly from scratch.
 ```
 
 ```{exercise}
