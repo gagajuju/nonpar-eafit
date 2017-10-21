@@ -23,6 +23,10 @@ apple-touch-icon-size: 120
 favicon: "favicon.ico"
 -->
 
+```{block2, type = 'rmdcaution'}
+The **animations** of these notes will not be displayed the first time they are browsed^[The reason is because they are hosted at `https` websites with auto-signed SSL certificates.]. See for example Figure \@ref(fig:mse). **To see them**, click on the caption's link *"Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/dist-mse/)"*. You will get a warning from your browser saying that *"Your connection is not private"*. Click in *"Advanced"* and **allow an exception** in your browser (I guarantee you I will not do anything evil!). The next time the animation will show up correctly within the notes.
+```
+
 This course is intended to provide an introduction to **nonparametric estimation** of the **density and regression functions** from, mostly, the perspective of kernel smoothing. The emphasis is placed in building intuition behind the methods, gaining insights into their asymptotic properties, and showing their application through the use of statistical software.
 
 ## Course objectives and logistics {#intro-course}
@@ -503,7 +507,7 @@ What does it happen when the data is generated from an $\mathrm{Exp}(\lambda)$? 
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/dist-mse/', height = '650px')
 ```
 
-## Credits {#intro-credits}
+## Main references and credits {#intro-credits}
 
 Several great reference books have been used for preparing these notes. The following list details the sections in which each of them has been consulted:
 
@@ -518,5 +522,7 @@ Several great reference books have been used for preparing these notes. The foll
 - @Wasserman2006 (Sections \@ref(intro-prob), \@ref(dens-ci), \@ref(reg-bwd)).
 
 In addition, these notes are possible due to the existence of the incredible pieces of software @R-bookdown, @R-knitr, @R-rmarkdown, and @R-base.
+
+The icons used in the notes were designed by [madebyoliver](http://www.flaticon.com/authors/madebyoliver), [freepik](http://www.flaticon.com/authors/freepik), and [roundicons](http://www.flaticon.com/authors/roundicons) from [Flaticon](http://www.flaticon.com/).
 
 All material in these notes is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
