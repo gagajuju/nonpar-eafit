@@ -520,7 +520,7 @@ Several great reference books have been used for preparing these notes. The foll
 - @Wasserman2004 (Sections \@ref(intro-stoch), \@ref(reg-param), \@ref(reg-loclik)).
 - @Wasserman2006 (Sections \@ref(intro-prob), \@ref(dens-ci), \@ref(reg-bwd)).
 
-In addition, these notes are possible due to the existence of the incredible pieces of software @R-bookdown, @R-knitr, @R-rmarkdown, and @R-base.
+In addition, these notes are possible due to the existence of these incredible pieces of software: @R-bookdown, @R-knitr, @R-rmarkdown, and @R-base.
 
 The icons used in the notes were designed by [madebyoliver](http://www.flaticon.com/authors/madebyoliver), [freepik](http://www.flaticon.com/authors/freepik), and [roundicons](http://www.flaticon.com/authors/roundicons) from [Flaticon](http://www.flaticon.com/).
 
