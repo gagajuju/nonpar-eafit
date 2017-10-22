@@ -47,7 +47,6 @@ The codes in the notes may assume that the packages have been loaded, so it is b
 library(ks)
 library(nor1mix)
 library(KernSmooth)
-library(manipulate)
 library(locfit)
 ```
 The **Shiny interactive apps** on the notes can be downloaded and run locally. This allows in particular to examine their codes. Check [this GitHub repository](https://github.com/egarpor/ShinyServer) for the sources.

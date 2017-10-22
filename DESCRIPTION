@@ -10,7 +10,6 @@ Depends:
     KernSmooth,
     nor1mix,
     sm,
-    rgl,
-    manipulate
+    rgl
 Imports: bookdown
 Remotes: rstudio/bookdown
