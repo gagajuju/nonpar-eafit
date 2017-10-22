@@ -1,5 +1,6 @@
 # A short course on nonparametric curve estimation
 
+[![Travis-CI Build Status](https://travis-ci.org/egarpor/SSS2-UC3M.svg?branch=master)](https://travis-ci.org/egarpor/nonpar-eafit) 
 [![License](https://img.shields.io/badge/license-CC_BY--NC--SA_4.0-blue.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 ![KDE animation](https://github.com/egarpor/nonpar-eafit/blob/master/images/images/kde.gif)
@@ -10,7 +11,7 @@ A module within the subject *Robust and nonparametric statistical techniques* fo
 
 ## Syllabus
 
-The notes are available at <https://bookdown.org/egarpor/nonpar-eafit>. 
+The notes are available at <https://bookdown.org/egarpor/nonpar-eafit>.
 
 Here is a broad view of the syllabus:
 
