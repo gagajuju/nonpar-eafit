@@ -69,19 +69,19 @@ The *cumulative distribution function* (cdf) of a random variable $X$ is $F(x):=
 \begin{align}
 F_n(x)=\frac{1}{n}\sum_{i=1}^n\mathbb{1}_{\{X_i\leq x\}}, (\#eq:ecdf)
 \end{align}
-where $1_A:=\begin{cases}1,&A\text{ is true},\\0,&A\text{ is false}\end{cases}$ is an *indicator function*. Continuous random variables are either characterized by the cdf $F$ or the *probability distribution function* (pdf) $f=F'$, which represents the *infinitesimal relative probability* of $X$ per unit of length. We write $X\sim F$ (or $X\sim f$) to denote that $X$ has a a cdf $F$ (or a pdf $f$). If two random variables $X$ and $Y$ have the same distribution, we write $X\stackrel{d}{=}Y$.
+where $1_A:=\begin{cases}1,&A\text{ is true},\\0,&A\text{ is false}\end{cases}$ is an *indicator function*. Continuous random variables are either characterized by the cdf $F$ or the *probability density function* (pdf) $f=F'$, which represents the *infinitesimal relative probability* of $X$ per unit of length. We write $X\sim F$ (or $X\sim f$) to denote that $X$ has a cdf $F$ (or a pdf $f$). If two random variables $X$ and $Y$ have the same distribution, we write $X\stackrel{d}{=}Y$.
 
 The *expectation* operator is constructed using the Lebesgue-Stieljes "$\mathrm{d}F(x)$" integral. Hence, for $X\sim F$, the expectation of $g(X)$ is
 \begin{align*}
 \mathbb{E}[g(X)]:=&\,\int g(x)\mathrm{d}F(x)\\
 =&\,
 \begin{cases}
-\int g(x)f(x)\mathrm{d}x,&X\text{ continuous,}\\\sum_{i} g(x_i)\mathbb{P}[X=x_i],&X\text{ discrete.}
+\int g(x)f(x)\mathrm{d}x,&X\text{ continuous,}\\\sum_{\{i:\mathbb{P}[X=x_i]>0\}} g(x_i)\mathbb{P}[X=x_i],&X\text{ discrete.}
 \end{cases}
 \end{align*}
 Unless otherwise stated, the integration limits of any integral are $\mathbb{R}$ or $\mathbb{R}^p$. The variance operator is defined as $\mathbb{V}\mathrm{ar}[X]:=\mathbb{E}[(X-\mathbb{E}[X])^2]$.
 
-We employ bold faces to denote vectors (assumed to be column matrices) and matrices. A $p$-*random vector* is a map $\mathbf{X}:\Omega\longrightarrow\mathbb{R}^p$, $\mathbf{X}(\omega):=(X_1(\omega),\ldots,X_p(\omega))$, such that each $X_i$ is a random variable. The (joint) cdf of $\mathbf{X}$ is $F(\mathbf{x}):=\mathbb{P}[\mathbf{X}\leq \mathbf{x}]:=\mathbb{P}[X_1\leq x_1,\ldots,X_p\leq x_p]$ and, if $\mathbf{X}$ is continuous, its (joint) pdf is $f:=\frac{\partial^p}{\partial x_1\cdots\partial x_p}F$. The *marginals* of $F$ and $f$ are the cdf and pdf of $X_i$, $i=1,\ldots,p$, respectively. They are defined as:
+We employ boldfaces to denote vectors (assumed to be column matrices) and matrices. A $p$-*random vector* is a map $\mathbf{X}:\Omega\longrightarrow\mathbb{R}^p$, $\mathbf{X}(\omega):=(X_1(\omega),\ldots,X_p(\omega))$, such that each $X_i$ is a random variable. The (joint) cdf of $\mathbf{X}$ is $F(\mathbf{x}):=\mathbb{P}[\mathbf{X}\leq \mathbf{x}]:=\mathbb{P}[X_1\leq x_1,\ldots,X_p\leq x_p]$ and, if $\mathbf{X}$ is continuous, its (joint) pdf is $f:=\frac{\partial^p}{\partial x_1\cdots\partial x_p}F$. The *marginals* of $F$ and $f$ are the cdf and pdf of $X_i$, $i=1,\ldots,p$, respectively. They are defined as:
 \begin{align*}
 F_{X_i}(x_i)&:=\mathbb{P}[X_i\leq x]=\int_{\mathbb{R}^{p-1}} F(\mathbf{x})\mathrm{d}\mathbf{x}_{-i},\\
 f_{X_i}(x_i)&:=\frac{\partial}{\partial x_i}F_{X_i}(x_i)=\int_{\mathbb{R}^{p-1}} f(\mathbf{x})\mathrm{d}\mathbf{x}_{-i},
