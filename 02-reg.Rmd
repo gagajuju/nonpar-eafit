@@ -98,7 +98,7 @@ Luckily, thanks to the matrix form of \@ref(eq:rss), it is simple to compute a c
 \end{align}
 
 ```{exercise, label = "ls"}
-$\hat{\boldsymbol{\beta}}$ can be obtained differentiating \@ref(eq:rss). Prove it using that $\frac{\partial \mathbf{A}\mathbf{x}}{\partial \mathbf{x}}=\mathbf{A}$ and $\frac{\partial f(\mathbf{x})'g(\mathbf{x})}{\partial \mathbf{x}}=f(\mathbf{x})'\frac{\partial g(\mathbf{x})}{\partial \mathbf{x}}+g(\mathbf{x})'\frac{\partial}{\partial f(\mathbf{x})}$ for two vector-valued functions $f$ and $g$.
+$\hat{\boldsymbol{\beta}}$ can be obtained differentiating \@ref(eq:rss). Prove it using that $\frac{\partial \mathbf{A}\mathbf{x}}{\partial \mathbf{x}}=\mathbf{A}$ and $\frac{\partial f(\mathbf{x})'g(\mathbf{x})}{\partial \mathbf{x}}=f(\mathbf{x})'\frac{\partial g(\mathbf{x})}{\partial \mathbf{x}}+g(\mathbf{x})'\frac{\partial f(\mathbf{x})}{\partial \mathbf{x}}$ for two vector-valued functions $f$ and $g$.
 ```
 
 (ref:leastsquares2title) The least squares regression plane $y=\hat\beta_0+\hat\beta_1x_1+\hat\beta_2x_2$ and its dependence on the kind of squared distance considered. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/least-squares-3D/).
