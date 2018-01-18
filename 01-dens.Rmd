@@ -1202,7 +1202,7 @@ Describe the results for the "Claw" and "Bimodal" densities in `nor1mix`, for sa
 ```{exercise, label = "multkde"}
 (practical, $\star\star\star$) The kde can be extended to a multivariate setting by  using *product kernels*. For a sample $\mathbf{X}_1,\ldots,\mathbf{X}_n$ in $\mathbb{R}^p$, the multivariate kde employing product kernels is
 \begin{align*}
-\hat f(\mathbf{x};\mathbf{h})=\frac{1}{n}\sum_{i=1}^nK_{h_1}(x_1-X_{i,1})\stackrel{p}{\times}\cdots\times K_{h_p}(x_p-X_{i,p}),
+\hat f(\mathbf{x};\mathbf{h})=\frac{1}{n}\sum_{i=1}^nK_{h_1}(x_1-X_{i,1})\cdots\stackrel{p}{\times}\cdots\times K_{h_p}(x_p-X_{i,p}),
 \end{align*}
 where $\mathbf{x}=(x_{1},\ldots,x_{p})$, $\mathbf{X}_i=(X_{i,1},\ldots,X_{i,p})$, and $\mathbf{h}=(h_1,\ldots,h_p)$ is a vector of bandwidths.
 
