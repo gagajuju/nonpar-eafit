@@ -160,7 +160,7 @@ with $K(z)=\frac{1}{2}1_{\{-1<z<1\}}$. Interestingly, $K$ is a uniform *density*
 \begin{align*}
 \mathbb{P}[x-h<X<x+h]=\mathbb{P}\left[-1<\frac{x-X}{h}<1\right]
 \end{align*}
-by \@ref(eq:movhist2), we give equal weight to all the points $X_1,\ldots,X_n$. The generalization of \@ref(eq:movhist2) is now obvious: replace $K$ by an arbitrary density. Then $K$ is known as a *kernel*, a density that is typically symmetric and unimodal at $0$. This generalization provides the definition of **kernel density estimator** (kde)^[Also known as the *Parzen-Rosemblatt estimator* to hounour the proposals by @Parzen1962 and @Rosenblatt1956.]:
+by \@ref(eq:movhist2), we give equal weight to all the points $X_1,\ldots,X_n$. The generalization of \@ref(eq:movhist2) is now obvious: replace $K$ by an arbitrary density. Then $K$ is known as a *kernel*, a density that is typically symmetric and unimodal at $0$. This generalization provides the definition of **kernel density estimator** (kde)^[Also known as the *Parzen-Rosemblatt estimator* to honor the proposals by @Parzen1962 and @Rosenblatt1956.]:
 \begin{align}
 \hat f(x;h):=\frac{1}{nh}\sum_{i=1}^nK\left(\frac{x-X_i}{h}\right). (\#eq:kde)
 \end{align}
@@ -187,7 +187,7 @@ samp <- rnorm(n = 100, mean = 0, sd = 1)
 # Automatically chooses bandwidth and uses normal kernel
 plot(density(x = samp))
 
-# Select a particular bandwidth (0.5) and kernel (Epanechnivok)
+# Select a particular bandwidth (0.5) and kernel (Epanechnikov)
 lines(density(x = samp, bw = 0.5, kernel = "epanechnikov"), col = 2)
 
 # density automatically chooses the interval for plotting the kde
