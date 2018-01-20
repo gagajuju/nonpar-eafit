@@ -12,7 +12,7 @@ Finally, recall that $Y$ can expressed in terms of $m$ by means of the *location
 $$
 Y=m(X)+\sigma(X)\varepsilon,
 $$
-where $\sigma^2(x):=\mathbb{V}\mathrm{ar}[Y\vert X=x]$ and $\varepsilon$ is independent from $X$ and such that $\mathbb{E}[\varepsilon]=0$ and $\mathbb{V}\mathrm{ar}[\varepsilon]=0$.
+where $\sigma^2(x):=\mathbb{V}\mathrm{ar}[Y\vert X=x]$ and $\varepsilon$ is independent from $X$ and such that $\mathbb{E}[\varepsilon]=0$ and $\mathbb{V}\mathrm{ar}[\varepsilon]=1$.
 
 ## Review on parametric regression {#reg-param}
 
@@ -671,7 +671,7 @@ The optimization of the above criterion might seem to be computationally expensi
 ```{proposition, label = "cv"}
 The weights of the leave-one-out estimator $\hat m_{-i}(x;p,h)=\sum_{\substack{j=1\\j\neq i}}^nW_{-i,j}^p(x)Y_j$ can be obtained from $\hat m(x;p,h)=\sum_{i=1}^nW_{i}^p(x)Y_i$:
 \begin{align*}
-W_{-i,j}^p(x)=\frac{W^p_j(x)}{\sum_{\substack{k=1\\k\neq j}}^nW_k^p(x)}.
+W_{-i,j}^p(x)=\frac{W^p_j(x)}{\sum_{\substack{k=1\\k\neq i}}^nW_k^p(x)}=\frac{W^p_j(x)}{1-W_i^p(x)}.
 \end{align*}
 This implies that
 \begin{align*}
@@ -759,14 +759,22 @@ or, equivalently,
 \end{align*}
 together with a distribution assumption for $Y|(X_1,\ldots,X_p)$. The following table lists some useful transformations and distributions that are adequate to model responses in different supports. Recall that the linear and logistic models of Sections \@ref(reg-lin) and \@ref(reg-log) are obtained from the first and second rows, respectively.
 
-| Support of $Y$ | Distribution | Link $g(x)$ | $g^{-1}(y)$ | $Y\vert(X_1=x_1,\ldots,X_p=x_p)$ |
+| Support of $Y$ | Distribution | Link $g(\mu)$ | $g^{-1}(\eta)$ | $Y\vert(X_1=x_1,\ldots,X_p=x_p)$ |
 |:--------------:|:------------:|:-----------:|:-----------:|:-----------------------------:|
-| $\mathbb{R}$ | $\mathcal{N}(\mu,\sigma^2)$ | $x$ | $y$ | $\mathcal{N}(\beta_0+\beta_1x_1+\ldots+\beta_px_p,\sigma^2)$|
-| $(0,\infty)$ | $\mathrm{Exp}(\lambda)$ | $x^{-1}$ | $y^{-1}$ | $\mathrm{Exp}(\beta_0+\beta_1x_1+\ldots+\beta_px_p)$ |
-| $0,1,\ldots,n$ | $\mathrm{B}(n,p)$ | $\log\left(\frac{x}{n-x}\right)$ | $\frac{n}{1-e^{-y}}$ | $\mathrm{B}\left(n,\frac{n}{1-e^{-(\beta_0+\beta_1x_1+\ldots+\beta_px_p)}}\right)$ |
-| $0,1,2,\ldots$ | $\mathrm{Pois}(\lambda)$ | $\log(x)$ | $e^y$ | $\mathrm{Pois}(e^{\beta_0+\beta_1x_1+\ldots+\beta_px_p})$ |
+| $\mathbb{R}$ | $\mathcal{N}(\mu,\sigma^2)$ | $\mu$ | $\eta$ | $\mathcal{N}(\beta_0+\beta_1x_1+\ldots+\beta_px_p,\sigma^2)$|
+| $(0,\infty)$ | $\mathrm{Exp}(\lambda)$ | $\mu^{-1}$ | $\eta^{-1}$ | $\mathrm{Exp}(\beta_0+\beta_1x_1+\ldots+\beta_px_p)$ |
+| $0,1$ | $\mathrm{B}(1,p)$ | $\mathrm{logit}(\mu)$ | $\mathrm{logistic}(\eta)$ | $\mathrm{B}\left(1,\mathrm{logistic}(\beta_0+\beta_1x_1+\ldots+\beta_px_p)\right)$ |
+| $0,1,2,\ldots$ | $\mathrm{Pois}(\lambda)$ | $\log(\mu)$ | $e^\eta$ | $\mathrm{Pois}(e^{\beta_0+\beta_1x_1+\ldots+\beta_px_p})$ |
 
-The parameter $\theta(x_1,\ldots,x_p)$ of the conditional distribution in the last column can be retrieved with $\theta(x_1,\ldots,x_p)=g(\mathbb{E}[Y|X_1=x_1,\ldots,X_p=x_p])$. Recall that, again, if there is only one predictor, identifying the $j$-th predictor $X_j$ by $X^j$ in the above expressions allows to consider $p$-th order polynomial fits for $g\left(\mathbb{E}[Y|X_1=x_1,\ldots,X_p=x_p]\right)$.
+All the distributions of the table above are members of the exponential family of distributions, which is the family of distributions with pdf expressable as
+\[
+f(y;\theta,\phi)=\exp\left\{\frac{y\theta-b(\theta)}{a(\phi)}+c(y,\phi)\right\},(\#eq:expd)
+\]
+where $a(\cdot)$, $b(\cdot)$, and $c(\cdot,\cdot)$ are specific functions, $\phi$ is the *scale parameter* and $\theta$ is the *canonial parameter*. If the *canonical link function* $g$ (the ones in the table above are all) is employed, then $\theta=g(\mu)$ and s a consequence
+\[
+\theta(x_1,\ldots,x_p):=g(\mathbb{E}[Y|X_1=x_1,\ldots,X_p=x_p]).
+\]
+Recall that, again, if there is only one predictor, identifying the $j$-th predictor $X_j$ by $X^j$ in the above expressions allows to consider $p$-th order polynomial fits for $g\left(\mathbb{E}[Y|X_1=x_1,\ldots,X_p=x_p]\right)$.
 
 (ref:locliktitle) Construction of the local likelihood estimator. The animation shows how local likelihood fits in a neighborhood of $x$ are combined to provide an estimate of the regression function for binary response, which depends on the polynomial degree, bandwidth, and kernel (gray density at the bottom). The data points are shaded according to their weights for the local fit at $x$. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/loclik/).
 
@@ -804,8 +812,7 @@ The local likelihood estimate of $\theta(x)$ is
 \]
 Note that the dependence of $\hat\beta_0$ on $x$ and $h$ is omitted. From $\hat\theta(x)$, we can obtain the *local logistic regression* evaluated at $x$ as
 \begin{align}
-\hat m_{\ell}(x;h,p):=&\,g^{-1}\left(\hat\theta(x)\right)\\
-=&\,\mathrm{logistic}(\hat\beta_0).(\#eq:glmloc)
+\hat m_{\ell}(x;h,p):=g^{-1}\left(\hat\theta(x)\right)=\mathrm{logistic}(\hat\beta_0).(\#eq:glmloc)
 \end{align}
 
 The code below shows three different ways of implementing the local logistic regression (of first degree) in `R`.
@@ -858,7 +865,7 @@ legend("topright", legend = c("p(x)", "glm", "nlm", "locfit"), lwd = 2,
        col = c(1, 2, 2, 4), lty = c(1, 2, 1, 1))
 ```
 
-Bandwidth selection can be done by means of *likelihood cross-validation*. The objective is to maximize the local likelihood fit at $(Y_i,X_i)$ but removing the influence by the datum itself. That is, maximizing
+Bandwidth selection can be done by means of *likelihood cross-validation*. The objective is to maximize the local likelihood fit at $(X_i,Y_i)$ but removing the influence by the datum itself. That is, maximizing
 \begin{align}
 \mathrm{LCV}(h)=\sum_{i=1}^n\ell(Y_i,\hat\theta_{-i}(X_i)),(\#eq:cvloclik)
 \end{align}
