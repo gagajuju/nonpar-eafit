@@ -1,6 +1,6 @@
 Package: nonpareafit
 Title: nonpar-eafit
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: person("Eduardo", "García-Portugués", role = c("aut", "cre"), email = "edgarcia@est-econ.uc3m.es")
 Description: A short course on nonparametric curve estimation
 Depends:
@@ -9,7 +9,6 @@ Depends:
     ks,
     KernSmooth,
     nor1mix,
-    sm,
     rgl,
     locfit
 Imports: bookdown

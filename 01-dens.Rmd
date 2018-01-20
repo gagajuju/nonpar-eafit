@@ -168,7 +168,7 @@ A common notation is $K_h(z):=\frac{1}{h}K\left(\frac{z}{h}\right)$, so $\hat f(
 
 Several types of kernels are possible. The most popular is the *normal kernel* $K(z)=\phi(z)$, although the *Epanechnikov kernel*, $K(z)=\frac{3}{4}(1-z^2)1_{\{|z|<1\}}$, is the most efficient. The *rectangular kernel* $K(z)=\frac{1}{2}1_{\{|z|<1\}}$ yields the moving histogram as a particular case. The kde inherits the smoothness properties of the kernel. That means, for example, \@ref(eq:kde) with a normal kernel is infinitely differentiable. But with an Epanechnikov kernel, \@ref(eq:kde) is not differentiable, and with a rectangular kernel is not even continuous. However, if a certain smoothness is guaranteed (continuity at least), the *choice of the kernel has little importance in practice* (at least compared with the choice of $h$). Figure \@ref(fig:kdeconst) illustrates the construction of the kde, and the bandwidth and kernel effects.
 
-It is useful to recall the kde with the normal kernel. If that is the case, then $K_h(x-X_i)=\phi_h(x-X_i)$ and the kernel is a the density of a $\mathcal{N}(X_i,h^2)$. Thus the bandwidth $h$ can be thought as the standard deviation of the normal densities that have mean zero.
+It is useful to recall the kde with the normal kernel. If that is the case, then $K_h(x-X_i)=\phi_h(x-X_i)$ and the kernel is the density of a $\mathcal{N}(X_i,h^2)$. Thus the bandwidth $h$ can be thought as the standard deviation of the normal densities that have mean zero.
 
 (ref:kdeconsttitle) Construction of the kernel density estimator. The animation shows how the bandwidth and kernel affect the density estimate, and how the kernels are rescaled densities with modes at the data points. Application also available [here](https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/).
 
@@ -176,7 +176,7 @@ It is useful to recall the kde with the normal kernel. If that is the case, then
 knitr::include_app('https://ec2-35-177-34-200.eu-west-2.compute.amazonaws.com/kde/', height = '1000px')
 ```
 
-Implementation of kde in `R` is built-in through the `density` function. The function automatically chooses the bandwidth $h$ using a *bandwidth selector* which will be studied in detail in Section \@ref(dens-bwd).
+Implementation of the kde in `R` is built-in through the `density` function. The function automatically chooses the bandwidth $h$ using a *bandwidth selector* which will be studied in detail in Section \@ref(dens-bwd).
 
 ```{r, echo = TRUE, eval = TRUE, collapse = TRUE, cache = TRUE}
 # Sample 100 points from a N(0, 1)
@@ -1200,7 +1200,7 @@ Describe the results for the "Claw" and "Bimodal" densities in `nor1mix`, for sa
 ```
 
 ```{exercise, label = "multkde"}
-(practical, $\star\star\star$) The kde can be extended to a multivariate setting by  using *product kernels*. For a sample $\mathbf{X}_1,\ldots,\mathbf{X}_n$ in $\mathbb{R}^p$, the multivariate kde employing product kernels is
+(practical, $\star\star\star$) The kde can be extended to the multivariate setting by using *product kernels*. For a sample $\mathbf{X}_1,\ldots,\mathbf{X}_n$ in $\mathbb{R}^p$, the multivariate kde employing product kernels is
 \begin{align*}
 \hat f(\mathbf{x};\mathbf{h})=\frac{1}{n}\sum_{i=1}^nK_{h_1}(x_1-X_{i,1})\times\stackrel{p}{\cdots}\times K_{h_p}(x_p-X_{i,p}),
 \end{align*}
