@@ -1,7 +1,7 @@
 ---
 title: "A short course on nonparametric curve estimation"
 subtitle: "MSc in Applied Mathematics at EAFIT University (Colombia)"
-author: "Eduardo García Portugués"
+author: "Eduardo García-Portugués"
 date: "`r Sys.Date()`, v1.8"
 knit: "bookdown::render_book"
 documentclass: book
